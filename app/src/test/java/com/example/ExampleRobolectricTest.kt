@@ -46,6 +46,10 @@ class ExampleRobolectricTest {
     assertTrue(html.contains("id=\"su-email\""))
     assertTrue(html.contains("id=\"su-pw\""))
     assertTrue(html.contains("id=\"su-go\""))
+    assertTrue(html.contains("id=\"su-show-pw\""))
+    assertTrue(html.contains("id=\"a-show-pw\""))
+    assertTrue(html.contains("id=\"pw-show\""))
+    assertTrue(html.contains("id=\"su-match\""))
     assertTrue(html.contains("email_signup"))
   }
 

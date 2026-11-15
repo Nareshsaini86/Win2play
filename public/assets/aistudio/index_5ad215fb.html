@@ -78,6 +78,9 @@ select option{background:var(--panel-solid);color:var(--ink)}
 input::placeholder{color:var(--mute)}
 label{display:block}
 .err{color:var(--red);font-size:.86rem;min-height:1.2em}
+.pw-toggle{display:flex;align-items:center;gap:10px;min-height:44px;margin:4px 0 8px;font-size:.86rem;font-weight:600;color:var(--ink);cursor:pointer;user-select:none}
+.pw-toggle input[type="checkbox"]{width:18px;height:18px;min-width:18px;margin:0;padding:0;border-radius:5px;accent-color:var(--gold);cursor:pointer}
+.pw-match{font-size:.8rem;font-weight:700;min-height:1.1em;margin:2px 0 4px}
 .hide{display:none!important}
 #v-auth{margin-top:8vh;padding:22px}
 #v-auth h2{margin-top:0;font-size:1.25rem}
@@ -434,6 +437,7 @@ img{ -webkit-user-drag:none; user-drag:none; }
     <div id="auth-login-pane">
       <label>Email ID / User ID<input id="a-id" autocomplete="username" placeholder="Email ID ya User ID daalein"></label>
       <label>Password<input id="a-pw" type="password" autocomplete="current-password" placeholder="Password daalein"></label>
+      <label class="pw-toggle"><input id="a-show-pw" type="checkbox"><span>Show password</span></label>
       <div class="err" id="a-err"></div>
       <button class="place" id="a-go" style="margin-top:4px">Log in</button>
     </div>
@@ -442,6 +446,8 @@ img{ -webkit-user-drag:none; user-drag:none; }
       <label>Email ID<input id="su-email" type="email" autocomplete="email" placeholder="example@gmail.com"></label>
       <label>Set Password<input id="su-pw" type="password" autocomplete="new-password" placeholder="Kam se kam 6 characters"></label>
       <label>Confirm Password<input id="su-pw2" type="password" autocomplete="new-password" placeholder="Password dobara daalein"></label>
+      <div class="pw-match" id="su-match"></div>
+      <label class="pw-toggle"><input id="su-show-pw" type="checkbox"><span>Show password (check karein dono same hain)</span></label>
       <div class="err" id="su-err"></div>
       <button class="place" id="su-go" style="margin-top:4px">Create Account</button>
       <div class="note" style="margin-top:8px">Naye account par apni Email ID aur Password khud set karein.</div>
@@ -718,6 +724,8 @@ img{ -webkit-user-drag:none; user-drag:none; }
       <input id="pw-old" type="password" placeholder="Current password" autocomplete="current-password">
       <input id="pw-new" type="password" placeholder="New password (min 6 characters)" autocomplete="new-password">
       <input id="pw-new2" type="password" placeholder="Confirm new password" autocomplete="new-password">
+      <div class="pw-match" id="pw-match"></div>
+      <label class="pw-toggle"><input id="pw-show" type="checkbox"><span>Show password</span></label>
       <div class="err" id="pw-err" role="alert"></div>
       <button class="place" id="pw-go" style="margin-top:4px">Change password</button>
     </section>
@@ -994,6 +1002,36 @@ img{ -webkit-user-drag:none; user-drag:none; }
   }
 
   // ---- auth ----
+  function bindPasswordToggle(checkboxId,inputIds){
+    var cb=$(checkboxId);if(!cb)return;
+    cb.onchange=function(){
+      var t=cb.checked?'text':'password';
+      inputIds.forEach(function(id){var el=$(id);if(el)el.type=t;});
+    };
+  }
+  function resetPasswordToggle(checkboxId,inputIds){
+    var cb=$(checkboxId);if(cb)cb.checked=false;
+    inputIds.forEach(function(id){var el=$(id);if(el)el.type='password';});
+  }
+  function bindPasswordMatch(pw1Id,pw2Id,msgId){
+    var p1=$(pw1Id),p2=$(pw2Id),out=$(msgId);
+    if(!p1||!p2||!out)return function(){};
+    var update=function(){
+      var a=p1.value,b=p2.value;
+      if(!b){out.textContent='';return;}
+      if(a===b){out.style.color='var(--green)';out.textContent='✓ Dono password same hain';}
+      else{out.style.color='var(--red)';out.textContent='✕ Dono password match nahi kar rahe';}
+    };
+    p1.addEventListener('input',update);
+    p2.addEventListener('input',update);
+    return update;
+  }
+  bindPasswordToggle('a-show-pw',['a-pw']);
+  bindPasswordToggle('su-show-pw',['su-pw','su-pw2']);
+  bindPasswordToggle('pw-show',['pw-old','pw-new','pw-new2']);
+  var refreshSignupMatch=bindPasswordMatch('su-pw','su-pw2','su-match');
+  var refreshChangePwMatch=bindPasswordMatch('pw-new','pw-new2','pw-match');
+
   var authMode='login';
   function setAuthMode(mode){
     authMode=mode==='signup'?'signup':'login';
@@ -1068,6 +1106,7 @@ img{ -webkit-user-drag:none; user-drag:none; }
       });
     p.then(function(r){
       $('a-pw').value='';
+      resetPasswordToggle('a-show-pw',['a-pw']);
       applySessionLogin(r);
     }).catch(function(x){
       e.textContent=x.message||'Login failed.';
@@ -1091,6 +1130,8 @@ img{ -webkit-user-drag:none; user-drag:none; }
     api('email_signup',{p_email:email,p_password:pw,p_name:name})
       .then(function(r){
         $('su-pw').value='';$('su-pw2').value='';
+        resetPasswordToggle('su-show-pw',['su-pw','su-pw2']);
+        refreshSignupMatch();
         toast('Account ban gaya! +20 Welcome Coins mile.');
         applySessionLogin(r);
       })
@@ -1113,11 +1154,15 @@ img{ -webkit-user-drag:none; user-drag:none; }
           if(res.data&&res.data.session){
             return exchangeSupabaseJwtForWallet(res.data.session).then(function(r){
               $('su-pw').value='';$('su-pw2').value='';
+              resetPasswordToggle('su-show-pw',['su-pw','su-pw2']);
+              refreshSignupMatch();
               toast('Account ban gaya!');
               applySessionLogin(r);
             });
           }
           $('su-pw').value='';$('su-pw2').value='';
+          resetPasswordToggle('su-show-pw',['su-pw','su-pw2']);
+          refreshSignupMatch();
           e.style.color='var(--green)';
           e.textContent='Account ban gaya! '+email+' par bheje gaye verification link par click karein, phir Log in karein.';
           if($('a-id'))$('a-id').value=email;
@@ -1926,10 +1971,15 @@ img{ -webkit-user-drag:none; user-drag:none; }
   $('m-pw').onclick=function(){location.hash='#/pw'};
   document.querySelectorAll('[data-back]').forEach(function(b){b.onclick=function(){location.hash='#/settings'}});
   $('pw-go').onclick=function(){
-    var e=$('pw-err'),n=$('pw-new').value;e.style.color='var(--red)';e.textContent='';
+    var e=$('pw-err'),oldPw=$('pw-old').value,n=$('pw-new').value;e.style.color='var(--red)';e.textContent='';
     if(n!==$('pw-new2').value){e.textContent='New passwords do not match.';return}
-    api('change_password',{p_token:S.token,p_old:$('pw-old').value,p_new:n}).then(function(){
-      ['pw-old','pw-new','pw-new2'].forEach(function(i){$(i).value=''});e.style.color='var(--green)';e.textContent='Password changed successfully.';
+    api('change_password',{p_token:S.token,p_old:oldPw,p_new:n}).catch(function(err){
+      return api('email_change_password',{p_token:S.token,p_old:oldPw,p_new:n}).catch(function(){throw err});
+    }).then(function(){
+      ['pw-old','pw-new','pw-new2'].forEach(function(i){$(i).value=''});
+      resetPasswordToggle('pw-show',['pw-old','pw-new','pw-new2']);
+      refreshChangePwMatch();
+      e.style.color='var(--green)';e.textContent='Password changed successfully.';
     }).catch(function(x){e.textContent=x.message});
   };
   $('s-logout').onclick=function(){logout()};

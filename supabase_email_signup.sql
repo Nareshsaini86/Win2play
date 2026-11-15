@@ -1,7 +1,7 @@
--- Play2Win Self-Service Email + Password Sign Up & Login (Supabase SQL Migration)
+-- Play2Win Self-Service Email + Password Sign Up, Login & Password Change (Supabase SQL Migration)
 -- Run this script once in your Supabase Dashboard -> SQL Editor.
--- Allows new users to register with their own Email ID and Password (with 20 starting coins)
--- and log in directly inside the app without needing external Google OAuth.
+-- Fixes: null value in column "pw" of relation "app_users" violates not-null constraint
+-- and supports any NOT NULL columns in app_users / sessions automatically.
 
 create extension if not exists pgcrypto;
 
@@ -36,7 +36,7 @@ begin
   group by t.table_schema, t.table_name
   having bool_or(c.column_name = 'id')
      and bool_or(c.column_name in ('balance','coins','credits'))
-  order by (t.table_schema = 'public') desc, (t.table_name = 'users') desc, t.table_name
+  order by (t.table_schema = 'public') desc, (t.table_name in ('app_users','users')) desc, t.table_name
   limit 1;
 
   select format('%I.%I', t.table_schema, t.table_name)
@@ -49,7 +49,7 @@ begin
   group by t.table_schema, t.table_name
   having bool_or(c.column_name = 'token')
      and bool_or(c.column_name = 'user_id')
-  order by (t.table_schema = 'public') desc, (t.table_name = 'sessions') desc, t.table_name
+  order by (t.table_schema = 'public') desc, (t.table_name in ('app_sessions','sessions')) desc, t.table_name
   limit 1;
 
   if v_users_tbl is null or v_sessions_tbl is null then
@@ -57,6 +57,44 @@ begin
   end if;
 
   return query select v_users_tbl, coalesce(v_bal_col, 'balance'), v_sessions_tbl;
+end;
+$$;
+
+-- Trigger helper so OAuth / Google logins that omit pw never fail app_users.pw NOT NULL
+create or replace function public._p2w_fill_missing_pw_before_insert()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+begin
+  if new.pw is null then
+    new.pw := crypt(encode(gen_random_bytes(24), 'hex'), gen_salt('bf'));
+  end if;
+  return new;
+end;
+$$;
+
+do $$
+declare
+  v_schema record;
+  v_users_schema text;
+  v_users_name text;
+begin
+  select * into v_schema from public._p2w_detect_auth_schema();
+  v_users_schema := replace(split_part(v_schema.users_table, '.', 1), '"', '');
+  v_users_name := replace(split_part(v_schema.users_table, '.', 2), '"', '');
+
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = v_users_schema and table_name = v_users_name and column_name = 'pw'
+  ) then
+    execute format('drop trigger if exists trg_p2w_fill_missing_pw on %s', v_schema.users_table);
+    execute format(
+      'create trigger trg_p2w_fill_missing_pw before insert on %s for each row execute function public._p2w_fill_missing_pw_before_insert()',
+      v_schema.users_table
+    );
+  end if;
 end;
 $$;
 
@@ -84,6 +122,7 @@ declare
   v_existing_id text;
   v_cols text[] := array[]::text[];
   v_vals text[] := array[]::text[];
+  v_col_rec record;
   v_token text;
   v_sess_cols text := 'token, user_id';
   v_sess_vals text := '$1, $2';
@@ -131,62 +170,75 @@ begin
 
   if v_id_type = 'uuid' then
     v_user_id := gen_random_uuid()::text;
-    v_cols := array_append(v_cols, 'id');
-    v_vals := array_append(v_vals, quote_literal(v_user_id) || '::uuid');
   else
     v_user_id := v_email;
-    if exists (select 1 from information_schema.columns where table_schema = v_users_schema and table_name = v_users_name and column_name = 'id') then
-      execute format('select id::text from %s where lower(id::text) = $1 limit 1', v_schema.users_table)
-        into v_existing_id using v_user_id;
-      if v_existing_id is not null then
-        raise exception 'Is Email ID se account pehle se bana hai. Kripya Log in karein.';
+    execute format('select id::text from %s where lower(id::text) = $1 limit 1', v_schema.users_table)
+      into v_existing_id using v_user_id;
+    if v_existing_id is not null then
+      raise exception 'Is Email ID se account pehle se bana hai. Kripya Log in karein.';
+    end if;
+  end if;
+
+  -- Dynamically populate every known column plus any remaining NOT NULL columns without defaults
+  for v_col_rec in
+    select column_name, data_type, is_nullable, column_default, is_identity, is_generated
+    from information_schema.columns
+    where table_schema = v_users_schema and table_name = v_users_name
+    order by ordinal_position
+  loop
+    if v_col_rec.is_identity = 'YES' or v_col_rec.is_generated = 'ALWAYS' then
+      continue;
+    end if;
+
+    if v_col_rec.column_name = 'id' then
+      v_cols := array_append(v_cols, 'id');
+      if v_id_type = 'uuid' then
+        v_vals := array_append(v_vals, quote_literal(v_user_id) || '::uuid');
+      else
+        v_vals := array_append(v_vals, quote_literal(v_user_id));
+      end if;
+    elsif v_col_rec.column_name = 'role' then
+      v_cols := array_append(v_cols, 'role');
+      v_vals := array_append(v_vals, quote_literal('user'));
+    elsif v_col_rec.column_name = v_schema.balance_col then
+      v_cols := array_append(v_cols, format('%I', v_schema.balance_col));
+      v_vals := array_append(v_vals, '20');
+    elsif v_col_rec.column_name = 'email' then
+      v_cols := array_append(v_cols, 'email');
+      v_vals := array_append(v_vals, quote_literal(v_email));
+    elsif v_col_rec.column_name in ('display_name', 'name', 'full_name') then
+      v_cols := array_append(v_cols, format('%I', v_col_rec.column_name));
+      v_vals := array_append(v_vals, quote_literal(v_name));
+    elsif v_col_rec.column_name in ('pw', 'password_hash', 'pw_hash', 'password') then
+      v_cols := array_append(v_cols, format('%I', v_col_rec.column_name));
+      v_vals := array_append(v_vals, quote_literal(v_pw_hash));
+    elsif v_col_rec.column_name = 'salt' then
+      v_cols := array_append(v_cols, 'salt');
+      v_vals := array_append(v_vals, quote_literal(''));
+    elsif v_col_rec.column_name in ('auth_provider', 'provider') then
+      v_cols := array_append(v_cols, format('%I', v_col_rec.column_name));
+      v_vals := array_append(v_vals, quote_literal('email'));
+    elsif v_col_rec.is_nullable = 'NO' and v_col_rec.column_default is null then
+      v_cols := array_append(v_cols, format('%I', v_col_rec.column_name));
+      if v_col_rec.data_type = 'boolean' then
+        v_vals := array_append(v_vals, 'false');
+      elsif v_col_rec.data_type in ('integer', 'bigint', 'smallint', 'numeric', 'real', 'double precision') then
+        v_vals := array_append(v_vals, '0');
+      elsif v_col_rec.data_type = 'uuid' then
+        v_vals := array_append(v_vals, quote_literal(gen_random_uuid()::text) || '::uuid');
+      elsif v_col_rec.data_type in ('timestamp with time zone', 'timestamp without time zone') then
+        v_vals := array_append(v_vals, 'now()');
+      elsif v_col_rec.data_type = 'date' then
+        v_vals := array_append(v_vals, 'current_date');
+      elsif v_col_rec.data_type = 'jsonb' then
+        v_vals := array_append(v_vals, '''{}''::jsonb');
+      elsif v_col_rec.data_type = 'json' then
+        v_vals := array_append(v_vals, '''{}''::json');
+      else
+        v_vals := array_append(v_vals, quote_literal(''));
       end if;
     end if;
-    v_cols := array_append(v_cols, 'id');
-    v_vals := array_append(v_vals, quote_literal(v_user_id));
-  end if;
-
-  if exists (select 1 from information_schema.columns where table_schema = v_users_schema and table_name = v_users_name and column_name = 'role') then
-    v_cols := array_append(v_cols, 'role');
-    v_vals := array_append(v_vals, quote_literal('user'));
-  end if;
-
-  v_cols := array_append(v_cols, format('%I', v_schema.balance_col));
-  v_vals := array_append(v_vals, '20');
-
-  if exists (select 1 from information_schema.columns where table_schema = v_users_schema and table_name = v_users_name and column_name = 'email') then
-    v_cols := array_append(v_cols, 'email');
-    v_vals := array_append(v_vals, quote_literal(v_email));
-  end if;
-
-  if exists (select 1 from information_schema.columns where table_schema = v_users_schema and table_name = v_users_name and column_name = 'display_name') then
-    v_cols := array_append(v_cols, 'display_name');
-    v_vals := array_append(v_vals, quote_literal(v_name));
-  elsif exists (select 1 from information_schema.columns where table_schema = v_users_schema and table_name = v_users_name and column_name = 'name') then
-    v_cols := array_append(v_cols, 'name');
-    v_vals := array_append(v_vals, quote_literal(v_name));
-  end if;
-
-  if exists (select 1 from information_schema.columns where table_schema = v_users_schema and table_name = v_users_name and column_name = 'password_hash') then
-    v_cols := array_append(v_cols, 'password_hash');
-    v_vals := array_append(v_vals, quote_literal(v_pw_hash));
-  elsif exists (select 1 from information_schema.columns where table_schema = v_users_schema and table_name = v_users_name and column_name = 'pw_hash') then
-    v_cols := array_append(v_cols, 'pw_hash');
-    v_vals := array_append(v_vals, quote_literal(v_pw_hash));
-  elsif exists (select 1 from information_schema.columns where table_schema = v_users_schema and table_name = v_users_name and column_name = 'password') then
-    v_cols := array_append(v_cols, 'password');
-    v_vals := array_append(v_vals, quote_literal(v_pw_hash));
-  end if;
-
-  if exists (select 1 from information_schema.columns where table_schema = v_users_schema and table_name = v_users_name and column_name = 'salt' and is_nullable = 'NO') then
-    v_cols := array_append(v_cols, 'salt');
-    v_vals := array_append(v_vals, quote_literal(''));
-  end if;
-
-  if exists (select 1 from information_schema.columns where table_schema = v_users_schema and table_name = v_users_name and column_name = 'phone' and is_nullable = 'NO') then
-    v_cols := array_append(v_cols, 'phone');
-    v_vals := array_append(v_vals, quote_literal(''));
-  end if;
+  end loop;
 
   execute format(
     'insert into %s (%s) values (%s)',
@@ -306,7 +358,77 @@ begin
 end;
 $$;
 
+create or replace function public.email_change_password(
+  p_token text,
+  p_old text,
+  p_new text
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+declare
+  v_schema record;
+  v_sess_schema text;
+  v_sess_name text;
+  v_users_schema text;
+  v_users_name text;
+  v_uid text;
+  v_acc public.email_auth_accounts;
+  v_new_hash text;
+begin
+  if length(coalesce(p_new, '')) < 6 then
+    raise exception 'New password must be at least 6 characters.';
+  end if;
+
+  select * into v_schema from public._p2w_detect_auth_schema();
+  v_sess_schema := replace(split_part(v_schema.sessions_table, '.', 1), '"', '');
+  v_sess_name := replace(split_part(v_schema.sessions_table, '.', 2), '"', '');
+  v_users_schema := replace(split_part(v_schema.users_table, '.', 1), '"', '');
+  v_users_name := replace(split_part(v_schema.users_table, '.', 2), '"', '');
+
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = v_sess_schema and table_name = v_sess_name and column_name = 'expires_at'
+  ) then
+    execute format('select user_id::text from %s where token = $1 and (expires_at is null or expires_at > now()) limit 1', v_schema.sessions_table)
+      into v_uid using p_token;
+  else
+    execute format('select user_id::text from %s where token = $1 limit 1', v_schema.sessions_table)
+      into v_uid using p_token;
+  end if;
+
+  if v_uid is null then
+    raise exception 'Session expired. Please log in again.';
+  end if;
+
+  select * into v_acc from public.email_auth_accounts where user_id = v_uid limit 1;
+  if not found then
+    raise exception 'Email password account not found.';
+  end if;
+
+  if v_acc.password_hash <> crypt(coalesce(p_old, ''), v_acc.password_hash) then
+    raise exception 'Current password is incorrect.';
+  end if;
+
+  v_new_hash := crypt(p_new, gen_salt('bf'));
+  update public.email_auth_accounts set password_hash = v_new_hash where email = v_acc.email;
+
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = v_users_schema and table_name = v_users_name and column_name = 'pw'
+  ) then
+    execute format('update %s set pw = $1 where id::text = $2', v_schema.users_table)
+      using v_new_hash, v_uid;
+  end if;
+
+  return jsonb_build_object('ok', true);
+end;
+$$;
+
 grant execute on function public.email_signup(text, text, text) to anon, authenticated;
 grant execute on function public.email_login(text, text) to anon, authenticated;
+grant execute on function public.email_change_password(text, text, text) to anon, authenticated;
 
 notify pgrst, 'reload schema';
