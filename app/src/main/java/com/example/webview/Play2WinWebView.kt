@@ -1,6 +1,7 @@
 package com.example.webview
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -10,6 +11,7 @@ import android.graphics.Bitmap
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
@@ -26,6 +28,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.webkit.UserAgentMetadata
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.example.R
@@ -98,6 +101,23 @@ class Play2WinNativeBridge(
       cm?.setPrimaryClip(ClipData.newPlainText(label ?: "Play2Win", value))
     }
   }
+
+  @JavascriptInterface
+  fun openExternalAuth(url: String?) {
+    val cleanUrl = url.orEmpty().trim()
+    if (!cleanUrl.startsWith("https://") && !cleanUrl.startsWith("http://")) return
+    mainHandler.post {
+      openInCustomTabOrBrowser(context, Uri.parse(cleanUrl))
+    }
+  }
+
+  var onGoogleErrorDetected: ((String) -> Unit)? = null
+
+  @JavascriptInterface
+  fun onGoogleAuthError(reason: String?) {
+    val clean = reason.orEmpty().trim().ifEmpty { "google_error" }
+    mainHandler.post { onGoogleErrorDetected?.invoke(clean) }
+  }
 }
 
 fun isNetworkAvailable(context: Context): Boolean {
@@ -151,21 +171,44 @@ fun createConfiguredWebView(
       javaScriptCanOpenWindowsAutomatically = true
       setSupportMultipleWindows(false)
       mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
-      // Strip WebView markers so Google OAuth does not block with disallowed_useragent.
+      // Strip WebView markers so Google OAuth works inside the in-app WebView.
       userAgentString =
         userAgentString
-          .replace("; wv)", ")")
+          .replace(Regex(";\\s*wv\\b"), "")
           .replace(Regex("Version/\\d+\\.\\d+\\s*"), "")
+    }
+
+    if (WebViewFeature.isFeatureSupported(WebViewFeature.USER_AGENT_METADATA)) {
+      val existingMetadata = WebSettingsCompat.getUserAgentMetadata(settings)
+      val cleanedBrands =
+        existingMetadata.brandVersionList.map { brand ->
+          if (brand.brand.contains("WebView", ignoreCase = true)) {
+            UserAgentMetadata.BrandVersion.Builder()
+              .setBrand("Google Chrome")
+              .setMajorVersion(brand.majorVersion)
+              .setFullVersion(brand.fullVersion)
+              .build()
+          } else {
+            brand
+          }
+        }
+      val updatedMetadata =
+        UserAgentMetadata.Builder(existingMetadata)
+          .setBrandVersionList(cleanedBrands)
+          .build()
+      WebSettingsCompat.setUserAgentMetadata(settings, updatedMetadata)
     }
 
     if (WebViewFeature.isFeatureSupported(WebViewFeature.REQUESTED_WITH_HEADER_ALLOW_LIST)) {
       WebSettingsCompat.setRequestedWithHeaderOriginAllowList(settings, emptySet())
     }
 
-    addJavascriptInterface(
-      Play2WinNativeBridge(context, onThemeChanged, canPullRefresh),
-      "Play2WinNative",
-    )
+    val nativeBridge = Play2WinNativeBridge(context, onThemeChanged, canPullRefresh)
+    nativeBridge.onGoogleErrorDetected = { reason ->
+      stopLoading()
+      loadUrl("$APP_START_URL?google_error=${Uri.encode(reason)}")
+    }
+    addJavascriptInterface(nativeBridge, "Play2WinNative")
 
     webViewClient =
       object : WebViewClient() {
@@ -201,22 +244,31 @@ fun createConfiguredWebView(
           }
         }
 
-        private fun redirectOAuthCallbackIfNeeded(view: WebView?, uri: Uri?): Boolean {
-          if (uri == null) return false
-          val urlStr = uri.toString()
-          if (
-            uri.host?.equals(SUPABASE_FALLBACK_HOST, ignoreCase = true) == true &&
-              (urlStr.contains("access_token=") ||
-                urlStr.contains("code=") ||
-                urlStr.contains("error="))
-          ) {
-            val query = uri.encodedQuery?.let { "?$it" }.orEmpty()
-            val fragment = uri.encodedFragment?.let { "#$it" }.orEmpty()
-            view?.stopLoading()
-            view?.loadUrl("$APP_START_URL$query$fragment")
-            return true
+        private var clearHistoryOnNextAppLoad = false
+
+        private fun interceptOAuthOrWebSiteRedirect(
+          view: WebView?,
+          uri: Uri?,
+          stopCurrentLoad: Boolean,
+        ): Boolean {
+          val targetUrl = extractInAppRedirectUrl(uri) ?: return false
+          val urlStr = uri?.toString().orEmpty()
+          val isPlay2WinAuth =
+            uri?.scheme?.equals("play2win", ignoreCase = true) == true &&
+              uri.host?.equals("auth-callback", ignoreCase = true) == true
+          val hasOAuthPayload =
+            isPlay2WinAuth ||
+              urlStr.contains("access_token=") ||
+              urlStr.contains("code=") ||
+              urlStr.contains("error=")
+          if (hasOAuthPayload) {
+            clearHistoryOnNextAppLoad = true
           }
-          return false
+          if (stopCurrentLoad) {
+            view?.stopLoading()
+          }
+          view?.post { view.loadUrl(targetUrl) }
+          return true
         }
 
         override fun shouldOverrideUrlLoading(
@@ -224,13 +276,13 @@ fun createConfiguredWebView(
           request: WebResourceRequest?,
         ): Boolean {
           val uri = request?.url ?: return false
-          if (redirectOAuthCallbackIfNeeded(view, uri)) return true
+          if (interceptOAuthOrWebSiteRedirect(view, uri, stopCurrentLoad = false)) return true
           return handleUri(context, uri)
         }
 
         override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
           val uri = url?.let { Uri.parse(it) }
-          if (redirectOAuthCallbackIfNeeded(view, uri)) return
+          if (interceptOAuthOrWebSiteRedirect(view, uri, stopCurrentLoad = true)) return
           onErrorChanged(null)
           onLoadingChanged(true)
           canPullRefresh.set(true)
@@ -240,7 +292,38 @@ fun createConfiguredWebView(
         override fun onPageFinished(view: WebView?, url: String?) {
           onLoadingChanged(false)
           onRefreshFinished()
-          onCanGoBackChanged(view?.canGoBack() == true)
+          if (clearHistoryOnNextAppLoad && url?.startsWith(APP_START_URL) == true) {
+            clearHistoryOnNextAppLoad = false
+            view?.clearHistory()
+            onCanGoBackChanged(false)
+          } else {
+            onCanGoBackChanged(view?.canGoBack() == true)
+          }
+          if (
+            url?.startsWith(APP_START_URL) == true &&
+              (url.contains("access_token=") || url.contains("code=") || url.contains("error="))
+          ) {
+            view?.evaluateJavascript(
+              "window.Play2WinHandleOAuthCallback && window.Play2WinHandleOAuthCallback(location.search || '', location.hash || '');",
+              null,
+            )
+          } else if (url?.contains("accounts.google.") == true) {
+            view?.evaluateJavascript(
+              """
+              (function() {
+                try {
+                  var txt = (document.body && document.body.innerText) || '';
+                  if (/400\.\s*That['’]s an error|malformed\.\s*It should not be retried|disallowed_useragent/i.test(txt)) {
+                    if (window.Play2WinNative && window.Play2WinNative.onGoogleAuthError) {
+                      window.Play2WinNative.onGoogleAuthError('google_400_malformed');
+                    }
+                  }
+                } catch (e) {}
+              })();
+              """.trimIndent(),
+              null,
+            )
+          }
           view?.evaluateJavascript(
             """
             (function() {
@@ -301,6 +384,20 @@ fun createConfiguredWebView(
           onCanGoBackChanged(view?.canGoBack() == true)
         }
 
+        override fun onReceivedHttpError(
+          view: WebView?,
+          request: WebResourceRequest?,
+          errorResponse: WebResourceResponse?,
+        ) {
+          val host = request?.url?.host?.lowercase().orEmpty()
+          val code = errorResponse?.statusCode ?: 0
+          if (request?.isForMainFrame == true && host.startsWith("accounts.google.") && code >= 400) {
+            clearHistoryOnNextAppLoad = true
+            view?.stopLoading()
+            view?.post { view.loadUrl("$APP_START_URL?google_error=http_$code") }
+          }
+        }
+
         override fun onReceivedError(
           view: WebView?,
           request: WebResourceRequest?,
@@ -357,19 +454,43 @@ fun createConfiguredWebView(
   }
 }
 
+internal fun extractInAppRedirectUrl(uri: Uri?): String? {
+  if (uri == null) return null
+  val scheme = uri.scheme?.lowercase().orEmpty()
+  val host = uri.host?.lowercase().orEmpty()
+  val isPlay2WinAuth = scheme == "play2win" && host == "auth-callback"
+  val isNetlifySite = host == SUPABASE_FALLBACK_HOST
+  if (!isPlay2WinAuth && !isNetlifySite) return null
+
+  val query = uri.encodedQuery?.let { "?$it" }.orEmpty()
+  val fragment = uri.encodedFragment?.let { "#$it" }.orEmpty()
+  return "$APP_START_URL$query$fragment"
+}
+
+internal fun shouldKeepUrlInWebView(uri: Uri?): Boolean {
+  if (uri == null) return false
+  val scheme = uri.scheme?.lowercase().orEmpty()
+  if (scheme != "http" && scheme != "https") return false
+  val host = uri.host?.lowercase().orEmpty()
+  val isGoogleAuthHost =
+    host == "accounts.google.com" ||
+      host.startsWith("accounts.google.") ||
+      host == "accounts.youtube.com" ||
+      host == "gds.google.com" ||
+      host == "myaccount.google.com" ||
+      (host.endsWith(".google.com") && !host.startsWith("play."))
+  return host == APP_ASSET_HOST ||
+    isGoogleAuthHost ||
+    host.endsWith(".supabase.co") ||
+    host.endsWith(".gstatic.com") ||
+    host.endsWith(".googleapis.com") ||
+    host.endsWith(".googleusercontent.com")
+}
+
 private fun handleUri(context: Context, uri: Uri): Boolean {
   val scheme = uri.scheme?.lowercase() ?: return false
   if (scheme == "http" || scheme == "https") {
-    val host = uri.host?.lowercase().orEmpty()
-    val keepInApp =
-      host == APP_ASSET_HOST ||
-        host == SUPABASE_FALLBACK_HOST ||
-        host.endsWith(".supabase.co") ||
-        host == "accounts.google.com" ||
-        host.endsWith(".google.com") ||
-        host.endsWith(".gstatic.com") ||
-        host.endsWith(".googleapis.com")
-    if (keepInApp) {
+    if (shouldKeepUrlInWebView(uri)) {
       return false
     }
     return openExternalIntent(context, Intent(Intent.ACTION_VIEW, uri))
@@ -385,6 +506,48 @@ private fun handleUri(context: Context, uri: Uri): Boolean {
   }
 
   return openExternalIntent(context, Intent(Intent.ACTION_VIEW, uri))
+}
+
+fun openInCustomTabOrBrowser(context: Context, uri: Uri) {
+  val customTabsExtras =
+    Bundle().apply {
+      putBinder("android.support.customtabs.extra.SESSION", null)
+    }
+  val customTabsIntent =
+    Intent(Intent.ACTION_VIEW, uri).apply {
+      putExtras(customTabsExtras)
+      putExtra(
+        "android.support.customtabs.extra.TOOLBAR_COLOR",
+        android.graphics.Color.parseColor("#0B0D22"),
+      )
+      putExtra("android.support.customtabs.extra.TITLE_VISIBILITY", 1)
+      if (context !is Activity) {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+      }
+    }
+  val serviceIntent = Intent("android.support.customtabs.action.CustomTabsService")
+  val customTabPackages =
+    context.packageManager
+      .queryIntentServices(serviceIntent, 0)
+      .mapNotNull { it.serviceInfo?.packageName }
+  val preferredPackage =
+    customTabPackages.firstOrNull { it == "com.android.chrome" } ?: customTabPackages.firstOrNull()
+  if (preferredPackage != null) {
+    customTabsIntent.setPackage(preferredPackage)
+  }
+  try {
+    context.startActivity(customTabsIntent)
+  } catch (_: ActivityNotFoundException) {
+    val fallback =
+      Intent(Intent.ACTION_VIEW, uri).apply {
+        if (context !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+      }
+    try {
+      context.startActivity(fallback)
+    } catch (_: ActivityNotFoundException) {
+      Toast.makeText(context, context.getString(R.string.no_browser_app), Toast.LENGTH_SHORT).show()
+    }
+  }
 }
 
 private fun openExternalIntent(context: Context, intent: Intent): Boolean {

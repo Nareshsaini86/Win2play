@@ -71,12 +71,16 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.delay
 import org.json.JSONObject
 
+data class OAuthCallbackPayload(val query: String, val fragment: String)
+
 class MainActivity : ComponentActivity() {
   private var incomingReferralCode by mutableStateOf<String?>(null)
+  private var incomingOAuthCallback by mutableStateOf<OAuthCallbackPayload?>(null)
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     incomingReferralCode = extractReferralCode(intent)
+    incomingOAuthCallback = extractOAuthCallback(intent)
     enableEdgeToEdge()
     setContent {
       var isDayTheme by remember { mutableStateOf(false) }
@@ -95,7 +99,9 @@ class MainActivity : ComponentActivity() {
         Play2WinShell(
           isDayTheme = isDayTheme,
           initialReferralCode = incomingReferralCode,
+          incomingOAuthCallback = incomingOAuthCallback,
           onReferralConsumed = { incomingReferralCode = null },
+          onOAuthConsumed = { incomingOAuthCallback = null },
           onThemeChanged = { isDay -> isDayTheme = isDay },
         )
       }
@@ -106,6 +112,7 @@ class MainActivity : ComponentActivity() {
     super.onNewIntent(intent)
     setIntent(intent)
     extractReferralCode(intent)?.let { code -> incomingReferralCode = code }
+    extractOAuthCallback(intent)?.let { payload -> incomingOAuthCallback = payload }
   }
 
   private fun extractReferralCode(intent: Intent?): String? {
@@ -117,13 +124,27 @@ class MainActivity : ComponentActivity() {
     }
     return null
   }
+
+  private fun extractOAuthCallback(intent: Intent?): OAuthCallbackPayload? {
+    val data: Uri = intent?.data ?: return null
+    val raw = data.toString()
+    val isPlay2WinAuth = data.scheme == "play2win" && data.host == "auth-callback"
+    val hasOAuthParams =
+      raw.contains("access_token=") || raw.contains("code=") || raw.contains("error=")
+    if (!isPlay2WinAuth && !hasOAuthParams) return null
+    val query = data.encodedQuery?.let { "?$it" }.orEmpty()
+    val fragment = data.encodedFragment?.let { "#$it" }.orEmpty()
+    return OAuthCallbackPayload(query = query, fragment = fragment)
+  }
 }
 
 @Composable
 fun Play2WinShell(
   isDayTheme: Boolean,
   initialReferralCode: String?,
+  incomingOAuthCallback: OAuthCallbackPayload?,
   onReferralConsumed: () -> Unit,
+  onOAuthConsumed: () -> Unit,
   onThemeChanged: (Boolean) -> Unit,
 ) {
   val context = LocalContext.current
@@ -178,6 +199,19 @@ fun Play2WinShell(
         null,
       )
       onReferralConsumed()
+    }
+  }
+
+  LaunchedEffect(incomingOAuthCallback, hasLoadedOnce) {
+    val payload = incomingOAuthCallback
+    if (hasLoadedOnce && payload != null) {
+      val q = JSONObject.quote(payload.query)
+      val f = JSONObject.quote(payload.fragment)
+      webView.evaluateJavascript(
+        "window.Play2WinHandleOAuthCallback && window.Play2WinHandleOAuthCallback($q, $f);",
+        null,
+      )
+      onOAuthConsumed()
     }
   }
 

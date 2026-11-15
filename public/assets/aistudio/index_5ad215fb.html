@@ -427,13 +427,28 @@ img{ -webkit-user-drag:none; user-drag:none; }
     <div id="auth-download-wrap" class="hide" style="margin-bottom:12px">
       <a id="auth-download-btn" class="place" href="#" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none;margin-top:0">Download Play2Win App (APK)</a>
     </div>
-    <label>User ID<input id="a-id" autocomplete="username"></label>
-    <label>Password<input id="a-pw" type="password" autocomplete="current-password"></label>
-    <div class="err" id="a-err"></div>
-    <button class="place" id="a-go" style="margin-top:4px">Log in</button>
-    <div style="text-align:center;margin:12px 0;color:var(--mute);font-size:.8rem">— OR —</div>
+    <div id="auth-mode-tabs" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;background:var(--soft);border:1px solid var(--line);border-radius:14px;margin-bottom:14px">
+      <button type="button" id="auth-tab-login" class="mini on" style="padding:10px 6px;border:0;font-weight:800;border-radius:10px">Log in</button>
+      <button type="button" id="auth-tab-signup" class="mini" style="padding:10px 6px;border:0;font-weight:800;border-radius:10px">New User Sign up</button>
+    </div>
+    <div id="auth-login-pane">
+      <label>Email ID / User ID<input id="a-id" autocomplete="username" placeholder="Email ID ya User ID daalein"></label>
+      <label>Password<input id="a-pw" type="password" autocomplete="current-password" placeholder="Password daalein"></label>
+      <div class="err" id="a-err"></div>
+      <button class="place" id="a-go" style="margin-top:4px">Log in</button>
+    </div>
+    <div id="auth-signup-pane" class="hide">
+      <label>Full Name (optional)<input id="su-name" autocomplete="name" placeholder="Apna naam daalein"></label>
+      <label>Email ID<input id="su-email" type="email" autocomplete="email" placeholder="example@gmail.com"></label>
+      <label>Set Password<input id="su-pw" type="password" autocomplete="new-password" placeholder="Kam se kam 6 characters"></label>
+      <label>Confirm Password<input id="su-pw2" type="password" autocomplete="new-password" placeholder="Password dobara daalein"></label>
+      <div class="err" id="su-err"></div>
+      <button class="place" id="su-go" style="margin-top:4px">Create Account</button>
+      <div class="note" style="margin-top:8px">Naye account par apni Email ID aur Password khud set karein.</div>
+    </div>
+    <div id="google-divider" style="text-align:center;margin:12px 0;color:var(--mute);font-size:.8rem">— OR —</div>
     <button class="place" id="google-login" type="button" style="margin-top:0;background:#fff;color:#222;box-shadow:none">Continue with Google</button>
-    <div class="note" id="google-msg" style="margin-top:8px">New users can register securely using their Google Account.</div>
+    <div class="note" id="google-msg" style="margin-top:8px">Naye users upar "New User Sign up" se apna Email ID &amp; Password bana sakte hain ya Google se login karein.</div>
   </section>
   <div id="app" class="hide">
     <nav class="nav" id="nav"></nav>
@@ -979,41 +994,188 @@ img{ -webkit-user-drag:none; user-drag:none; }
   }
 
   // ---- auth ----
+  var authMode='login';
+  function setAuthMode(mode){
+    authMode=mode==='signup'?'signup':'login';
+    var isSignup=authMode==='signup'&&$('a-go').dataset.setup!=='1';
+    if($('auth-login-pane'))$('auth-login-pane').classList.toggle('hide',isSignup);
+    if($('auth-signup-pane'))$('auth-signup-pane').classList.toggle('hide',!isSignup);
+    if($('auth-tab-login'))$('auth-tab-login').classList.toggle('on',!isSignup);
+    if($('auth-tab-signup'))$('auth-tab-signup').classList.toggle('on',isSignup);
+    if($('auth-title')&&$('a-go').dataset.setup!=='1')$('auth-title').textContent=isSignup?'Create new account':'Log in';
+    if($('a-err'))$('a-err').textContent='';
+    if($('su-err'))$('su-err').textContent='';
+  }
+  if($('auth-tab-login'))$('auth-tab-login').onclick=function(){setAuthMode('login')};
+  if($('auth-tab-signup'))$('auth-tab-signup').onclick=function(){setAuthMode('signup')};
+
+  function applySessionLogin(r){
+    S.token=r.token;S.id=r.id;S.role=r.role||'user';
+    S.displayName=r.name||r.display_name||r.email||r.id;
+    S.email=r.email||null;
+    try{
+      localStorage.setItem('np_token',r.token);localStorage.setItem('np_id',r.id);
+      if(S.displayName)localStorage.setItem('np_display_name',S.displayName);
+      if(S.email)localStorage.setItem('np_email',S.email);
+    }catch(x){}
+    start();
+  }
+
   function showAuth(){
-    $('app').classList.add('hide');$('gear').classList.add('hide');$('v-auth').classList.remove('hide');$('bal').textContent='';$('bal').dataset.admin='0';$('a-err').textContent='';
+    $('app').classList.add('hide');$('gear').classList.add('hide');$('v-auth').classList.remove('hide');$('bal').textContent='';$('bal').dataset.admin='0';
+    if($('a-err'))$('a-err').textContent='';
+    if($('su-err'))$('su-err').textContent='';
     ['v-add','v-withdraw'].forEach(function(id){$(id).classList.add('hide')});
     api('has_admin').then(function(has){
-      $('auth-title').textContent=has?'Log in':'Set up the admin account';
+      $('auth-title').textContent=has?(authMode==='signup'?'Create new account':'Log in'):'Set up the admin account';
       $('a-go').textContent=has?'Log in':'Create admin account';
       $('a-go').dataset.setup=has?'':'1';
-    }).catch(function(e){$('a-err').textContent=e.message});
+      if($('auth-mode-tabs'))$('auth-mode-tabs').classList.toggle('hide',!has);
+      if(!has)setAuthMode('login');
+    }).catch(function(e){if($('a-err'))$('a-err').textContent=e.message});
   }
+
+  function exchangeSupabaseJwtForWallet(session){
+    return fetch(SUPABASE_URL+'/rest/v1/rpc/google_wallet_login',{
+      method:'POST',
+      headers:{'Content-Type':'application/json',apikey:SUPABASE_KEY,Authorization:'Bearer '+session.access_token}
+    }).then(function(r){
+      return r.text().then(function(t){
+        var j=t?JSON.parse(t):null;
+        if(!r.ok)throw new Error((j&&j.message)||'Account registration failed.');
+        return j;
+      });
+    });
+  }
+
   $('a-go').onclick=function(){
-    var id=$('a-id').value.trim(),pw=$('a-pw').value,setup=$('a-go').dataset.setup==='1',e=$('a-err');e.textContent='';
-    if(!id||!pw){e.textContent='Enter your User ID and password.';return}
-    var p=setup?api('setup_admin',{p_id:id,p_pw:pw}).then(function(){return api('login',{p_id:id,p_pw:pw})}):api('login',{p_id:id,p_pw:pw});
-    p.then(function(r){S.token=r.token;S.id=r.id;S.role=r.role;try{localStorage.setItem('np_token',r.token);localStorage.setItem('np_id',r.id)}catch(x){}
-      $('a-pw').value='';start()}).catch(function(x){e.textContent=x.message});
+    var id=$('a-id').value.trim(),pw=$('a-pw').value,setup=$('a-go').dataset.setup==='1',e=$('a-err');
+    e.style.color='var(--red)';e.textContent='';
+    if(!id||!pw){e.textContent='Email ID / User ID aur Password dono enter karein.';return}
+    $('a-go').disabled=true;
+    var p=setup
+      ?api('setup_admin',{p_id:id,p_pw:pw}).then(function(){return api('login',{p_id:id,p_pw:pw})})
+      :api('login',{p_id:id,p_pw:pw}).catch(function(loginErr){
+        if(id.indexOf('@')<1)throw loginErr;
+        return api('email_login',{p_email:id,p_password:pw}).catch(function(emailErr){
+          if(!supa||!supa.auth||!supa.auth.signInWithPassword)throw emailErr;
+          return supa.auth.signInWithPassword({email:id,password:pw}).then(function(authRes){
+            if(authRes.error)throw new Error(authRes.error.message||loginErr.message);
+            if(!authRes.data||!authRes.data.session)throw new Error('Kripya pehle apna email verify karein.');
+            return exchangeSupabaseJwtForWallet(authRes.data.session);
+          });
+        });
+      });
+    p.then(function(r){
+      $('a-pw').value='';
+      applySessionLogin(r);
+    }).catch(function(x){
+      e.textContent=x.message||'Login failed.';
+    }).then(function(){
+      $('a-go').disabled=false;
+    });
   };
+
+  if($('su-go'))$('su-go').onclick=function(){
+    var name=($('su-name')?$('su-name').value:'').trim();
+    var email=($('su-email')?$('su-email').value:'').trim().toLowerCase();
+    var pw=$('su-pw')?$('su-pw').value:'';
+    var pw2=$('su-pw2')?$('su-pw2').value:'';
+    var e=$('su-err');
+    e.style.color='var(--red)';e.textContent='';
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){e.textContent='Valid Email ID enter karein.';return}
+    if(pw.length<6){e.textContent='Password kam se kam 6 characters ka hona chahiye.';return}
+    if(pw!==pw2){e.textContent='Dono password match nahi kar rahe.';return}
+    $('su-go').disabled=true;$('su-go').textContent='Creating account...';
+    var oauthRedirect=getOAuthRedirectUrl();
+    api('email_signup',{p_email:email,p_password:pw,p_name:name})
+      .then(function(r){
+        $('su-pw').value='';$('su-pw2').value='';
+        toast('Account ban gaya! +20 Welcome Coins mile.');
+        applySessionLogin(r);
+      })
+      .catch(function(rpcErr){
+        var msg=(rpcErr&&rpcErr.message)||'';
+        var missingFn=/Could not find the function|schema cache/i.test(msg);
+        if(!missingFn)throw rpcErr;
+        if(!supa||!supa.auth||!supa.auth.signUp){
+          throw new Error('Signup setup baaki hai: Supabase SQL Editor mein supabase_email_signup.sql run karein.');
+        }
+        return supa.auth.signUp({
+          email:email,
+          password:pw,
+          options:{
+            data:{full_name:name||email.split('@')[0],name:name||email.split('@')[0]},
+            emailRedirectTo:oauthRedirect
+          }
+        }).then(function(res){
+          if(res.error)throw res.error;
+          if(res.data&&res.data.session){
+            return exchangeSupabaseJwtForWallet(res.data.session).then(function(r){
+              $('su-pw').value='';$('su-pw2').value='';
+              toast('Account ban gaya!');
+              applySessionLogin(r);
+            });
+          }
+          $('su-pw').value='';$('su-pw2').value='';
+          e.style.color='var(--green)';
+          e.textContent='Account ban gaya! '+email+' par bheje gaye verification link par click karein, phir Log in karein.';
+          if($('a-id'))$('a-id').value=email;
+        });
+      })
+      .catch(function(x){
+        e.style.color='var(--red)';
+        e.textContent=(x&&x.message)||'Account create nahi ho saka.';
+      })
+      .then(function(){
+        $('su-go').disabled=false;$('su-go').textContent='Create Account';
+      });
+  };
+
+  function getOAuthRedirectUrl(){
+    var isNative=!!(window.Play2WinNative&&window.Play2WinNative.isNativeApp&&window.Play2WinNative.isNativeApp());
+    if(isNative)return 'https://splendorous-jalebi-a6d440.netlify.app/';
+    var u=location.origin+location.pathname;
+    return /^https?:/i.test(u)?u:'https://splendorous-jalebi-a6d440.netlify.app/';
+  }
+
   $('google-login').onclick=function(){
     var msg=$('google-msg');
-    if(!supa){msg.textContent='Google login library load nahi hui. Page refresh karein.';return}
-    msg.textContent='Google sign-in khul raha hai...';
-    var oauthRedirect=(location.hostname==='appassets.androidplatform.net')
-      ?'https://splendorous-jalebi-a6d440.netlify.app/'
-      :(location.origin+location.pathname);
-    supa.auth.signInWithOAuth({provider:'google',options:{redirectTo:oauthRedirect}})
-      .then(function(r){if(r.error)throw r.error;})
-      .catch(function(e){msg.textContent=e.message||'Google sign-in failed.'});
+    if(!supa){msg.style.color='var(--red)';msg.textContent='Google login library load nahi hui. Page refresh karein.';return}
+    msg.style.color='var(--mute)';msg.textContent='Google sign-in khul raha hai...';
+    var oauthRedirect=getOAuthRedirectUrl();
+    supa.auth.signInWithOAuth({
+      provider:'google',
+      options:{
+        redirectTo:oauthRedirect,
+        skipBrowserRedirect:true,
+        queryParams:{prompt:'select_account'}
+      }
+    })
+      .then(function(r){
+        if(r.error)throw r.error;
+        if(!r.data||!r.data.url)throw new Error('Google sign-in URL nahi mila.');
+        window.location.assign(r.data.url);
+      })
+      .catch(function(e){msg.style.color='var(--red)';msg.textContent=e.message||'Google sign-in failed. Kripya New User Sign up se Email & Password account banayein.'});
   };
   (function(){
     try{
       var q=new URLSearchParams(location.search||''),h=new URLSearchParams((location.hash||'').replace(/^#/,''));
+      var gErr=q.get('google_error');
       var oauthErr=q.get('error_description')||h.get('error_description')||q.get('error')||h.get('error');
-      if(oauthErr&&$('google-msg'))$('google-msg').textContent=oauthErr;
+      if(gErr&&$('google-msg')){
+        $('google-msg').style.color='var(--red)';
+        $('google-msg').textContent='Google login server error ('+gErr+') aa raha hai. Upar "New User Sign up" par tap karke apni Email ID aur Password set karein.';
+        try{history.replaceState(null,'',location.pathname+(location.hash||''));}catch(ex){}
+      }else if(oauthErr&&$('google-msg')){
+        $('google-msg').style.color='var(--red)';
+        $('google-msg').textContent=oauthErr;
+      }
     }catch(e){}
   })();
   var googleLoginFinishing=false;
+  var oauthCallbackHandled=false;
   function finishGoogleLogin(passedSession){
     if(!supa||googleLoginFinishing||S.token)return;
     googleLoginFinishing=true;
@@ -1021,21 +1183,71 @@ img{ -webkit-user-drag:none; user-drag:none; }
     p.then(function(res){
       var session=res.data&&res.data.session;
       if(!session){googleLoginFinishing=false;return;}
-      return fetch(SUPABASE_URL+'/rest/v1/rpc/google_wallet_login',{method:'POST',headers:{'Content-Type':'application/json',apikey:SUPABASE_KEY,Authorization:'Bearer '+session.access_token}})
-        .then(function(r){return r.text().then(function(t){var j=t?JSON.parse(t):null;if(!r.ok)throw new Error((j&&j.message)||'Google account registration failed.');return j})})
+      return exchangeSupabaseJwtForWallet(session)
         .then(function(r){
-          S.token=r.token;S.id=r.id;S.role=r.role;S.displayName=r.name||r.display_name||r.email||r.id;S.email=r.email||null;
-          try{
-            localStorage.setItem('np_token',r.token);localStorage.setItem('np_id',r.id);
-            localStorage.setItem('np_display_name',S.displayName);if(S.email)localStorage.setItem('np_email',S.email);
-          }catch(x){}
           googleLoginFinishing=false;
-          if(location.hash&&location.hash.indexOf('access_token=')>=0){location.hash='#/home';}
-          start();
+          if((location.hash&&location.hash.indexOf('access_token=')>=0)||(location.search&&(location.search.indexOf('code=')>=0||location.search.indexOf('error=')>=0))){
+            try{history.replaceState(null,'',location.pathname+'#/home');}catch(x){location.hash='#/home';}
+          }
+          applySessionLogin(r);
         });
-    }).catch(function(e){googleLoginFinishing=false;if($('google-msg'))$('google-msg').textContent=e.message||'Google login failed.'});
+    }).catch(function(e){googleLoginFinishing=false;if($('google-msg')){$('google-msg').style.color='var(--red)';$('google-msg').textContent=e.message||'Google login failed.';}});
   }
-  finishGoogleLogin();
+  window.Play2WinHandleOAuthCallback=function(queryStr,hashStr){
+    try{
+      if(S.token||googleLoginFinishing||oauthCallbackHandled)return;
+      if(!supa){
+        if($('google-msg'))$('google-msg').textContent='Google login library load nahi hui. Page refresh karein.';
+        return;
+      }
+      if(hashStr&&hashStr.indexOf('access_token=')>=0){
+        var hp=new URLSearchParams(String(hashStr).replace(/^#/,''));
+        var accessToken=hp.get('access_token');
+        var refreshToken=hp.get('refresh_token');
+        if(accessToken&&refreshToken){
+          oauthCallbackHandled=true;
+          if($('google-msg'))$('google-msg').textContent='Google account verify ho raha hai...';
+          supa.auth.setSession({access_token:accessToken,refresh_token:refreshToken})
+            .then(function(res){
+              if(res.error)throw res.error;
+              if(res.data&&res.data.session)finishGoogleLogin(res.data.session);
+              else oauthCallbackHandled=false;
+            })
+            .catch(function(e){oauthCallbackHandled=false;if($('google-msg')){$('google-msg').style.color='var(--red)';$('google-msg').textContent=e.message||'Google login failed.';}});
+          return;
+        }
+      }
+      if(queryStr&&queryStr.indexOf('code=')>=0){
+        var qp=new URLSearchParams(String(queryStr).replace(/^\?/,''));
+        var code=qp.get('code');
+        if(code&&supa.auth.exchangeCodeForSession){
+          oauthCallbackHandled=true;
+          if($('google-msg'))$('google-msg').textContent='Google account verify ho raha hai...';
+          supa.auth.exchangeCodeForSession(code)
+            .then(function(res){
+              if(res.error)throw res.error;
+              if(res.data&&res.data.session)finishGoogleLogin(res.data.session);
+              else oauthCallbackHandled=false;
+            })
+            .catch(function(e){oauthCallbackHandled=false;if($('google-msg')){$('google-msg').style.color='var(--red)';$('google-msg').textContent=e.message||'Google login failed.';}});
+          return;
+        }
+      }
+      if(queryStr||hashStr){
+        var errP=new URLSearchParams(String(hashStr||queryStr).replace(/^[?#]/,''));
+        var errMsg=errP.get('error_description')||errP.get('error');
+        if(errMsg&&$('google-msg')){$('google-msg').style.color='var(--red)';$('google-msg').textContent=errMsg;}
+      }
+    }catch(e){
+      oauthCallbackHandled=false;
+      if($('google-msg')){$('google-msg').style.color='var(--red)';$('google-msg').textContent=e.message||'Google login failed.';}
+    }
+  };
+  if((location.hash&&location.hash.indexOf('access_token=')>=0)||(location.search&&location.search.indexOf('code=')>=0)){
+    window.Play2WinHandleOAuthCallback(location.search||'',location.hash||'');
+  }else{
+    finishGoogleLogin();
+  }
   if(supa)supa.auth.onAuthStateChange(function(event,session){
     if(event==='SIGNED_IN'&&session&&!S.token&&!loggingOut)finishGoogleLogin(session);
     if(event==='SIGNED_OUT'&&!loggingOut){ /* user-initiated sign-out is handled by logout() */ }
@@ -1074,6 +1286,10 @@ img{ -webkit-user-drag:none; user-drag:none; }
     $('nav').innerHTML=items.map(function(i){return '<a href="#/'+i[0]+'" data-r="'+i[0]+'">'+i[1]+'</a>'}).join('');
   }
   function route(){
+    if(location.hash&&location.hash.indexOf('access_token=')>=0&&window.Play2WinHandleOAuthCallback){
+      window.Play2WinHandleOAuthCallback(location.search||'',location.hash);
+      return;
+    }
     var r=location.hash.replace('#/','')||(isAdmin()?'admin':'home');
     var legalView=$('p2w-legal-view');
     if(r.indexOf('legal/')===0){
