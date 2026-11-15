@@ -1,9 +1,8 @@
 -- Play2Win Aviator + Admin Multi-Game Live Bets (Supabase SQL Migration)
 -- Run this script once in your Supabase Dashboard -> SQL Editor.
--- Aviator Crash Rules:
---   * No bet placed in round (total_stake = 0): crashes between 25.00x and 50.00x
---   * Bet placed up to 500 Coins (1..500): max crash capped at 25.00x
---   * Bet placed over 500 Coins (> 500): max crash capped at 1.10x
+-- Aviator Crash Rule:
+--   * Any bet of 300 Coins or more (stake >= 300): crashes at 1.10x
+--   * All other rounds (bets < 300 Coins or no bets): random crash (1.00x - 50.00x)
 -- Admin Live Bets RPCs:
 --   * admin_gold_bets(p_token): Gold Ball live/recent bets, user, amount, win/loss & payout
 --   * admin_aviator_bets(p_token): Aviator current round + recent bets, cashout & crash
@@ -197,10 +196,9 @@ end;
 $$;
 
 -- Synchronize & advance global Aviator rounds:
--- Finalizes crash_point right when 10s betting closes based on total staked in that round:
---   * 0 Coins bet -> 25.00x .. 50.00x
---   * 1..500 Coins bet -> capped at <= 25.00x
---   * > 500 Coins bet -> capped at <= 1.10x
+-- Finalizes crash_point right when 10s betting closes:
+--   * Any bet >= 300 Coins -> crashes at 1.10x
+--   * All other rounds -> random (1.00x .. 50.00x)
 create or replace function public._p2w_aviator_ensure_round(
   p_users_table text,
   p_balance_col text,
@@ -218,7 +216,7 @@ declare
   v_bet record;
   v_payout integer;
   v_r double precision;
-  v_total_stake bigint;
+  v_max_stake integer;
   v_crash_point numeric(10, 2);
   v_fly_secs double precision;
   v_betting_ends timestamptz;
@@ -235,28 +233,21 @@ begin
 
   -- Finalize crash_point as soon as betting closes for the active round
   if v_has_round and not v_round.crash_finalized and v_now >= v_round.betting_ends_at then
-    select coalesce(sum(stake), 0)
-    into v_total_stake
+    select coalesce(max(stake), 0)
+    into v_max_stake
     from public.aviator_bets
     where round_id = v_round.id;
 
-    v_r := random();
-    if coalesce(v_total_stake, 0) = 0 then
-      -- No bet in this round: 25.00x to 50.00x
-      v_crash_point := least(50.00, greatest(25.00, round((25.00 + v_r * 25.00)::numeric, 2)));
-    elsif v_total_stake > 500 then
-      -- Bet over 500 Coins: never above 1.10x
-      if v_r < 0.25 then
-        v_crash_point := 1.00;
-      else
-        v_crash_point := least(1.10, greatest(1.01, round((1.01 + random() * 0.09)::numeric, 2)));
-      end if;
+    if coalesce(v_max_stake, 0) >= 300 then
+      -- Any bet of 300 Coins or more: crash at 1.10x
+      v_crash_point := 1.10;
     else
-      -- Normal bet (1..500 Coins): max 25.00x
-      if v_r < 0.05 then
+      -- All other rounds (bets < 300 or no bets): random crash (1.00x .. 50.00x)
+      v_r := random();
+      if v_r < 0.04 then
         v_crash_point := 1.00;
       else
-        v_crash_point := least(25.00, greatest(1.02, round((0.96 / greatest(0.038, 1.0 - v_r))::numeric, 2)));
+        v_crash_point := least(50.00, greatest(1.01, round((0.96 / greatest(0.0192, 1.0 - v_r))::numeric, 2)));
       end if;
     end if;
 

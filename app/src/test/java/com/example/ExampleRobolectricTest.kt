@@ -67,6 +67,8 @@ class ExampleRobolectricTest {
     assertTrue(html.contains("id=\"bets-pane-aviator\""))
     assertTrue(html.contains("admin_gold_bets"))
     assertTrue(html.contains("admin_aviator_bets"))
+    assertTrue(html.contains("Any bet ≥ 300 Coins → crashes at 1.10x"))
+    assertFalse(html.contains("No bet → 25x–50x"))
   }
 
   @Test
