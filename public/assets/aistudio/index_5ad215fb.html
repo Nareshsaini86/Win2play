@@ -1,0 +1,2116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Play2Win</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0b0d22">
+<script>try{var _t=localStorage.getItem("np_theme");if(_t)document.documentElement.setAttribute("data-theme",_t)}catch(e){}</script>
+<style>
+:root{--bg:#0b0d22;--panel:rgba(255,255,255,.06);--panel-solid:#171a3c;--ink:#f4f5ff;--mute:#9ba1cc;--line:rgba(255,255,255,.12);--green:#2ee6a0;--red:#ff5d73;--violet:#a98bff;--gold:#ffc94d;--gold2:#ff9f1c;--accent:#ffc94d;--onaccent:#1a1200;--gold-text:#ffc94d;--h1a:#ffc94d;--h1b:#ff7ac6;--sel:#fff;--sel-glow:rgba(255,255,255,.5);--bgA:rgba(124,77,255,.35);--bgB:rgba(0,168,232,.28);--bgC:rgba(255,93,115,.18);--bal-bg:rgba(255,201,77,.12);--bal-line:rgba(255,201,77,.4);--clock-glow:rgba(255,201,77,.45);--timer-bg:linear-gradient(135deg,rgba(124,77,255,.28),rgba(0,168,232,.18));--track:rgba(255,255,255,.1);--chip:rgba(255,255,255,.06);--field:rgba(255,255,255,.07);--soft:rgba(255,255,255,.03);--shadow:rgba(0,0,0,.28);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme="day"]{--bg:#f3f5ff;--panel:rgba(255,255,255,.78);--panel-solid:#fff;--ink:#1b1f3b;--mute:#5f678f;--line:rgba(27,31,59,.13);--green:#0f9f68;--red:#e0344d;--violet:#6d46e8;--gold:#ffb21e;--gold2:#ff8a00;--accent:#ff8a00;--onaccent:#2a1600;--gold-text:#b86a00;--h1a:#ff7a00;--h1b:#d6249f;--sel:#1b1f3b;--sel-glow:rgba(27,31,59,.3);--bgA:rgba(124,77,255,.18);--bgB:rgba(0,168,232,.16);--bgC:rgba(255,93,115,.13);--bal-bg:rgba(255,138,0,.12);--bal-line:rgba(255,138,0,.45);--clock-glow:rgba(255,138,0,.25);--timer-bg:linear-gradient(135deg,rgba(124,77,255,.13),rgba(0,168,232,.12));--track:rgba(27,31,59,.1);--chip:rgba(27,31,59,.05);--field:#fff;--soft:rgba(27,31,59,.03);--shadow:rgba(40,50,120,.14)}
+:root[data-theme="day"] .ball{box-shadow:inset 0 -7px 12px rgba(0,0,0,.18),0 5px 12px rgba(40,50,120,.25)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--bg)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;line-height:1.4;background:radial-gradient(800px 480px at 90% -8%,var(--bgA),transparent 60%),radial-gradient(700px 480px at -10% 8%,var(--bgB),transparent 60%),radial-gradient(600px 500px at 50% 110%,var(--bgC),transparent 60%),var(--bg);background-attachment:fixed}
+.wrap{max-width:520px;margin:0 auto;padding:16px 14px 48px}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--violet);outline-offset:2px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.top h1{margin:0;font-size:1.6rem;font-weight:900;letter-spacing:.02em;background:linear-gradient(90deg,var(--h1a),var(--h1b) 70%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.bal{font-weight:800;font-size:1rem;color:var(--gold-text);background:var(--bal-bg);border:1px solid var(--bal-line);padding:6px 13px;border-radius:999px;white-space:nowrap}
+.bal:empty{display:none}
+.note{font-size:.8rem;color:var(--mute);margin:0 0 12px}
+.card,.timer,.nums,.menu-btn,table{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:14px;box-shadow:0 8px 24px var(--shadow)}
+.timer{background:var(--timer-bg);border:1px solid var(--line);border-radius:18px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 8px 24px var(--shadow)}
+.timer small{color:var(--mute);display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em}
+.timer b{font-size:1.1rem}
+.clock{font-variant-numeric:tabular-nums;font-size:2.2rem;font-weight:900;letter-spacing:.05em;color:var(--gold-text);text-shadow:0 0 18px var(--clock-glow)}
+.clock.lock{color:var(--red);text-shadow:0 0 18px rgba(255,93,115,.6);animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.55}}
+.bar{height:6px;border-radius:99px;background:var(--track);margin-top:8px;overflow:hidden}
+.bar i{display:block;height:100%;width:100%;border-radius:99px;background:linear-gradient(90deg,var(--green),var(--gold),var(--red));transition:width 1s linear}
+.row{display:grid;gap:10px;margin-top:14px}
+.c3{grid-template-columns:repeat(3,1fr)}
+.c2{grid-template-columns:repeat(2,1fr)}
+.pick{border:0;border-radius:14px;padding:13px 4px;font-weight:800;color:#fff;box-shadow:0 6px 16px var(--shadow),inset 0 1px 0 rgba(255,255,255,.3);transition:transform .12s,box-shadow .12s}
+.pick:active{transform:scale(.96)}
+.pick.green{background:linear-gradient(160deg,#35f0a8,#0f9d6a)}
+.pick.violet{background:linear-gradient(160deg,#b79cff,#6a3fe0)}
+.pick.red{background:linear-gradient(160deg,#ff7a8c,#d8324b)}
+.pick.big{background:linear-gradient(160deg,#ffc14d,#ff7a1c)}
+.pick.small{background:linear-gradient(160deg,#5ccbff,#3a6bff)}
+.pick.sel{outline:3px solid var(--sel);outline-offset:2px;box-shadow:0 0 22px var(--sel-glow)}
+.pick small{display:block;font-weight:600;opacity:.9;font-size:.72rem}
+.nums{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 8px 24px var(--shadow)}
+.ball{position:relative;aspect-ratio:1;border-radius:50%;border:0;font-size:1.3rem;font-weight:900;color:#fff;display:grid;place-items:center;text-shadow:0 1px 3px rgba(0,0,0,.4);box-shadow:inset 0 -7px 12px rgba(0,0,0,.28),0 5px 12px rgba(0,0,0,.4);transition:transform .12s}
+.ball::after{content:"";position:absolute;top:9%;left:17%;width:40%;height:26%;border-radius:50%;background:rgba(255,255,255,.4);filter:blur(1px)}
+.ball:active{transform:scale(.9)}
+.ball.sel{outline:3px solid var(--sel);outline-offset:3px;box-shadow:0 0 22px var(--sel-glow),inset 0 -7px 12px rgba(0,0,0,.28)}
+.amt{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.amt button{flex:1;min-width:52px;padding:9px 0;border-radius:10px;border:1px solid var(--line);background:var(--chip);font-weight:700;transition:background .15s}
+.amt button.on{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--onaccent);border-color:transparent}
+.place{width:100%;margin-top:14px;padding:15px;border:0;border-radius:14px;background:linear-gradient(135deg,#ffd45e,var(--gold2));color:var(--onaccent);font-weight:900;font-size:1.02rem;letter-spacing:.02em;box-shadow:0 8px 22px rgba(255,159,28,.35);transition:transform .12s}
+.place:active:not(:disabled){transform:scale(.98)}
+.place:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+.logout{background:linear-gradient(135deg,#ff7a8c,#d8324b);color:#fff;box-shadow:0 8px 22px rgba(216,50,75,.35)}
+h2{font-size:1rem;font-weight:800;margin:22px 0 10px;color:var(--ink)}
+table{width:100%;border-collapse:collapse;font-size:.86rem;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+th,td{padding:10px 6px;text-align:center;border-bottom:1px solid var(--line)}
+tbody tr:last-child td{border-bottom:0}
+th{color:var(--mute);font-weight:700;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;background:var(--panel-solid);z-index:1}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin:0 2px;box-shadow:0 0 8px currentColor}
+.scroll{overflow:auto;max-height:calc(100vh - 240px);max-height:calc(100dvh - 240px);min-height:140px;border:1px solid var(--line);border-radius:14px;background:var(--soft);-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(130,135,170,.5) transparent}
+.scroll table{border:0;border-radius:0;min-width:300px}
+.empty{color:var(--mute);font-size:.86rem;padding:10px 0}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:linear-gradient(135deg,#ffd45e,var(--gold2));color:var(--onaccent);padding:13px 20px;border-radius:14px;font-weight:800;max-width:90%;text-align:center;display:none;z-index:5;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.toast.show{display:block;animation:pop .25s ease-out}
+@keyframes pop{from{transform:translate(-50%,12px);opacity:0}}
+.nav{display:flex;gap:6px;margin:0 0 6px;flex-wrap:wrap;padding:5px;background:var(--panel);border:1px solid var(--line);border-radius:16px}
+.nav a{flex:1;text-align:center;padding:10px 6px;border-radius:12px;color:var(--mute);text-decoration:none;font-size:.86rem;font-weight:700;transition:background .15s,color .15s}
+.nav a.on{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--onaccent);box-shadow:0 4px 14px rgba(255,159,28,.35)}
+select,input{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:var(--field);color:var(--ink);font:inherit;margin:6px 0}
+select option{background:var(--panel-solid);color:var(--ink)}
+input::placeholder{color:var(--mute)}
+label{display:block}
+.err{color:var(--red);font-size:.86rem;min-height:1.2em}
+.hide{display:none!important}
+#v-auth{margin-top:8vh;padding:22px}
+#v-auth h2{margin-top:0;font-size:1.25rem}
+.gear{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink);display:grid;place-items:center;padding:0}
+.srow{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.menu-btn{width:100%;display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--panel);font-weight:700;font-size:1rem;text-align:left}
+.mini{padding:7px 12px;border-radius:10px;border:1px solid var(--line);background:var(--chip);font-size:.8rem;font-weight:600}
+.mini.on{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--onaccent);border-color:transparent}
+.reset{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 10px;color:var(--mute);font-size:.8rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.round-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(5,8,25,.76);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.round-overlay.hide{display:none!important}
+.round-modal{width:min(390px,94vw);padding:26px 22px 22px;text-align:center;border:1px solid rgba(255,255,255,.18);border-radius:26px;background:linear-gradient(155deg,#252947,#15182d);box-shadow:0 22px 80px rgba(0,0,0,.48);color:#fff;animation:roundPop .22s ease-out}
+.round-modal-kicker{font-size:.78rem;font-weight:900;letter-spacing:.18em;color:#ffc34d}
+.round-modal-title{margin-top:10px;font-size:1.15rem;font-weight:800}
+.round-result-label{margin-top:6px;color:#c5c9e4;font-weight:700}
+.round-result-number{display:grid;place-items:center;width:116px;height:116px;margin:14px auto 8px;border-radius:50%;font-size:4.2rem;font-weight:1000;color:#fff;background:linear-gradient(145deg,#ffbd48,#f07819);box-shadow:0 0 0 8px rgba(255,190,70,.12),0 12px 35px rgba(0,0,0,.35)}
+.round-result-number.hide{display:none}
+.round-modal-foot{margin-top:14px;color:#aeb5d7;font-size:.82rem}
+@keyframes roundPop{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+.win-fx-layer{position:fixed;inset:0;z-index:10020;pointer-events:none;overflow:hidden}
+.win-fx-coin{position:absolute;left:50%;top:54%;font-size:clamp(24px,5vw,42px);filter:drop-shadow(0 5px 12px rgba(255,190,50,.45));animation:coinFlyUp 1.45s cubic-bezier(.18,.72,.25,1) forwards;will-change:transform,opacity}
+.win-fx-total{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%) scale(.7);padding:12px 20px;border:1px solid rgba(255,218,112,.65);border-radius:18px;background:linear-gradient(135deg,#3c2a0b,#171a35);color:#ffd15c;font-size:clamp(22px,6vw,34px);font-weight:1000;white-space:nowrap;box-shadow:0 12px 40px rgba(0,0,0,.4);animation:winTotalPop 1.7s ease-out forwards}
+@keyframes coinFlyUp{0%{opacity:0;transform:translate(-50%,0) scale(.45) rotate(0deg)}12%{opacity:1}75%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-1 * var(--dy))) scale(.72) rotate(var(--rot))}}
+@keyframes winTotalPop{0%{opacity:0;transform:translate(-50%,-30%) scale(.55)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}30%{transform:translate(-50%,-50%) scale(1)}78%{opacity:1}100%{opacity:0;transform:translate(-50%,-95%) scale(.9)}}
+.balance-win-pulse{animation:balanceWinPulse .9s ease-in-out 2}
+@keyframes balanceWinPulse{0%,100%{filter:none;transform:scale(1)}50%{filter:drop-shadow(0 0 12px #ffc84d);transform:scale(1.13);color:#ffd15c}}
+
+.top{gap:10px}
+.top-brand{display:flex;align-items:center;gap:9px;min-width:0}
+.brand-crown{width:30px;height:30px;flex:0 0 auto;filter:drop-shadow(0 2px 7px rgba(255,201,77,.35))}
+.top h1{margin:0;letter-spacing:-.7px;font-size:clamp(1.35rem,4.5vw,1.9rem);font-weight:1000;background:linear-gradient(100deg,#ffd05a 0%,#ff9f35 45%,#ff79c6 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.bal{display:flex;align-items:center;gap:7px;padding:7px 12px;min-height:38px;font-weight:900;letter-spacing:.1px;background:linear-gradient(135deg,rgba(255,201,77,.17),rgba(255,145,30,.09));border:1px solid rgba(255,201,77,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 4px 16px rgba(255,175,35,.08)}
+.bal:not(:empty)::before{content:"🪙";font-size:1.05rem;line-height:1}
+.bal:not(:empty)::after{content:"👛";font-size:1rem;line-height:1;margin-left:2px}
+.bal[data-admin="1"]::before,.bal[data-admin="1"]::after{display:none}
+@media(max-width:420px){.top{margin-bottom:12px}.brand-crown{width:25px;height:25px}.top h1{font-size:1.3rem}.bal{font-size:.88rem;padding:6px 9px;gap:5px}}
+
+
+.round-id-wrap{min-width:0}
+.round-id-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px}
+#period{display:block;font-size:clamp(1.05rem,4.4vw,1.48rem);font-weight:1000;letter-spacing:.15px;line-height:1.2;overflow-wrap:anywhere}
+.round-live{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;border:1px solid rgba(46,230,160,.28);background:rgba(46,230,160,.09);color:#48e9ae;font-size:.66rem;font-weight:900;letter-spacing:.7px;white-space:nowrap}
+.round-live i{width:7px;height:7px;border-radius:50%;background:#2ee6a0;box-shadow:0 0 8px rgba(46,230,160,.8)}
+@media(max-width:420px){.round-id-line{gap:8px}#period{font-size:clamp(1rem,4.2vw,1.25rem)}.round-live{font-size:.6rem;padding:3px 7px}}
+
+
+/* Compact Play2Win game launcher */
+.game-launcher{margin-top:8px}
+.game-launcher-head{margin:8px 2px 14px}
+.game-launcher-head h2{margin:0 0 4px;font-size:1.12rem}
+.game-launcher-head p{margin:0;color:var(--mute);font-size:.78rem}
+.game-launch-grid{display:grid;grid-template-columns:repeat(3,minmax(0,85px));justify-content:space-between;gap:18px 10px;padding:8px 2px}
+.game-launch-item{width:85px;text-align:center;cursor:pointer}
+.game-launch-box{width:85px;height:85px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(145deg,rgba(255,201,77,.16),var(--panel));box-shadow:0 7px 18px var(--shadow),inset 0 1px 0 rgba(255,255,255,.10);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:var(--ink);transition:transform .14s,border-color .14s,box-shadow .14s}
+.game-launch-item:active .game-launch-box{transform:scale(.94);border-color:var(--gold);box-shadow:0 0 18px var(--clock-glow)}
+.game-launch-icon{font-size:27px;line-height:1.1;filter:drop-shadow(0 3px 7px rgba(255,190,60,.22))}
+.game-launch-name{font-size:.73rem;font-weight:900;line-height:1.1}
+.game-launch-desc{margin-top:6px;color:var(--mute);font-size:.68rem;font-weight:700;letter-spacing:.02em}
+.game-launch-item:focus-visible{outline:0}
+.game-launch-item:focus-visible .game-launch-box{outline:3px solid var(--violet);outline-offset:3px}
+@media(max-width:360px){.game-launch-grid{grid-template-columns:repeat(3,80px)}.game-launch-item,.game-launch-box{width:80px}.game-launch-box{height:80px}}
+
+
+/* Play2Win game-first dashboard */
+.game-launcher{margin:12px 0 0}
+.game-launcher-head{margin:14px 4px 20px}
+.game-eyebrow{display:inline-block;color:var(--gold-text);font-size:.68rem;font-weight:1000;letter-spacing:2px;margin-bottom:8px}
+.game-launcher-head h2{font-size:1.35rem;margin:0 0 5px}
+.game-launcher-head p{font-size:.82rem;color:var(--mute);margin:0}
+.game-launch-grid{display:flex;justify-content:center;padding:8px 4px 18px}
+.game-launch-item{display:block;width:100%;max-width:340px;padding:0;border:0;background:none;text-align:inherit}
+.game-launch-box{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px;width:100%;min-height:220px;padding:24px 18px;border-radius:26px;border:1px solid rgba(255,201,77,.48);color:var(--ink);background:radial-gradient(circle at 50% 0%,rgba(255,201,77,.25),transparent 58%),linear-gradient(145deg,rgba(255,255,255,.11),rgba(255,255,255,.025));box-shadow:0 16px 34px var(--shadow),inset 0 1px 0 rgba(255,255,255,.18);transition:transform .18s,border-color .18s,box-shadow .18s}
+.game-launch-box:before{content:"";position:absolute;inset:9px;border:1px solid rgba(255,201,77,.16);border-radius:19px;z-index:-1}
+.game-launch-item:active .game-launch-box{transform:scale(.975);border-color:var(--gold);box-shadow:0 0 28px var(--clock-glow)}
+.game-launch-icon{display:grid;place-items:center;width:82px;height:82px;border-radius:24px;font-size:43px;background:linear-gradient(145deg,#ffe5a1,#ffad26);box-shadow:0 10px 25px rgba(255,159,28,.28),inset 0 2px 0 rgba(255,255,255,.65)}
+.game-launch-name{font-size:1.05rem;font-weight:1000;letter-spacing:1.2px}
+.game-launch-sub{font-size:.68rem;font-weight:800;letter-spacing:1.5px;color:var(--mute)}
+.game-launch-cta{display:flex;align-items:center;gap:9px;margin-top:5px;padding:10px 25px;border-radius:999px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--onaccent);font-size:.78rem;font-weight:1000;letter-spacing:.8px;box-shadow:0 7px 18px rgba(255,159,28,.25)}
+.game-subnav{display:flex;gap:7px;margin:0 0 14px;padding:5px;border:1px solid var(--line);border-radius:15px;background:var(--panel)}
+.game-subnav button{flex:1;min-width:0;padding:9px 5px;border:0;border-radius:10px;background:transparent;color:var(--mute);font-size:.76rem;font-weight:850}
+.game-subnav button.active{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--onaccent);box-shadow:0 4px 12px rgba(255,159,28,.2)}
+@media(prefers-reduced-motion:reduce){.game-launch-box{transition:none}}
+
+
+/* Clean home screen: weekly reward card + icon-only game launcher */
+.game-launcher,.game-launcher-head{display:none!important}
+.daily-reward-card{margin:12px 0 8px;padding:16px 14px 12px;border-radius:20px;border:1px solid rgba(255,190,65,.42);background:radial-gradient(circle at 100% 0%,rgba(255,184,55,.18),transparent 42%),linear-gradient(145deg,var(--panel),rgba(255,255,255,.025));box-shadow:0 12px 28px var(--shadow),inset 0 1px 0 rgba(255,255,255,.12)}
+.daily-reward-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}
+.daily-reward-heading h2{margin:0 0 3px;font-size:1.02rem;font-weight:950}
+.daily-reward-heading p{margin:0;color:var(--mute);font-size:.72rem}
+.reward-calendar-icon{width:39px;height:39px;flex:0 0 39px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(145deg,#ffe7a8,#ffad2e);font-size:22px;box-shadow:0 6px 16px rgba(255,159,28,.2)}
+.daily-reward-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.daily-reward-day{min-width:0;min-height:78px;padding:9px 3px 7px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:13px;border:1px solid var(--line);background:var(--soft);box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.daily-reward-day:nth-child(n+5){background:linear-gradient(145deg,rgba(255,201,77,.12),var(--soft))}
+.daily-reward-day span{font-size:.62rem;letter-spacing:.8px;font-weight:900;color:var(--mute)}
+.daily-reward-day b{font-size:1.15rem;line-height:1.25;font-weight:1000;color:var(--gold-text)}
+.daily-reward-day small{font-size:.61rem;color:var(--mute)}
+.daily-reward-foot{margin:10px 2px 0;text-align:center;font-size:.67rem;color:var(--mute)}
+.game-launch-grid{display:flex;justify-content:center;align-items:center;padding:18px 4px 24px}
+.game-launch-item{width:auto;max-width:none;padding:0;border:0;background:transparent;display:grid;place-items:center}
+.game-launch-icon{width:92px;height:92px;border-radius:27px;font-size:49px;cursor:pointer;display:grid;place-items:center;background:linear-gradient(145deg,#ffe5a1,#ffad26);box-shadow:0 12px 28px rgba(255,159,28,.3),inset 0 2px 0 rgba(255,255,255,.7);transition:transform .16s,box-shadow .16s}
+.game-launch-item:active .game-launch-icon{transform:scale(.93);box-shadow:0 0 0 5px rgba(255,190,60,.15),0 8px 20px rgba(255,159,28,.25)}
+.game-launch-item:focus-visible{outline:3px solid var(--violet);outline-offset:5px;border-radius:30px}
+@media(max-width:360px){.daily-reward-card{padding:13px 10px 10px}.daily-reward-grid{gap:6px}.daily-reward-day{min-height:72px}.game-launch-icon{width:84px;height:84px;font-size:45px}}
+
+
+/* Interactive daily check-in rewards */
+.daily-reward-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.daily-reward-day{appearance:none;width:100%;font:inherit;cursor:pointer;position:relative;transition:transform .15s,border-color .15s,background .15s,box-shadow .15s}
+.daily-reward-day:active{transform:scale(.96)}
+.daily-reward-day:disabled{cursor:default;opacity:.7}
+.daily-reward-day.is-current{border:1.5px solid var(--gold);background:linear-gradient(145deg,rgba(255,201,77,.28),var(--soft));box-shadow:0 0 0 2px rgba(255,190,60,.12),0 7px 16px rgba(255,159,28,.12)}
+.daily-reward-day.is-claimed{border-color:rgba(46,190,130,.48);background:linear-gradient(145deg,rgba(46,190,130,.14),var(--soft))}
+.daily-reward-day.is-locked{opacity:.52}
+.daily-reward-day small{font-weight:800}
+.daily-reward-day.is-claimed small{color:var(--green)}
+.daily-reward-day.is-current small{color:var(--gold-text)}
+.daily-reward-foot{min-height:18px}
+@media(max-width:360px){.daily-reward-grid{gap:5px}.daily-reward-day{min-height:68px}.daily-reward-day b{font-size:1.02rem}}
+
+
+/* Dedicated Rewards tab layout */
+#v-rewards{padding-top:4px}
+#v-rewards .daily-reward-card{margin-top:8px}
+#v-rewards .daily-reward-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+#v-rewards .daily-reward-day{min-height:88px}
+@media(max-width:360px){#v-rewards .daily-reward-day{min-height:78px}}
+
+
+
+
+
+/* Home game icon sizing */
+#v-home .game-launch-grid{display:flex!important;justify-content:flex-start!important;align-items:flex-start!important;gap:14px!important;padding:12px 2px 18px!important}
+#v-home .game-launch-item{display:grid!important;place-items:center!important;width:64px!important;max-width:64px!important;padding:0!important;border:0!important;background:transparent!important}
+#v-home .game-launch-icon{width:64px!important;height:64px!important;min-width:64px!important;min-height:64px!important;border-radius:17px!important;font-size:32px!important;line-height:1!important;display:grid!important;place-items:center!important}
+@media(max-width:360px){#v-home .game-launch-item,#v-home .game-launch-icon{width:58px!important;max-width:58px!important;min-width:58px!important;height:58px!important;min-height:58px!important}#v-home .game-launch-icon{font-size:29px!important}}
+
+
+/* Premium attractive home game icons */
+#v-home .game-launch-grid{
+  display:flex!important;justify-content:center!important;align-items:flex-start;
+  gap:26px!important;padding:16px 4px 24px!important;
+}
+#v-home .game-launch-item{
+  width:112px!important;max-width:112px!important;padding:0!important;
+  border:0!important;background:transparent!important;text-align:center!important;
+}
+#v-home .game-launch-box{
+  position:relative;isolation:isolate;overflow:hidden;
+  width:104px!important;height:112px!important;min-height:112px!important;
+  margin:0 auto;padding:10px!important;border-radius:25px!important;
+  display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:9px!important;
+  border:1px solid rgba(255,255,255,.48)!important;
+  box-shadow:0 12px 26px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.7)!important;
+  transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;
+}
+#v-home .game-launch-box:before{
+  content:"";position:absolute;inset:5px;border:1px solid rgba(255,255,255,.32);
+  border-radius:20px;pointer-events:none;z-index:-1;
+}
+#v-home .game-launch-box:after{
+  content:"";position:absolute;top:-38%;left:-35%;width:85%;height:75%;
+  transform:rotate(28deg);background:linear-gradient( to bottom,rgba(255,255,255,.45),rgba(255,255,255,0));
+  border-radius:50%;pointer-events:none;z-index:-1;
+}
+#v-home .game-launch-item:active .game-launch-box{
+  transform:translateY(2px) scale(.96);filter:brightness(1.06);
+}
+#v-home .game-launch-icon{
+  position:relative;width:66px!important;height:66px!important;min-width:66px;
+  display:flex!important;align-items:center;justify-content:center;
+  margin:0!important;font-size:initial!important;filter:drop-shadow(0 5px 5px rgba(0,0,0,.24))!important;
+}
+#v-home .game-launch-name{
+  display:block;font-size:12px!important;line-height:1.05;font-weight:950!important;
+  letter-spacing:.25px;color:var(--ink)!important;white-space:nowrap;
+  text-shadow:0 1px 5px rgba(0,0,0,.22);
+}
+#v-home .game-launch-item:focus-visible{outline:0}
+#v-home .game-launch-item:focus-visible .game-launch-box{outline:3px solid var(--violet);outline-offset:4px}
+
+/* Number Game: glossy blue number tile */
+#v-home .game-launch-box:has(.number-game-icon){
+  background:radial-gradient(circle at 25% 12%,#8fe3ff 0,#369dff 34%,#1762d5 72%,#103d9d 100%)!important;
+}
+#v-home .number-game-icon{
+  width:62px!important;height:62px!important;border-radius:17px!important;
+  display:grid!important;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;
+  place-items:center;gap:2px!important;padding:7px!important;
+  border:2px solid rgba(255,255,255,.92)!important;
+  background:linear-gradient(145deg,#0d4ca9,#168de9 55%,#073b91)!important;
+  box-shadow:inset 0 2px 7px rgba(255,255,255,.35),0 5px 12px rgba(0,26,90,.35);
+  color:#fff!important;font-size:17px!important;font-weight:1000!important;line-height:1!important;
+  text-shadow:0 2px 3px rgba(0,0,0,.35);
+}
+#v-home .number-game-icon span{
+  display:block!important;font-size:17px!important;line-height:1!important;
+}
+
+/* Gold Ball: emerald glass cup with glowing golden ball */
+#v-home .game-launch-box:has(.goldball-launch-icon){
+  background:radial-gradient(circle at 50% 0%,#fff0b2 0,#ffc94d 36%,#f39a16 76%,#bd650b 100%)!important;
+}
+#v-home .goldball-launch-icon{
+  width:70px!important;height:70px!important;overflow:visible!important;
+  border-radius:20px;
+  background:radial-gradient(circle at 50% 20%,rgba(255,255,255,.38),rgba(255,255,255,0) 62%);
+}
+#v-home .launch-cup{
+  position:absolute;left:12px;right:12px;bottom:5px;height:43px;
+  border-radius:8px 8px 17px 17px;
+  clip-path:polygon(12% 0,88% 0,100% 100%,0 100%);
+  background:linear-gradient(100deg,#00695f 0%,#00d9b8 24%,#8bfff0 39%,#009c87 57%,#004e49 100%);
+  border:2px solid rgba(213,255,246,.95);
+  box-shadow:inset 0 3px 8px rgba(255,255,255,.75),0 8px 12px rgba(0,54,47,.35);
+}
+#v-home .launch-cup:after{
+  content:"";position:absolute;left:10%;right:10%;top:1px;height:8px;border-radius:50%;
+  background:linear-gradient(180deg,#fff,#9affee 70%,#22bfa9);
+  box-shadow:0 2px 4px rgba(0,0,0,.18);
+}
+#v-home .launch-ball{
+  position:absolute;z-index:3;top:4px;left:27px;width:25px;height:25px;border-radius:50%;
+  background:radial-gradient(circle at 29% 22%,#fffbd0 0,#ffe76b 22%,#ffb900 58%,#d76b00 100%);
+  box-shadow:0 0 0 3px rgba(255,236,145,.2),0 0 15px 5px rgba(255,207,48,.75),0 5px 8px rgba(104,54,0,.35);
+}
+@media(max-width:360px){
+  #v-home .game-launch-grid{gap:16px!important}
+  #v-home .game-launch-item{width:100px!important}
+  #v-home .game-launch-box{width:96px!important;height:106px!important;min-height:106px!important}
+}
+
+</style>
+
+<style id="basic-copy-deterrence">
+html,body,.app-shell{ -webkit-user-select:none!important; user-select:none!important; }
+input,textarea,[contenteditable="true"]{ -webkit-user-select:text!important; user-select:text!important; }
+img{ -webkit-user-drag:none; user-drag:none; }
+</style>
+<style id="gold-ball-game-style">
+.gold-game{margin-top:12px;padding:16px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(155deg,rgba(0,65,66,.92),rgba(3,23,34,.98));color:#efffff;box-shadow:0 16px 36px rgba(0,0,0,.28);overflow:hidden}
+.gold-game-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.gold-game-head h2{margin:0;color:#f4ffff;font-size:1.25rem}.gold-game-head p{margin:4px 0 0;color:#a7d9d7;font-size:.78rem}
+.gold-auto{font-size:.7rem;font-weight:900;color:#082d2b;background:#c9f4e8;border-radius:99px;padding:7px 10px;white-space:nowrap}
+.gold-stage{position:relative;min-height:390px;margin-top:16px;border-radius:18px;background:radial-gradient(ellipse at 50% 75%,rgba(0,190,170,.18),transparent 65%),#06272c;overflow:hidden;padding:20px 8px}
+.gold-title{text-align:center;font-weight:1000;letter-spacing:.08em;font-size:1.7rem;color:#f3ffff}.gold-sub{text-align:center;color:#ffcf54;font-weight:900;margin-top:2px;letter-spacing:.08em}
+.gold-cup-row{position:relative;height:220px;max-width:420px;margin:38px auto 0}
+.gold-cup{position:absolute;top:18px;width:30%;height:175px;border:0;background:transparent;padding:0;transition:left .42s cubic-bezier(.2,.8,.2,1),transform .25s;z-index:2}
+.gold-cup:disabled{cursor:default}.gold-cup-shape{position:absolute;left:8%;right:8%;bottom:3px;height:132px;background:linear-gradient(100deg,#007d70,#00e0c2 25%,#008d80 48%,#004f4b 78%,#00b9a6);clip-path:polygon(19% 0,81% 0,100% 100%,0 100%);border:2px solid #00f2cf;filter:drop-shadow(0 8px 7px rgba(0,0,0,.55));border-radius:10px 10px 24px 24px}
+.gold-cup-shape:before{content:"";position:absolute;left:8%;right:8%;top:-8px;height:22px;border-radius:50%;background:radial-gradient(ellipse at 40% 35%,#f1ffff,#8bd7d1 70%,#267f7a);border:2px solid rgba(255,255,255,.55)}
+.gold-cup-shape:after{content:"";position:absolute;left:20%;top:16px;width:9%;height:98px;background:rgba(255,255,255,.62);filter:blur(4px);border-radius:99px}
+.gold-cup:active{transform:scale(.96)}.gold-cup.is-picked .gold-cup-shape{filter:drop-shadow(0 0 12px #ffd24e)}
+.gold-ball{position:absolute;left:50%;top:32px;transform:translateX(-50%);width:31px;height:31px;border-radius:50%;background:radial-gradient(circle at 32% 25%,#fff8bd,#ffcf30 38%,#d98200 78%);box-shadow:0 0 20px rgba(255,207,48,.85);opacity:0;transition:top .28s,opacity .2s;z-index:1}
+.gold-cup.revealed .gold-ball{opacity:1;top:10px}.gold-cup.revealed .gold-cup-shape{transform:translateY(-24px)}
+.gold-cup-label{position:absolute;bottom:-24px;left:0;right:0;text-align:center;font-size:.75rem;color:#c3e9e5;font-weight:800}
+.gold-message{text-align:center;min-height:24px;margin:14px 0 4px;color:#d4efeb;font-weight:700;font-size:.9rem}
+.gold-controls{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin-top:12px}.gold-controls button{border:1px solid rgba(255,255,255,.2);border-radius:12px;background:rgba(255,255,255,.08);color:#efffff;padding:11px 2px;font-weight:900;font-size:.82rem}.gold-controls button.active{background:linear-gradient(135deg,#ffd85e,#ff9d17);color:#2a1a00;border-color:transparent}
+.gold-start{width:100%;margin-top:12px;padding:14px;border:0;border-radius:14px;background:linear-gradient(135deg,#ffdc65,#ff9812);color:#2a1900;font-weight:1000;font-size:1rem}.gold-start:disabled{opacity:.55}
+.gold-history{display:none!important}
+.gold-wallet-bar,.gold-total-line{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 12px;border:1px solid rgba(255,201,77,.28);border-radius:12px;background:rgba(255,201,77,.08);color:#f8e8bd;font-size:.84rem}
+.gold-wallet-bar strong,.gold-total-line strong{color:#ffda73;font-weight:1000}
+.gold-entry-label{display:block;margin-top:12px;color:#d4efeb;font-size:.84rem;font-weight:800}
+#gold-entry-amount{margin:6px 0 8px;background:rgba(0,0,0,.2);border-color:rgba(255,255,255,.2);color:#fff}
+#gold-multipliers{grid-template-columns:repeat(3,minmax(0,1fr));margin:6px 0 10px}
+.gold-total-line{margin-top:8px}
+@keyframes goldPulse{50%{filter:brightness(1.35)}}.gold-game.is-shuffling .gold-title{animation:goldPulse .4s infinite}
+@media(max-width:370px){.gold-stage{min-height:290px}.gold-cup-row{height:135px}.gold-cup{height:100px}.gold-cup-shape{height:74px}}
+</style>
+
+<style id="play2win-ad-rewards-style">
+.ad-reward-card{margin:14px 0 8px;padding:16px 14px 14px;border-radius:20px;border:1px solid rgba(255,190,65,.42);background:radial-gradient(circle at 100% 0%,rgba(255,184,55,.16),transparent 42%),linear-gradient(145deg,var(--panel),rgba(255,255,255,.025));box-shadow:0 12px 28px var(--shadow),inset 0 1px 0 rgba(255,255,255,.10)}
+.ad-reward-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.ad-reward-title{font-size:1.02rem;font-weight:950;margin:0 0 3px}.ad-reward-sub{margin:0;color:var(--mute);font-size:.72rem}
+.ad-reward-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(145deg,#ffe7a8,#ffad2e);font-size:23px}
+.ad-bonus-wallet{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:11px 12px;border:1px solid rgba(46,230,160,.28);border-radius:12px;background:rgba(46,230,160,.07);font-size:.84rem;margin:10px 0}
+.ad-bonus-wallet strong{color:var(--green);font-weight:1000}.ad-watch-btn{width:100%;padding:14px;border:0;border-radius:13px;background:linear-gradient(135deg,#ffd45e,#ff9812);color:#271700;font-weight:1000;font-size:.95rem;box-shadow:0 7px 18px rgba(255,159,28,.23)}.ad-watch-btn:disabled{opacity:.5;cursor:not-allowed}.ad-reward-status{min-height:18px;margin:9px 2px 0;text-align:center;color:var(--mute);font-size:.72rem}
+</style>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8506844324170066"
+     crossorigin="anonymous"></script>
+
+<style id="p2w-single-file-legal-css">
+.p2w-policy-footer{margin:24px 0 8px;padding:18px 14px 12px;border:1px solid var(--line);border-radius:16px;background:var(--panel);text-align:center;color:var(--mute);font-size:.78rem}
+.p2w-policy-footer-brand{font-weight:1000;font-size:1rem;letter-spacing:.5px;color:var(--gold-text);margin-bottom:10px}
+.p2w-policy-links{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 16px}
+.p2w-policy-links a,.p2w-policy-footer-contact a{color:var(--ink);text-decoration:none}
+.p2w-policy-links a{font-weight:750}
+.p2w-policy-links a:hover,.p2w-policy-footer-contact a:hover{text-decoration:underline;color:var(--gold-text)}
+.p2w-policy-footer-contact{margin-top:12px;overflow-wrap:anywhere}
+.p2w-legal-page{margin:18px auto 24px;max-width:900px}
+.p2w-legal-heading{padding:22px 20px;border:1px solid var(--line);border-radius:16px;background:var(--panel);margin-bottom:14px}
+.p2w-legal-kicker{font-size:.72rem;font-weight:900;letter-spacing:.12em;color:var(--green)}
+.p2w-legal-heading h2{margin:6px 0 10px;color:var(--ink);font-size:1.65rem}
+.p2w-legal-back{color:var(--gold-text);font-weight:800;text-decoration:none}
+.p2w-legal-card{padding:20px;border:1px solid var(--line);border-radius:16px;background:var(--panel);overflow-wrap:anywhere}
+.p2w-legal-card h2{color:var(--gold-text);font-size:1.08rem;margin:1.45em 0 .4em}
+.p2w-legal-card h2:first-child{margin-top:0}
+.p2w-legal-card p,.p2w-legal-card li{color:var(--ink);line-height:1.65}
+.p2w-legal-card .notice{border-left:4px solid var(--gold);background:rgba(255,201,77,.10);padding:14px;border-radius:8px;color:var(--ink)}
+.p2w-legal-card .placeholder{color:var(--gold-text);font-weight:800}
+@media(max-width:520px){.p2w-policy-links{gap:10px 13px}.p2w-policy-footer{padding:16px 10px 12px}.p2w-legal-card{padding:15px}.p2w-legal-heading{padding:18px}}
+</style>
+<style id="play2win-refer-style">
+.ref-card{margin:14px 0 8px;padding:16px 14px 14px;border-radius:20px;border:1px solid rgba(255,190,65,.45);background:radial-gradient(circle at 100% 0%,rgba(46,230,160,.15),transparent 45%),linear-gradient(145deg,var(--panel),rgba(255,255,255,.025));box-shadow:0 12px 28px var(--shadow),inset 0 1px 0 rgba(255,255,255,.10)}
+.ref-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.ref-head h2{margin:0 0 3px;font-size:1.05rem;font-weight:950}
+.ref-head p{margin:0;color:var(--mute);font-size:.74rem}
+.ref-badge-icon{width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(145deg,#a9ffdb,#2ee6a0);font-size:22px}
+.ref-code-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px dashed var(--gold);border-radius:13px;background:var(--bal-bg);margin-bottom:10px}
+.ref-code-val{font-size:1.08rem;font-weight:1000;letter-spacing:.12em;color:var(--gold-text)}
+.ref-stats-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0 12px}
+.ref-stat{padding:10px 6px;border:1px solid var(--line);border-radius:12px;background:var(--soft);text-align:center}
+.ref-stat span{display:block;font-size:.64rem;font-weight:800;letter-spacing:.05em;color:var(--mute);text-transform:uppercase}
+.ref-stat b{display:block;margin-top:3px;font-size:1.05rem;font-weight:1000;color:var(--gold-text)}
+.ref-actions{display:grid;grid-template-columns:1fr auto;gap:8px}
+.ref-share-btn{padding:13px 14px;border:0;border-radius:13px;background:linear-gradient(135deg,#ffd45e,#ff9812);color:#271700;font-weight:1000;font-size:.92rem;box-shadow:0 7px 18px rgba(255,159,28,.24)}
+.ref-copy-btn{padding:13px 14px;border:1px solid var(--line);border-radius:13px;background:var(--chip);font-weight:800;font-size:.82rem}
+.ref-claim-box{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.ref-claim-row{display:flex;gap:8px;align-items:center;margin-top:6px}
+.ref-claim-row input{margin:0;flex:1;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+.ref-claim-row button{padding:13px 14px;border:0;border-radius:12px;background:linear-gradient(135deg,#35f0a8,#0f9d6a);color:#042416;font-weight:900;white-space:nowrap}
+.ref-claimed-pill{margin-top:12px;padding:10px 12px;border-radius:12px;border:1px solid rgba(46,230,160,.35);background:rgba(46,230,160,.1);color:var(--green);font-size:.8rem;font-weight:800;text-align:center}
+.ref-banner{margin:10px 0 0;padding:13px 14px;border-radius:16px;border:1px solid rgba(255,201,77,.42);background:linear-gradient(135deg,rgba(255,201,77,.14),rgba(46,230,160,.08));display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left}
+.ref-banner b{display:block;font-size:.9rem;color:var(--gold-text)}
+.ref-banner span{display:block;font-size:.74rem;color:var(--mute);margin-top:2px}
+.ref-auth-banner{margin:0 0 12px;padding:11px 12px;border-radius:12px;border:1px solid rgba(46,230,160,.45);background:rgba(46,230,160,.12);color:var(--ink);font-size:.82rem;font-weight:700}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><div class="top-brand">
+    <svg class="brand-crown" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+      <path d="M8 18l13 12L31 8l11 22 14-12-5 31H13L8 18Z" fill="#FFC94D" stroke="#FFD96B" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M14 54h38" stroke="#FFB52E" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="8" cy="16" r="5" fill="#FFD96B"/><circle cx="31" cy="7" r="5" fill="#FFD96B"/><circle cx="56" cy="16" r="5" fill="#FFD96B"/>
+    </svg>
+    <h1>Play2Win</h1>
+  </div><div style="display:flex;align-items:center;gap:10px"><div class="bal" id="bal"></div><button class="gear hide" id="gear" aria-label="Settings"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></div></div>
+
+  <section id="v-auth" class="hide card">
+    <h2 id="auth-title" style="margin-top:0">Log in</h2>
+    <div id="auth-ref-banner" class="ref-auth-banner hide"></div>
+    <div id="auth-download-wrap" class="hide" style="margin-bottom:12px">
+      <a id="auth-download-btn" class="place" href="#" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none;margin-top:0">Download Play2Win App (APK)</a>
+    </div>
+    <label>User ID<input id="a-id" autocomplete="username"></label>
+    <label>Password<input id="a-pw" type="password" autocomplete="current-password"></label>
+    <div class="err" id="a-err"></div>
+    <button class="place" id="a-go" style="margin-top:4px">Log in</button>
+    <div style="text-align:center;margin:12px 0;color:var(--mute);font-size:.8rem">— OR —</div>
+    <button class="place" id="google-login" type="button" style="margin-top:0;background:#fff;color:#222;box-shadow:none">Continue with Google</button>
+    <div class="note" id="google-msg" style="margin-top:8px">New users can register securely using their Google Account.</div>
+  </section>
+  <div id="app" class="hide">
+    <nav class="nav" id="nav"></nav>
+
+
+    <section id="v-home" class="hide">
+      <div class="game-launch-grid">
+        <button class="game-launch-item" type="button" data-open-route="play" aria-label="Open Number Game">
+          <span class="game-launch-box" aria-hidden="true">
+            <span class="game-launch-icon number-game-icon"><span>1 2</span><span>3 4</span></span>
+            <span class="game-launch-name">Number Game</span>
+          </span>
+        </button>
+        <button class="game-launch-item" type="button" data-open-route="goldball" aria-label="Open Gold Ball Challenge">
+          <span class="game-launch-box" aria-hidden="true">
+            <span class="game-launch-icon goldball-launch-icon"><span class="launch-ball"></span><span class="launch-cup"></span></span>
+            <span class="game-launch-name">Gold Ball</span>
+          </span>
+        </button>
+      </div>
+      <button class="ref-banner" type="button" data-open-route="rewards" aria-label="Refer and earn 20 coins">
+        <div>
+          <b>🎁 Share App &amp; Earn 20 Coins</b>
+          <span>Dost ko link bhejein — install par dono ko 20 Coins milenge</span>
+        </div>
+        <span style="font-size:1.3rem;font-weight:900;color:var(--gold-text)" aria-hidden="true">›</span>
+      </button>
+    </section>
+
+    <section id="v-goldball" class="hide">
+      <div class="gold-game" id="gold-game">
+        <div class="gold-game-head"><div><h2>Gold Ball Challenge</h2><p>Watch the cups · Follow the gold ball</p></div><span class="gold-auto">SKILL CHALLENGE</span></div>
+        <div class="gold-stage">
+          <div class="gold-sub">FOLLOW THE GOLD BALL</div>
+          <div class="gold-cup-row" id="gold-cup-row">
+            <button class="gold-cup" type="button" data-cup="0" aria-label="Choose cup 1" style="left:0%"><span class="gold-ball"></span><span class="gold-cup-shape"></span><span class="gold-cup-label">CUP 1</span></button>
+            <button class="gold-cup" type="button" data-cup="1" aria-label="Choose cup 2" style="left:35%"><span class="gold-ball"></span><span class="gold-cup-shape"></span><span class="gold-cup-label">CUP 2</span></button>
+            <button class="gold-cup" type="button" data-cup="2" aria-label="Choose cup 3" style="left:70%"><span class="gold-ball"></span><span class="gold-cup-shape"></span><span class="gold-cup-label">CUP 3</span></button>
+          </div>
+          <div class="gold-message" id="gold-message" aria-live="polite">Press Start Round to reveal the ball, then follow the cups.</div>
+        </div>
+        <span id="gold-wallet-balance" hidden aria-hidden="true">— Coins</span>
+        <label class="gold-entry-label" for="gold-entry-amount">Entry amount (coins)</label>
+        <input id="gold-entry-amount" type="number" min="1" max="10000" step="1" value="10" inputmode="numeric">
+        <div class="gold-controls" id="gold-multipliers" aria-label="Entry multiplier"><button type="button" data-gold-mult="1" class="active">×1</button><button type="button" data-gold-mult="5">×5</button><button type="button" data-gold-mult="10">×10</button></div>
+        <div class="gold-total-line"><span>Total entry</span><strong id="gold-total-entry">10 Coins</strong></div>
+        <button class="gold-start" id="gold-start" type="button">START ROUND</button>
+        <div class="gold-history" id="gold-history">No Gold Ball rounds yet.</div>
+      </div>
+    </section>
+
+
+    <section id="v-rewards" class="hide">
+      <section class="daily-reward-card" aria-label="Daily check-in rewards">
+        <div class="daily-reward-heading">
+          <div>
+            <h2>Daily Check Rewards</h2>
+            <p>Claim daily · Miss a day and start again</p>
+          </div>
+          <span class="reward-calendar-icon" aria-hidden="true">🎁</span>
+        </div>
+        <div class="daily-reward-grid" id="daily-reward-grid">
+          <button class="daily-reward-day" type="button" data-reward-day="1"><span>DAY 1</span><b>1 Coin</b><small>Claim</small></button>
+          <button class="daily-reward-day" type="button" data-reward-day="2"><span>DAY 2</span><b>2 Coins</b><small>Claim</small></button>
+          <button class="daily-reward-day" type="button" data-reward-day="3"><span>DAY 3</span><b>3 Coins</b><small>Claim</small></button>
+          <button class="daily-reward-day" type="button" data-reward-day="4"><span>DAY 4</span><b>5 Coins</b><small>Claim</small></button>
+          <button class="daily-reward-day" type="button" data-reward-day="5"><span>DAY 5</span><b>10 Coins</b><small>Claim</small></button>
+        </div>
+        <p class="daily-reward-foot" id="daily-reward-status" aria-live="polite">Loading your check-in status…</p>
+      </section>
+
+      <section class="ad-reward-card" id="ad-reward-card" aria-label="Watch an ad and earn bonus coins">
+        <div class="ad-reward-head">
+          <div><h2 class="ad-reward-title">Watch Ads &amp; Earn</h2><p class="ad-reward-sub">Watch a complete rewarded ad to earn 1 Bonus Coin</p></div>
+          <span class="ad-reward-icon" aria-hidden="true">📺</span>
+        </div>
+        <div class="ad-bonus-wallet"><span>🎁 Bonus Wallet <small>(non-withdrawable)</small></span><strong id="ad-bonus-balance">0 Coins</strong></div>
+        <button class="ad-watch-btn" id="ad-watch-btn" type="button" disabled>Watch Ad · +1 Bonus Coin</button>
+        <p class="ad-reward-status" id="ad-reward-status" aria-live="polite">Rewarded ads are not configured yet.</p>
+      </section>
+
+      <section class="ref-card" id="referral-card" aria-label="Refer and earn 20 coins">
+        <div class="ref-head">
+          <div>
+            <h2>Refer &amp; Earn 20 Coins</h2>
+            <p>Share download link · Friend joins &amp; installs → Both get +20 Coins</p>
+          </div>
+          <span class="ref-badge-icon" aria-hidden="true">🤝</span>
+        </div>
+        <div class="ref-code-row">
+          <div>
+            <div style="font-size:.66rem;color:var(--mute);font-weight:800;letter-spacing:.06em">YOUR REFERRAL CODE</div>
+            <div class="ref-code-val" id="ref-my-code">Loading…</div>
+          </div>
+          <button class="mini" id="ref-copy-code-btn" type="button">Copy Code</button>
+        </div>
+        <div class="ref-stats-grid">
+          <div class="ref-stat"><span>Shares</span><b id="ref-stat-shares">0</b></div>
+          <div class="ref-stat"><span>Installs</span><b id="ref-stat-refers">0</b></div>
+          <div class="ref-stat"><span>Earned</span><b id="ref-stat-earned">0</b></div>
+        </div>
+        <div class="ref-actions">
+          <button class="ref-share-btn" id="ref-share-btn" type="button">Share App &amp; Download Link</button>
+          <button class="ref-copy-btn" id="ref-copy-link-btn" type="button">Copy Link</button>
+        </div>
+        <div id="ref-claim-box" class="ref-claim-box">
+          <label for="ref-input-code" style="font-size:.78rem;color:var(--mute);font-weight:700">Friend ka referral code daalein (+20 Coins dono ko)</label>
+          <div class="ref-claim-row">
+            <input id="ref-input-code" placeholder="Enter code (e.g. P2W...)" autocapitalize="characters" autocomplete="off">
+            <button id="ref-claim-btn" type="button">Claim +20</button>
+          </div>
+          <div class="err" id="ref-claim-err" style="margin-top:6px"></div>
+        </div>
+        <div id="ref-claimed-badge" class="ref-claimed-pill hide"></div>
+        <div id="ref-my-history" class="empty" style="margin-top:10px"></div>
+      </section>
+
+    </section>
+
+    <section id="v-play">
+<div class="game-subnav" aria-label="Game menu"><button type="button" data-open-route="play" class="active">🎮 Game</button><button type="button" data-open-route="results" class="">🏆 Results</button><button type="button" data-open-route="mine" class="">📜 My History</button></div>
+
+      <!-- Result popup is scoped inside Play only; other views cannot display it. -->
+  <div id="round-overlay" class="round-overlay hide" role="status" aria-live="assertive">
+    <div class="round-modal">
+      <div class="round-modal-kicker" id="round-modal-kicker">ROUND RESULT</div>
+      <div class="round-modal-title" id="round-modal-title">Winning number</div>
+      <div class="round-result-label" id="round-result-label">Result declared</div>
+      <div class="round-result-number hide" id="round-result-number">–</div>
+      <div class="round-modal-foot" id="round-modal-foot">Round complete</div>
+    </div>
+  </div>
+
+      <div class="timer">
+        <div class="round-id-wrap"><small>ROUND</small><div class="round-id-line"><b id="period">–</b><span class="round-live"><i></i> LIVE</span></div></div>
+        <div style="text-align:right"><small id="state">Betting is open</small><div class="clock" id="clock">00:35</div></div>
+      </div>
+      <div class="bar" aria-hidden="true"><i id="bar"></i></div>
+      <div class="row c3">
+        <button class="pick green" data-t="color:green">Green<small>2x</small></button>
+        <button class="pick violet" data-t="color:violet">Violet<small>4.5x</small></button>
+        <button class="pick red" data-t="color:red">Red<small>2x</small></button>
+      </div>
+      <div class="nums" id="nums"></div>
+      <div class="row c2">
+        <button class="pick big" data-t="size:big">Big (5–9)<small>2x</small></button>
+        <button class="pick small" data-t="size:small">Small (0–4)<small>2x</small></button>
+      </div>
+      <div class="card" style="padding:10px">
+        <label style="font-size:.8rem;color:var(--mute)">Bet amount (coins)<input id="base" type="number" inputmode="numeric" min="1" max="100000" step="1" value="10"></label>
+        <div class="amt" id="amt"></div>
+        <div class="amt" id="mult" aria-label="Multiplier"></div>
+        <div id="total" style="margin-top:8px;font-weight:700;text-align:center"></div>
+      </div>
+      <button class="place" id="place" disabled>Select an option first</button>
+      <h2>Your bets this round</h2>
+      <div id="mybets" class="empty">No bets yet.</div>
+    </section>
+
+    <section id="v-results" class="hide">
+<div class="game-subnav" aria-label="Game menu"><button type="button" data-open-route="play" class="">🎮 Game</button><button type="button" data-open-route="results" class="active">🏆 Results</button><button type="button" data-open-route="mine" class="">📜 My History</button></div>
+
+      <h2 style="margin-top:0">Result history</h2><p class="note" style="margin-top:-4px">Showing the last 2 hours. Older results are removed automatically.</p>
+      <div class="scroll"><table><thead><tr><th>Round</th><th>Number</th><th>Size</th><th>Colour</th></tr></thead><tbody id="hist"></tbody></table></div>
+    </section>
+
+    <section id="v-mine" class="hide">
+<div class="game-subnav" aria-label="Game menu"><button type="button" data-open-route="play" class="">🎮 Game</button><button type="button" data-open-route="results" class="">🏆 Results</button><button type="button" data-open-route="mine" class="active">📜 My History</button></div>
+
+      <h2 style="margin-top:0">Your history</h2>
+      <div class="scroll"><table><thead><tr><th>Round</th><th>Bet</th><th>Stake</th><th>Net</th></tr></thead><tbody id="mine"></tbody></table></div>
+    </section>
+
+    <section id="v-settings" class="hide">
+      <div class="card" id="settings-profile" style="margin-top:0">
+        <div class="srow"><b id="st-name" style="font-size:1.1rem"></b><span class="bal" id="st-amt"></span></div>
+        <div class="note" id="st-sub" style="margin:6px 0 0"></div>
+      </div>
+      <div id="settings-wallet-links">
+        <button class="menu-btn" id="m-add"><span>Add Coins</span><span aria-hidden="true">›</span></button>
+        <button class="menu-btn" id="m-withdraw"><span>Withdraw Coins</span><span aria-hidden="true">›</span></button>
+      </div>
+      <section id="v-add" class="hide">
+      <button class="mini" data-back style="margin:12px 0 0">‹ Back to Settings</button>
+      <div class="card" id="wallet-topup">
+        <h2 style="margin-top:0">Add Coins</h2>
+        <p class="note">UPI QR se payment karein. ₹1 = 1 coin. Payment ke baad UTR submit karna zaroori hai.</p>
+        <label>Amount (INR)
+          <input id="pay-amount" type="number" inputmode="numeric" min="10" max="50000" step="1" value="100" placeholder="Enter amount in ₹">
+        </label>
+        <div class="err" id="pay-err" role="alert"></div>
+        <button class="place" id="pay-now" style="margin-top:4px">Generate UPI QR</button>
+        <p class="note" style="margin:8px 0 0">Coins admin ke payment verify karke approve karne ke baad add honge.</p>
+      </div>
+      <div class="card hide" id="upi-payment">
+        <h2 style="margin-top:0">Scan & Pay</h2>
+        <p class="note">Neeche diye gaye exact amount ka payment isi UPI QR par karein.</p>
+        <div id="upi-qr" style="display:flex;justify-content:center;background:#fff;padding:14px;border-radius:14px;min-height:210px;align-items:center"></div>
+        <div id="upi-details" style="text-align:center;margin:10px 0;font-weight:800"></div>
+        <p class="note">Payment successful hone ke baad UPI app se 12 digit UTR / UPI transaction reference number daalein.</p>
+        <label>12 digit UTR number<input id="upi-utr" inputmode="numeric" maxlength="12" placeholder="Enter UTR number"></label>
+        <div class="err" id="upi-err" role="alert"></div>
+        <button class="place" id="upi-submit">Submit UTR for verification</button>
+        <button class="mini" id="upi-cancel" style="width:100%;margin-top:8px">Cancel</button>
+      </div>
+      <div class="card">
+        <h2 style="margin-top:0">My Deposit Requests</h2>
+        <div id="my-deposits" class="empty">Loading...</div>
+      </div>
+      </section>
+      <section id="v-withdraw" class="hide">
+      <button class="mini" data-back style="margin:12px 0 0">‹ Back to Settings</button>
+      <div class="card" id="withdraw-card">
+        <h2 style="margin-top:0">Withdraw Coins</h2>
+        <p class="note">Minimum withdrawal ₹100 (100 coins). Add and save your UPI ID before requesting withdrawal.</p>
+        <label>UPI ID<input id="withdraw-upi" type="text" placeholder="name@upi" autocapitalize="off" autocomplete="off"></label>
+        <button class="mini" id="save-withdraw-upi" type="button">Save UPI ID</button>
+        <label style="margin-top:10px">Amount (₹)<input id="withdraw-amount" type="number" min="100" step="1" value="100" inputmode="numeric"></label>
+        <div class="err" id="withdraw-msg" role="alert"></div>
+        <button class="place" id="withdraw-submit" type="button">Request Withdrawal</button>
+        <h2>My Withdrawal Requests</h2><div id="my-withdrawals" class="empty">Loading...</div>
+      </div>
+      </section>
+      <div id="settings-other">
+      <div class="card hide" id="st-admin">
+        <div class="srow"><span>Total users</span><b id="st-users">0</b></div>
+        <div class="srow" style="margin-top:8px"><span>Total coins (all users)</span><b id="st-total">0</b></div>
+      </div>
+      <div class="card">
+        <div style="font-weight:700;margin-bottom:10px">Theme</div>
+        <div class="row c2" style="margin-top:0">
+          <button class="mini" data-theme-set="night" style="padding:12px">🌙 Neon Night</button>
+          <button class="mini" data-theme-set="day" style="padding:12px">☀️ Daylight</button>
+        </div>
+      </div>
+      <button class="menu-btn" id="m-tx"><span>Transactions</span><span aria-hidden="true">›</span></button>
+      <button class="menu-btn" id="m-pw"><span>Change password</span><span aria-hidden="true">›</span></button>
+      <button class="place logout" id="s-logout" style="margin-top:16px">Log out</button>
+      <footer class="p2w-policy-footer" aria-label="Play2Win information and policies">
+        <div class="p2w-policy-footer-brand">Play2Win</div>
+        <nav class="p2w-policy-links" aria-label="Legal and information pages">
+          <a href="#/legal/privacy">Privacy Policy</a>
+          <a href="#/legal/terms">Terms &amp; Conditions</a>
+          <a href="#/legal/about">About Us</a>
+          <a href="#/legal/contact">Contact Us</a>
+        </nav>
+        <div class="p2w-policy-footer-contact">
+          Operated by Shivya · <a href="mailto:sainishivya3@gmail.com">sainishivya3@gmail.com</a>
+        </div>
+      </footer>
+      </div>
+    </section>
+
+    <section id="v-tx" class="hide">
+      <button class="mini" data-back style="margin-bottom:10px">‹ Back</button>
+      <h2 style="margin-top:0">Transactions</h2>
+      <select id="tx-user" class="hide" aria-label="Filter by user"></select>
+      <div class="scroll" style="max-height:60vh;max-height:60dvh"><table><thead><tr id="cl-head"></tr></thead><tbody id="coinlog"></tbody></table></div>
+    </section>
+
+    <section id="v-pw" class="hide">
+      <button class="mini" data-back style="margin-bottom:10px">‹ Back</button>
+      <h2 style="margin-top:0">Change password</h2>
+      <input id="pw-old" type="password" placeholder="Current password" autocomplete="current-password">
+      <input id="pw-new" type="password" placeholder="New password (min 6 characters)" autocomplete="new-password">
+      <input id="pw-new2" type="password" placeholder="Confirm new password" autocomplete="new-password">
+      <div class="err" id="pw-err" role="alert"></div>
+      <button class="place" id="pw-go" style="margin-top:4px">Change password</button>
+    </section>
+
+    <section id="v-bets" class="hide">
+      <div class="timer"><div><small>Round</small><b id="b-round">–</b></div><div style="text-align:right"><small>Total staked</small><div class="clock" id="b-total" style="font-size:1.5rem">0</div></div></div>
+      <p class="note" style="margin-top:8px">Live bets for the current round. Results are generated randomly by the server and are never affected by bets.</p>
+      <h2 style="margin-top:8px">Bets by option</h2>
+      <div class="scroll" style="max-height:40vh;max-height:40dvh"><table><thead><tr><th>Option</th><th>Players</th><th>Coins</th></tr></thead><tbody id="b-opts"></tbody></table></div>
+      <h2>Bets in this round</h2>
+      <div class="scroll" style="max-height:30vh;max-height:30dvh"><table><thead><tr><th>User</th><th>Bet on</th><th>Coins</th></tr></thead><tbody id="b-cur"></tbody></table></div>
+      <h2>Recent bets</h2>
+      <div class="scroll" style="max-height:35vh;max-height:35dvh"><table><thead><tr><th>Round</th><th>User</th><th>Bet on</th><th>Coins</th><th>Net</th></tr></thead><tbody id="b-rec"></tbody></table></div>
+    </section>
+
+    <section id="v-admin" class="hide">
+      <div class="card" id="admin-alert-card" style="margin-top:0">
+        <div class="srow"><h2 style="margin:0">Request Alerts</h2><span class="bal" id="admin-alert-status">Sound off</span></div>
+        <p class="note">Admin login hote hi sound alerts automatically start honge. New Add Coins aur Withdrawal request par ring aur browser notification milega.</p>
+        <button class="mini hide" id="admin-alert-enable" type="button">Enable Sound Alerts</button>
+        <button class="mini" id="admin-alert-disable" type="button" style="width:100%;margin-top:8px">Mute Sound</button>
+        <div class="note" id="admin-alert-message" role="status" style="margin-top:8px">Automatic alerts are ready while the admin dashboard is open.</div>
+      </div>
+      <div class="card" style="margin-top:0">
+        <h2 style="margin-top:0">Create user</h2>
+        <input id="n-id" placeholder="User ID" autocomplete="off">
+        <input id="n-phone" placeholder="Phone number (e.g. 9876543210)" inputmode="tel" autocomplete="off">
+        <input id="n-pw" placeholder="Password (min 6 characters)" autocomplete="off">
+        <div class="err" id="n-err"></div>
+        <button class="place" id="n-go" style="margin-top:4px">Create user</button>
+      </div>
+      <div class="card" id="admin-payment-upi-card">
+        <div class="srow"><h2 style="margin-top:0">Payment UPI Management</h2><span class="bal">Admin</span></div>
+        <p class="note">Yahan UPI ID add karein. Active UPI ID se users ke Add Coins QR generate honge. Payment bank/UPI statement se verify karna zaroori hai.</p>
+        <label>UPI ID (VPA)<input id="admin-upi-id" type="text" placeholder="yourname@upi" autocapitalize="off" autocomplete="off"></label>
+        <label>Payee / Business Name<input id="admin-upi-name" type="text" placeholder="Play2Win" maxlength="60"></label>
+        <div class="err" id="admin-upi-error" role="alert"></div>
+        <button class="place" id="admin-upi-add" type="button">Add UPI ID</button>
+        <div style="font-weight:700;margin:16px 0 8px">Saved UPI IDs</div>
+        <div class="scroll" style="max-height:35vh;max-height:35dvh">
+          <table><thead><tr><th>UPI ID</th><th>Name</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="admin-upi-list"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody></table>
+        </div>
+        <div id="admin-upi-qr-wrap" class="hide" style="margin-top:14px;text-align:center">
+          <b id="admin-upi-qr-title"></b>
+          <div id="admin-upi-qr" style="display:flex;justify-content:center;background:#fff;padding:14px;border-radius:14px;margin:10px auto;width:max-content"></div>
+          <button class="mini" id="admin-upi-qr-close" type="button">Close QR</button>
+        </div>
+      </div>
+      <div class="card" id="admin-deposits-card">
+        <div class="srow"><h2 style="margin-top:0">UPI Deposit Requests</h2><span class="bal" id="deposit-pending-count">0 Pending</span></div>
+        <p class="note">UTR aur bank statement verify karne ke baad hi Approve karein.</p>
+        <div class="scroll" style="max-height:45vh;max-height:45dvh"><table><thead><tr><th>Time</th><th>User</th><th>Amount</th><th>UTR</th><th>Status / Action</th></tr></thead><tbody id="deposit-requests"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody></table></div>
+      </div>
+      <div class="card" id="admin-withdrawals-card">
+        <div class="srow"><h2 style="margin-top:0">Withdrawal Requests</h2><span class="bal" id="withdraw-pending-count">0 Pending</span></div>
+        <p class="note">UPI payout manually complete karne ke baad Mark Paid karein. Reject karne par coins user ko refund honge.</p>
+        <div class="scroll" style="max-height:45vh;max-height:45dvh"><table><thead><tr><th>Time</th><th>User</th><th>UPI ID</th><th>Amount</th><th>Status / Action</th></tr></thead><tbody id="withdraw-requests"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody></table></div>
+      </div>
+      <div class="card" id="admin-referrals-card">
+        <div class="srow"><h2 style="margin-top:0">Refer &amp; Earn Analytics</h2><span class="bal" id="admin-ref-badge">20 Coins / Refer</span></div>
+        <p class="note">Yahan app/APK download link set karein aur dekhein kis user ne kitne share kiye, kitne installs hue, aur kitne coins earn kiye.</p>
+        <label>App / APK Download Link
+          <input id="admin-ref-download-url" type="url" placeholder="https://splendorous-jalebi-a6d440.netlify.app/" autocapitalize="off" autocomplete="off">
+        </label>
+        <div class="err" id="admin-ref-url-msg" role="alert"></div>
+        <button class="place" id="admin-ref-save-url" type="button" style="margin-top:4px">Save Download Link</button>
+        <div class="ref-stats-grid" style="margin-top:14px">
+          <div class="ref-stat"><span>Total Shares</span><b id="admin-ref-total-shares">0</b></div>
+          <div class="ref-stat"><span>Total Installs</span><b id="admin-ref-total-refers">0</b></div>
+          <div class="ref-stat"><span>Coins Earned</span><b id="admin-ref-total-coins">0</b></div>
+        </div>
+        <div style="font-weight:700;margin:12px 0 8px">Shares &amp; Earnings by User</div>
+        <div class="scroll" style="max-height:38vh;max-height:38dvh">
+          <table><thead><tr><th>User</th><th>Code</th><th>Shares</th><th>Installs</th><th>Earned</th></tr></thead>
+          <tbody id="admin-ref-users"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody></table>
+        </div>
+        <div style="font-weight:700;margin:14px 0 8px">Recent Referrals</div>
+        <div class="scroll" style="max-height:35vh;max-height:35dvh">
+          <table><thead><tr><th>Time</th><th>Referrer</th><th>New User</th><th>Bonus</th></tr></thead>
+          <tbody id="admin-ref-recent"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody></table>
+        </div>
+      </div>
+      <div class="card">
+        <h2 style="margin-top:0">Users</h2>
+        <div class="scroll" style="max-height:50vh;max-height:50dvh"><table><thead><tr><th>User ID</th><th>Phone</th><th>Coins</th><th>Actions</th></tr></thead><tbody id="users"></tbody></table></div>
+        <p class="note" style="margin-top:8px">Accounts, passwords and coins are stored securely in the cloud database.</p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div id="p2w-legal-view" class="hide" aria-live="polite">
+  <nav class="p2w-policy-links" aria-label="Policy page navigation" style="margin:16px 0">
+    <a href="#/legal/privacy">Privacy Policy</a>
+    <a href="#/legal/terms">Terms &amp; Conditions</a>
+    <a href="#/legal/about">About Us</a>
+    <a href="#/legal/contact">Contact Us</a>
+  </nav>
+
+      <section class="p2w-legal-page hide" id="p2w-legal-privacy" aria-labelledby="p2w-legal-title-privacy">
+        <div class="p2w-legal-heading">
+          <div class="p2w-legal-kicker">PLAY2WIN · INFORMATION</div>
+          <h2 id="p2w-legal-title-privacy">Privacy Policy</h2>
+          <a class="p2w-legal-back" href="#/home">← Back to Play2Win</a>
+        </div>
+        <article class="p2w-legal-card"><div class="notice"><strong>Publication checklist:</strong> Before publishing, replace every highlighted placeholder with real operator/contact details. Confirm the actual data flows, payment provider, retention periods and applicable Indian legal requirements. Do not publish inaccurate statements.</div>
+<h2>1. Who operates Play2Win?</h2>
+<p>Play2Win is operated by <span class="placeholder">Shivya</span> (“we”, “us” or “our”). Our contact address is <span class="placeholder">Hodal, Haryana, India</span>. This policy explains how information is handled when you visit or use the Play2Win website at <span class="placeholder">https://splendorous-jalebi-a6d440.netlify.app/</span>.</p>
+<h2>2. Information we may collect</h2>
+<ul>
+<li><strong>Account information:</strong> phone number and account identifier used for registration or login; display name and email address where provided.</li>
+<li><strong>Wallet and transaction information:</strong> coin balances, deposits, withdrawals, transaction references/UTR, payment status and UPI ID or other payout details you submit.</li>
+<li><strong>Gameplay information:</strong> game selections, rounds, entries, results, reward claims and related account activity.</li>
+<li><strong>Technical information:</strong> device/browser details, IP address, timestamps, diagnostic and security logs, where made available by the hosting, database or security services.</li>
+<li><strong>Browser storage:</strong> the website may use local storage or similar browser storage for session state, preferences and interface settings.</li>
+</ul>
+<p>Only information actually collected by the live version of the service should be described here. Review the application, database, hosting and payment-provider settings before publication.</p>
+<h2>3. How we use information</h2>
+<ul><li>Create and secure accounts and authenticate users.</li><li>Operate the website, games, wallet records and customer support.</li><li>Process and reconcile payment or withdrawal requests through the payment methods made available.</li><li>Detect fraud, abuse, duplicate transactions, unauthorized access and service errors.</li><li>Maintain business, accounting, tax and legal records and respond to lawful requests.</li><li>Improve reliability, troubleshoot issues and communicate important service or policy changes.</li></ul>
+<h2>4. Payments and third-party services</h2>
+<p>Payments may be initiated through UPI or other third-party payment applications. The payment provider or bank processes payment credentials under its own terms and privacy policy. Play2Win should not collect or store UPI PINs, bank passwords, card PINs or one-time passwords.</p>
+<p>The application uses Supabase for database/backend services. The website may also use Netlify for hosting and external libraries or services. These providers may process technical information to provide their services. Add or remove providers here to match the production configuration.</p>
+<h2>5. Advertising and analytics</h2>
+<p>Advertising technologies, including Google services, may be used only after the relevant account, website and ad format have been approved and correctly configured. If advertising, analytics, cookies or similar technologies are enabled, update this policy with the exact providers, data collected, purposes, consent controls and opt-out choices before turning them on. Do not represent that ads are active if they are not.</p>
+<h2>6. Sharing</h2>
+<p>We do not sell personal information. We may share limited information with hosting/database providers, payment providers, professional advisers, fraud-prevention services and authorities where necessary to operate the service, protect users, resolve disputes or comply with law. We require service providers to handle information for the relevant service purpose.</p>
+<h2>7. Retention and security</h2>
+<p>We retain information for as long as needed for account operation, transaction reconciliation, security, dispute resolution and legal/accounting obligations. Exact retention periods should be set by the operator and documented. We use reasonable technical and organizational safeguards, but no internet service can guarantee absolute security.</p>
+<h2>8. Your choices and requests</h2>
+<p>Subject to applicable law, you may request access, correction or deletion of personal information, or raise a privacy concern. Some records may need to be retained for fraud prevention, payment disputes, accounting or legal obligations. Contact us using the details below. We may need to verify your identity before acting.</p>
+<h2>9. Children and eligibility</h2>
+<p>Play2Win is not intended for persons under 18. Do not create an account or use payment, wallet or game features if you are under 18. The operator must also restrict access wherever local law or licensing requirements make the service unavailable.</p>
+<h2>10. Changes and contact</h2>
+<p>We may update this policy when the service or legal requirements change. The latest version will be published on this page with its updated date.</p>
+<p><strong>Privacy contact:</strong> <span class="placeholder">sainishivya3@gmail.com</span><br><strong>Postal address:</strong> <span class="placeholder">Hodal, Haryana, India</span></p></article>
+      </section>
+    
+
+      <section class="p2w-legal-page hide" id="p2w-legal-terms" aria-labelledby="p2w-legal-title-terms">
+        <div class="p2w-legal-heading">
+          <div class="p2w-legal-kicker">PLAY2WIN · INFORMATION</div>
+          <h2 id="p2w-legal-title-terms">Terms &amp; Conditions</h2>
+          <a class="p2w-legal-back" href="#/home">← Back to Play2Win</a>
+        </div>
+        <article class="p2w-legal-card"><div class="notice"><strong>Important — operator review required:</strong> The current app appears to include coin deposits, gameplay entries and withdrawal requests. These features may be regulated as paid gaming, gambling or financial activity depending on their design and jurisdiction. Do not accept deposits, wagers or withdrawals until an Indian-qualified lawyer has reviewed the exact product, state-by-state availability, licensing, tax and payment requirements. These template terms do not make an unlawful service lawful.</div>
+<h2>1. Operator and acceptance</h2>
+<p>This website is operated by <span class="placeholder">Shivya</span> (“Play2Win”, “we”, “us”). By accessing the website you agree to these Terms and our Privacy Policy. If you do not agree, do not use the service.</p>
+<h2>2. Eligibility and location</h2>
+<p>You must be at least 18 years old and legally permitted to access the service where you are located. You are responsible for checking local laws. We may block or suspend access in locations where the service is not permitted. Do not use the service if you are under 18 or if local law prohibits your participation.</p>
+<h2>3. Account security</h2>
+<p>Provide accurate registration information, keep your login credentials private and notify us promptly if you suspect unauthorized access. You are responsible for activity carried out through your account, except where applicable law provides otherwise. We may request reasonable verification to protect accounts and transactions.</p>
+<h2>4. Coins, wallet and rewards</h2>
+<p>Coins are in-app units and are not a bank deposit or a promise of cash value unless a separately approved and lawful feature expressly says otherwise. Promotional or bonus coins may be subject to separate conditions and may be non-transferable and non-withdrawable. Do not assume bonus coins can be exchanged for cash, transferred, or used in paid-entry games.</p>
+<p>Any deposit, paid-entry, prize, payout or withdrawal feature must remain disabled until the operator has obtained all required legal advice, approvals, licences and payment-provider permissions. The operator must publish clear rules, fees, limits, settlement and refund terms before enabling such a feature.</p>
+<h2>5. Games and results</h2>
+<p>Game rules, entry conditions, result determination, settlement, limits and dispute procedures must be clearly disclosed before a game is made available. We may suspend a game to investigate errors, abuse, security incidents or suspected manipulation. No outcome or return is guaranteed.</p>
+<h2>6. Prohibited conduct</h2>
+<ul><li>Creating multiple or false accounts to evade limits or obtain repeated rewards.</li><li>Using bots, scripts, exploits, modified clients or unauthorized access.</li><li>Manipulating results, transactions, referral or reward systems.</li><li>Submitting another person's payment details or impersonating another person.</li><li>Using the service for unlawful activity, fraud, money laundering or abuse.</li></ul>
+<h2>7. Advertising and promotional rewards</h2>
+<p>Where a compliant rewarded-ad feature is enabled, participation must be voluntary and the reward conditions must be displayed before the ad begins. No reward is offered for clicking an advertisement. Ad availability and rewards may be limited by provider rules, location, account eligibility and technical verification. We may disable the feature when required by an advertising provider or law.</p>
+<h2>8. Suspension and termination</h2>
+<p>We may restrict or suspend access when reasonably necessary for security, suspected fraud, legal compliance, policy violations or service maintenance. We will handle any remaining account or transaction records in accordance with applicable law and our Privacy Policy.</p>
+<h2>9. Service availability and liability</h2>
+<p>The website is provided subject to maintenance, outages and third-party service availability. To the extent permitted by law, we do not guarantee uninterrupted access or error-free operation. Nothing in these terms excludes rights or liabilities that cannot legally be excluded.</p>
+<h2>10. Changes, governing law and contact</h2>
+<p>These terms may be updated by publishing a revised version. Governing law, jurisdiction and dispute process must be completed after legal review: <span class="placeholder">To be specified after review by qualified legal counsel.</span>.</p>
+<p><strong>Operator:</strong> <span class="placeholder">Shivya</span><br><strong>Support:</strong> <span class="placeholder">sainishivya3@gmail.com</span><br><strong>Address:</strong> <span class="placeholder">Hodal, Haryana, India</span></p></article>
+      </section>
+    
+
+      <section class="p2w-legal-page hide" id="p2w-legal-about" aria-labelledby="p2w-legal-title-about">
+        <div class="p2w-legal-heading">
+          <div class="p2w-legal-kicker">PLAY2WIN · INFORMATION</div>
+          <h2 id="p2w-legal-title-about">About Us</h2>
+          <a class="p2w-legal-back" href="#/home">← Back to Play2Win</a>
+        </div>
+        <article class="p2w-legal-card"><h2>Who we are</h2>
+<p>Play2Win is an online entertainment platform developed to provide browser-based games and account features in one place. The website includes a user interface for accessing available games, viewing account information and reviewing applicable reward or wallet features.</p>
+<p>Play2Win is operated by <span class="placeholder">Shivya</span>. We are based at <span class="placeholder">Hodal, Haryana, India</span>.</p>
+<h2>What the platform offers</h2>
+<ul><li>Browser-based game interfaces and account access.</li><li>Account and coin-balance displays.</li><li>Game history and relevant account activity, where available.</li><li>Promotional bonus features when enabled and permitted.</li></ul>
+<p>Features involving deposits, paid entries, prizes or withdrawals are subject to applicable law, provider terms and the operator's compliance review. Their appearance in an interface should not be taken as confirmation that they are available or lawful in every location.</p>
+<h2>Our approach</h2>
+<p>We aim to provide clear rules, accurate account records, responsible access controls and a way for users to contact the operator about questions or concerns. We do not promise winnings or financial returns.</p>
+<h2>Contact</h2>
+<p>For support or general enquiries, contact <span class="placeholder">sainishivya3@gmail.com</span>. Postal address: <span class="placeholder">Hodal, Haryana, India</span>.</p></article>
+      </section>
+    
+
+      <section class="p2w-legal-page hide" id="p2w-legal-contact" aria-labelledby="p2w-legal-title-contact">
+        <div class="p2w-legal-heading">
+          <div class="p2w-legal-kicker">PLAY2WIN · INFORMATION</div>
+          <h2 id="p2w-legal-title-contact">Contact Us</h2>
+          <a class="p2w-legal-back" href="#/home">← Back to Play2Win</a>
+        </div>
+        <article class="p2w-legal-card"><h2>Contact Play2Win</h2>
+<p>For account, technical, privacy or general support questions, contact the operator using the details below.</p>
+<h2>Support details</h2>
+<p><strong>Operator:</strong> <span class="placeholder">Shivya</span></p>
+<p><strong>Support email:</strong> <span class="placeholder">sainishivya3@gmail.com</span></p>
+<p><strong>Privacy requests:</strong> <span class="placeholder">sainishivya3@gmail.com</span></p>
+<p><strong>Postal address:</strong> <span class="placeholder">Hodal, Haryana, India</span></p>
+<p><strong>Support hours:</strong> <span class="placeholder">Email support is available at the address above; response times may vary.</span></p>
+<h2>When contacting us</h2>
+<p>Describe the issue and include the date/time and a transaction reference if relevant. Never send your password, UPI PIN, bank PIN, card PIN or one-time password. For your safety, do not send full payment credentials by email.</p>
+<div class="notice">Replace all highlighted placeholders with contact details that you actively monitor before publishing this page. Do not invent a business address or support email.</div></article>
+      </section>
+    
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+  // ====== CONFIG: Supabase project URL and public anon key ======
+  var SUPABASE_URL='https://tcirnuhynvtwbprbogqp.supabase.co';
+  var SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRjaXJudWh5bnZ0d2JwcmJvZ3FwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwNjM4MDAsImV4cCI6MjEwOTYzOTgwMH0.ksoUk7ItTqcfcO01PbCRozztAErtvhEsIQa0QGORH_g';
+  var supa=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
+  // =====================================================================
+  var AMTS=[10,50,100,500];
+  // Change this UPI ID to the merchant UPI ID that should receive customer payments.
+  var MERCHANT_UPI_ID='naresh.saini13@ybl';
+  var MERCHANT_NAME='Play2Win';
+  var COLORS={green:'var(--green)',red:'var(--red)',violet:'var(--violet)'};
+  var $=function(i){return document.getElementById(i)};
+  var S={token:null,id:null,role:null,balance:0,round:0,deadline:0,results:[],pending:[],mine:[],users:[],displayName:null,email:null};
+  var target=null,amount=10,busy=false,lastRound=0,fetching=false,lastRevealedRound=0,roundRevealTimer=null;
+  try{S.token=localStorage.getItem('np_token');S.id=localStorage.getItem('np_id');S.displayName=localStorage.getItem('np_display_name');S.email=localStorage.getItem('np_email')}catch(e){}
+
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(function(){t.classList.remove('show')},3500)}
+  function api(fn,args){
+    if(SUPABASE_URL.indexOf('PASTE')===0)return Promise.reject(new Error('The app is not connected to the database yet. See README.md.'));
+    return fetch(SUPABASE_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'Content-Type':'application/json',apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY},body:JSON.stringify(args||{})})
+    .then(function(r){return r.text().then(function(t){var j=null;try{j=t?JSON.parse(t):null}catch(e){}
+      if(!r.ok){var m=(j&&j.message)||'Request failed. Check your connection.';if(/Session expired/.test(m))logout(true);throw new Error(m)}return j})},
+      function(){throw new Error('No internet connection.')});
+  }
+
+  window.Play2WinGoldBridge={
+    api:api,
+    getSession:function(){return {token:S.token,id:S.id,role:S.role,balance:S.balance}},
+    refresh:refresh,
+    toast:toast
+  };
+  window.Play2WinAdBridge={
+    getSession:function(){return {token:S.token,id:S.id,role:S.role}},
+    refresh:refresh,
+    toast:toast
+  };
+  window.Play2WinReferBridge={
+    api:api,
+    getSession:function(){return {token:S.token,id:S.id,role:S.role}},
+    refresh:refresh,
+    toast:toast,
+    esc:esc,
+    fmtTime:fmtTime
+  };
+  function isAdmin(){return S.role==='admin'}
+  function colorsOf(n){if(n===0)return['red','violet'];if(n===5)return['green','violet'];return n%2?['green']:['red']}
+  function sizeOf(n){return n>=5?'Big':'Small'}
+  function label(t){var p=t.split(':');return p[0]==='num'?'Number '+p[1]:p[1][0].toUpperCase()+p[1].slice(1)}
+  function dots(n){return colorsOf(n).map(function(c){return '<span class="dot" style="background:'+COLORS[c]+'"></span>'}).join('')}
+  function rl(r){
+    if(r===null||r===undefined||r==='')return '–';
+    var raw=String(r).trim();
+    if(/^R-\\d{8}-/.test(raw))return raw;
+    var d=new Date();
+    var date=String(d.getFullYear())+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
+    // Pad short numeric round counters to six digits; never truncate longer IDs.
+    var suffix=/^\\d+$/.test(raw)?raw.padStart(6,'0'):raw;
+    return 'R-'+date+'-'+suffix;
+  }
+
+  // ---- auth ----
+  function showAuth(){
+    $('app').classList.add('hide');$('gear').classList.add('hide');$('v-auth').classList.remove('hide');$('bal').textContent='';$('bal').dataset.admin='0';$('a-err').textContent='';
+    ['v-add','v-withdraw'].forEach(function(id){$(id).classList.add('hide')});
+    api('has_admin').then(function(has){
+      $('auth-title').textContent=has?'Log in':'Set up the admin account';
+      $('a-go').textContent=has?'Log in':'Create admin account';
+      $('a-go').dataset.setup=has?'':'1';
+    }).catch(function(e){$('a-err').textContent=e.message});
+  }
+  $('a-go').onclick=function(){
+    var id=$('a-id').value.trim(),pw=$('a-pw').value,setup=$('a-go').dataset.setup==='1',e=$('a-err');e.textContent='';
+    if(!id||!pw){e.textContent='Enter your User ID and password.';return}
+    var p=setup?api('setup_admin',{p_id:id,p_pw:pw}).then(function(){return api('login',{p_id:id,p_pw:pw})}):api('login',{p_id:id,p_pw:pw});
+    p.then(function(r){S.token=r.token;S.id=r.id;S.role=r.role;try{localStorage.setItem('np_token',r.token);localStorage.setItem('np_id',r.id)}catch(x){}
+      $('a-pw').value='';start()}).catch(function(x){e.textContent=x.message});
+  };
+  $('google-login').onclick=function(){
+    var msg=$('google-msg');
+    if(!supa){msg.textContent='Google login library load nahi hui. Page refresh karein.';return}
+    msg.textContent='Google sign-in khul raha hai...';
+    var oauthRedirect=(location.hostname==='appassets.androidplatform.net')
+      ?'https://splendorous-jalebi-a6d440.netlify.app/'
+      :(location.origin+location.pathname);
+    supa.auth.signInWithOAuth({provider:'google',options:{redirectTo:oauthRedirect}})
+      .then(function(r){if(r.error)throw r.error;})
+      .catch(function(e){msg.textContent=e.message||'Google sign-in failed.'});
+  };
+  (function(){
+    try{
+      var q=new URLSearchParams(location.search||''),h=new URLSearchParams((location.hash||'').replace(/^#/,''));
+      var oauthErr=q.get('error_description')||h.get('error_description')||q.get('error')||h.get('error');
+      if(oauthErr&&$('google-msg'))$('google-msg').textContent=oauthErr;
+    }catch(e){}
+  })();
+  var googleLoginFinishing=false;
+  function finishGoogleLogin(passedSession){
+    if(!supa||googleLoginFinishing||S.token)return;
+    googleLoginFinishing=true;
+    var p=passedSession?Promise.resolve({data:{session:passedSession}}):supa.auth.getSession();
+    p.then(function(res){
+      var session=res.data&&res.data.session;
+      if(!session){googleLoginFinishing=false;return;}
+      return fetch(SUPABASE_URL+'/rest/v1/rpc/google_wallet_login',{method:'POST',headers:{'Content-Type':'application/json',apikey:SUPABASE_KEY,Authorization:'Bearer '+session.access_token}})
+        .then(function(r){return r.text().then(function(t){var j=t?JSON.parse(t):null;if(!r.ok)throw new Error((j&&j.message)||'Google account registration failed.');return j})})
+        .then(function(r){
+          S.token=r.token;S.id=r.id;S.role=r.role;S.displayName=r.name||r.display_name||r.email||r.id;S.email=r.email||null;
+          try{
+            localStorage.setItem('np_token',r.token);localStorage.setItem('np_id',r.id);
+            localStorage.setItem('np_display_name',S.displayName);if(S.email)localStorage.setItem('np_email',S.email);
+          }catch(x){}
+          googleLoginFinishing=false;
+          if(location.hash&&location.hash.indexOf('access_token=')>=0){location.hash='#/home';}
+          start();
+        });
+    }).catch(function(e){googleLoginFinishing=false;if($('google-msg'))$('google-msg').textContent=e.message||'Google login failed.'});
+  }
+  finishGoogleLogin();
+  if(supa)supa.auth.onAuthStateChange(function(event,session){
+    if(event==='SIGNED_IN'&&session&&!S.token&&!loggingOut)finishGoogleLogin(session);
+    if(event==='SIGNED_OUT'&&!loggingOut){ /* user-initiated sign-out is handled by logout() */ }
+  });
+  var loggingOut=false;
+  function clearLocalLogin(silent){
+    S.token=null;S.id=null;S.role=null;S.balance=0;S.displayName=null;S.email=null;
+    try{
+      ['np_token','np_id','np_display_name','np_email'].forEach(function(k){localStorage.removeItem(k)});
+      if(silent)sessionStorage.setItem('np_msg','Session expired. Please log in again.');
+    }catch(e){}
+    googleLoginFinishing=false;
+    location.hash='';
+    showAuth();
+  }
+  function logout(silent){
+    if(loggingOut)return;
+    loggingOut=true;
+    var done=function(){clearLocalLogin(silent);loggingOut=false};
+    if(supa&&supa.auth){supa.auth.signOut().catch(function(){}).finally(done)}else done();
+  }
+
+  function start(){
+    refresh().then(function(){
+      $('v-auth').classList.add('hide');$('app').classList.remove('hide');$('gear').classList.remove('hide');buildNav();route();
+      if(window.Play2WinOnSessionReady)window.Play2WinOnSessionReady();
+    }).catch(function(e){if(S.token)toast(e.message);showAuth()});
+  }
+
+  // ---- routing ----
+  function buildNav(){
+    $('nav').classList.remove('hide');
+    var items=isAdmin()
+      ?[['admin','Admin'],['bets','Live Bets'],['results','Results']]
+      :[['home','Games'],['rewards','🎁 Rewards']];
+    $('nav').innerHTML=items.map(function(i){return '<a href="#/'+i[0]+'" data-r="'+i[0]+'">'+i[1]+'</a>'}).join('');
+  }
+  function route(){
+    var r=location.hash.replace('#/','')||(isAdmin()?'admin':'home');
+    var legalView=$('p2w-legal-view');
+    if(r.indexOf('legal/')===0){
+      $('v-auth').classList.add('hide');
+      $('app').classList.add('hide');
+      $('gear').classList.add('hide');
+      if(legalView)legalView.classList.remove('hide');
+      document.querySelectorAll('.p2w-legal-page').forEach(function(el){el.classList.add('hide')});
+      var legalKey=r.slice(6);
+      var legalPage=$('p2w-legal-'+legalKey);
+      if(!legalPage){legalKey='privacy';legalPage=$('p2w-legal-privacy');}
+      if(legalPage)legalPage.classList.remove('hide');
+      window.scrollTo(0,0);
+      return;
+    }
+    if(legalView)legalView.classList.add('hide');
+    if(!S.token){
+      $('app').classList.add('hide');
+      $('gear').classList.add('hide');
+      $('v-auth').classList.remove('hide');
+      return;
+    }
+    $('v-auth').classList.add('hide');
+    $('app').classList.remove('hide');
+    $('gear').classList.remove('hide');
+    if(!$('nav').children.length)buildNav();
+    if(r==='logout'){logout();return}
+    if(isAdmin()&&(r==='play'||r==='mine'||r==='add'||r==='withdraw'||r==='rewards'||r==='goldball'))r='admin';
+    if(!isAdmin()&&(r==='admin'||r==='bets'))r='play';
+    var mainRoute=(r==='add'||r==='withdraw')?'settings':r;
+    ['home','rewards','goldball','play','results','mine','admin','bets','settings','tx','pw'].forEach(function(k){$('v-'+k).classList.toggle('hide',k!==mainRoute)});
+    $('v-add').classList.toggle('hide',r!=='add');
+    $('v-withdraw').classList.toggle('hide',r!=='withdraw');
+    clearPlayOnlyEffects();
+    var inSettingsSub=(r==='add'||r==='withdraw');
+    ['settings-profile','settings-wallet-links','settings-other'].forEach(function(id){$(id).classList.toggle('hide',inSettingsSub)});
+    document.querySelectorAll('#nav a').forEach(function(a){a.classList.toggle('on',a.dataset.r===r)});
+    if(r==='rewards'){loadDailyRewards();if(window.Play2WinLoadReferrals)window.Play2WinLoadReferrals();}
+    if(r==='mine')loadMine();
+    if(r==='admin'){if(adminAlertsEnabled)primeAdminAlertAudio();loadUsers();loadAdminPaymentUpis();loadDepositRequests();loadWithdrawalRequests();pollAdminRequests();if(window.Play2WinLoadAdminReferrals)window.Play2WinLoadAdminReferrals();}
+    if(r==='bets')loadBets();
+    if(r==='settings'){renderSettings();}
+    if(r==='add'){loadMyDeposits();}
+    if(r==='withdraw'){loadMyWithdrawals();}
+    if(r==='tx'){if(isAdmin())fillTxUsers().then(loadTx);else loadTx()}
+    if(r==='pw'){['pw-old','pw-new','pw-new2'].forEach(function(i){$(i).value=''});$('pw-err').textContent=''}
+    render();
+  }
+  window.addEventListener('hashchange',route);
+
+  // Allow public policy pages to open without requiring an account login.
+  if(location.hash.indexOf('#/legal/')===0){route();}
+
+
+  // ---- Daily check-in rewards (server-validated; India time) ----
+  var DAILY_REWARD_VALUES=[0,1,2,3,5,10];
+  function renderDailyRewards(st){
+    var grid=$('daily-reward-grid'),status=$('daily-reward-status');
+    if(!grid||!status)return;
+    var todayDone=!!(st&&st.claimed_today);
+    var nextDay=Number((st&&st.next_day)||1);
+    var streak=Number((st&&st.streak_day)||0);
+    grid.querySelectorAll('[data-reward-day]').forEach(function(btn){
+      var day=Number(btn.getAttribute('data-reward-day'));
+      var small=btn.querySelector('small');
+      btn.classList.remove('is-current','is-claimed','is-locked');
+      btn.disabled=true;
+      if(todayDone&&day<=streak){btn.classList.add('is-claimed');small.textContent='✓ Claimed';}
+      else if(!todayDone&&day===nextDay){btn.classList.add('is-current');btn.disabled=false;small.textContent='Tap to claim';}
+      else {btn.classList.add('is-locked');small.textContent='Locked';}
+    });
+    if(todayDone){
+      status.textContent='Today’s reward claimed! Come back tomorrow for Day '+(streak>=5?5:streak+1)+'.';
+    }else{
+      status.textContent='Your next reward: Day '+nextDay+' · '+DAILY_REWARD_VALUES[nextDay]+' Coins. Open Rewards and tap the highlighted box to collect.';
+    }
+  }
+  function loadDailyRewards(){
+    if(!S.token||isAdmin())return;
+    api('daily_reward_status',{p_token:S.token}).then(renderDailyRewards).catch(function(e){
+      var status=$('daily-reward-status');if(status)status.textContent=e.message||'Could not load check-in status.';
+    });
+  }
+  var dailyRewardBusy=false;
+  document.addEventListener('click',function(ev){
+    var tile=ev.target.closest('[data-reward-day]');
+    if(!tile||tile.disabled||dailyRewardBusy)return;
+    var day=Number(tile.getAttribute('data-reward-day'));
+    dailyRewardBusy=true;tile.disabled=true;
+    var status=$('daily-reward-status');if(status)status.textContent='Collecting your Day '+day+' reward…';
+    api('claim_daily_reward',{p_token:S.token}).then(function(res){
+      toast('Congratulations! '+res.reward+' coins added to your wallet.');
+      return Promise.all([refresh(),api('daily_reward_status',{p_token:S.token})]);
+    }).then(function(results){renderDailyRewards(results[1]);})
+      .catch(function(e){toast(e.message||'Reward could not be collected.');loadDailyRewards();})
+      .then(function(){dailyRewardBusy=false;});
+  });
+
+  document.addEventListener('click',function(ev){
+    var btn=ev.target.closest('[data-open-route]');
+    if(btn){var next=btn.getAttribute('data-open-route');if(next)location.hash='#/'+next;}
+  });
+
+
+  // ---- state from server ----
+  function refresh(){
+    if(fetching)return Promise.resolve();fetching=true;
+    return api('get_state',{p_token:S.token}).then(function(s){
+      var prevPending=S.pending.length,prevRound=S.round;
+      S.role=s.role;S.phone=s.phone;S.balance=s.balance;S.round=s.round;S.results=s.results;S.pending=s.pending;
+      S.deadline=Date.now()+s.left*1000;
+      if(prevRound&&s.round!==prevRound){
+        var completed=(s.results||[]).find(function(x){return Number(x.round)===Number(prevRound)})||(s.results||[])[0];
+        if(completed&&Number(completed.round)>lastRevealedRound){
+          lastRevealedRound=Number(completed.round);
+          // Never show a result/win popup on Results, History, Settings, Admin, or other screens.
+          // Also verify that this user actually placed a bet in the completed round.
+          if(isPlayScreen()&&!isAdmin()){
+            api('my_history',{p_token:S.token}).then(function(rows){
+              if(!isPlayScreen()||isAdmin())return; // user may have navigated while history loaded
+              var roundBets=(rows||[]).filter(function(row){return Number(row.round)===Number(completed.round)});
+              if(!roundBets.length)return;
+              showRoundResult(completed.num,completed.round);
+              animateWinCoins(completed.round,roundBets);
+              loadMine();
+            }).catch(function(){});
+          }
+        }
+      }
+      fetching=false;render();
+    },function(e){fetching=false;throw e});
+  }
+  function isPlayScreen(){
+    var app=$('app'),play=$('v-play');
+    return !!(S.token&&!isAdmin()&&app&&!app.classList.contains('hide')&&play&&!play.classList.contains('hide')&&(location.hash==='#/play'||location.hash===''||location.hash==='#'));
+  }
+  function clearPlayOnlyEffects(){
+    // Popup and coin animation are allowed only while the Play screen is active.
+    if(isPlayScreen())return;
+    var overlay=$('round-overlay');
+    if(overlay)overlay.classList.add('hide');
+    if(roundRevealTimer){clearTimeout(roundRevealTimer);roundRevealTimer=null;}
+    document.querySelectorAll('.win-fx-layer').forEach(function(node){node.remove()});
+    var balance=$('bal');
+    if(balance)balance.classList.remove('balance-win-pulse');
+  }
+  function animateWinCoins(roundNo,roundRows){
+    if(!isPlayScreen()||!S.token)return;
+    var key='play2win_win_anim_'+roundNo;
+    try{if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,'1')}catch(e){}
+    var wins=(roundRows||[]).filter(function(row){
+      return Number(row.round)===Number(roundNo)&&row.settled&&Number(row.payout)>0&&Number(row.payout)>Number(row.amount);
+    });
+    if(!wins.length)return;
+    var total=wins.reduce(function(sum,row){return sum+Number(row.payout||0)},0);
+    if(total<=0||!isPlayScreen())return;
+    var layer=document.createElement('div');layer.className='win-fx-layer';layer.setAttribute('aria-hidden','true');
+    var label=document.createElement('div');label.className='win-fx-total';label.textContent='+'+total.toLocaleString('en-IN')+' COINS';layer.appendChild(label);
+    var count=Math.min(18,Math.max(8,Math.ceil(total/10)));
+    for(var i=0;i<count;i++){
+      var coin=document.createElement('div');coin.className='win-fx-coin';coin.textContent='🪙';
+      coin.style.setProperty('--dx',((Math.random()-.5)*260)+'px');
+      coin.style.setProperty('--dy',(180+Math.random()*260)+'px');
+      coin.style.setProperty('--rot',((Math.random()-.5)*520)+'deg');
+      coin.style.animationDelay=(Math.random()*.22)+'s';
+      layer.appendChild(coin);
+    }
+    document.body.appendChild(layer);
+    var balance=$('bal');if(balance)balance.classList.add('balance-win-pulse');
+    setTimeout(function(){layer.remove();if(balance)balance.classList.remove('balance-win-pulse')},2200);
+    toast('Congratulations! You won '+total.toLocaleString('en-IN')+' coins.');
+  }
+  function showRoundResult(number,roundNo){
+    if(!isPlayScreen())return;
+    var overlay=$('round-overlay');if(!overlay)return;
+    $('round-modal-kicker').textContent='ROUND '+roundNo+' RESULT';
+    $('round-modal-title').textContent='Winning number';
+    $('round-result-label').textContent='Result declared';
+    var ball=$('round-result-number');ball.textContent=String(number);ball.classList.remove('hide');
+    ball.style.background=Number(number)===0||Number(number)===5?'linear-gradient(145deg,#b88cff,#6b3fce)':Number(number)%2?'linear-gradient(145deg,#35e9a3,#0b9b68)':'linear-gradient(145deg,#ff7187,#d72e4d)';
+    $('round-modal-foot').textContent='Round complete · '+sizeOf(number);
+    overlay.classList.remove('hide');
+    if(roundRevealTimer)clearTimeout(roundRevealTimer);
+    roundRevealTimer=setTimeout(function(){overlay.classList.add('hide')},4500);
+    toast('Winning number: '+number+' · Round '+roundNo);
+  }
+  function left(){return Math.max(0,Math.ceil((S.deadline-Date.now())/1000))}
+  function tick(){
+    if(!S.token||$('app').classList.contains('hide'))return;
+    var l=left();renderClock(l);
+    if(l<=0&&!busy){busy=true;setTimeout(function(){refresh().catch(function(){}).then(function(){busy=false})},1500)}
+  }
+  function renderClock(l){
+    var locked=l<=5;if(l>35)l=35;
+    var c=$('clock');c.textContent='00:'+String(l).padStart(2,'0');var br=$('bar');if(br)br.style.width=Math.max(0,Math.min(100,l/35*100))+'%';c.classList.toggle('lock',locked);
+    $('state').textContent=locked?'Betting closed. Result coming':'Betting is open';updatePlace(locked);
+    // Countdown stays in the Play screen's normal timer; no full-screen countdown popup.
+    // Result and win effects are shown separately, and only on the visible Play screen.
+    clearPlayOnlyEffects();
+  }
+  function updatePlace(locked){
+    var b=$('place');if(isAdmin())return;
+    if(locked){b.disabled=true;b.textContent='Betting is closed';return}
+    if(amount<1){b.disabled=true;b.textContent='Enter a bet amount';return}
+    if(amount>100000){b.disabled=true;b.textContent='Maximum bet is 100,000 coins';return}
+    if(!target){b.disabled=true;b.textContent='Select an option first';return}
+    if(amount>S.balance){b.disabled=true;b.textContent='Not enough coins';return}
+    b.disabled=false;b.textContent='Place bet: '+label(target)+' · '+amount+' coins';
+  }
+  function render(){
+    if(!S.token)return;
+    $('bal').dataset.admin=isAdmin()?'1':'0';$('bal').textContent=isAdmin()?'Admin':Number(S.balance||0).toLocaleString('en-IN')+' Coins';
+    $('period').textContent=rl(S.round);
+    document.querySelectorAll('[data-t]').forEach(function(e){e.classList.toggle('sel',e.dataset.t===target)});
+    $('hist').innerHTML=S.results.length?S.results.map(function(h){return '<tr><td>'+rl(h.round)+'</td><td><b>'+h.num+'</b></td><td>'+sizeOf(h.num)+'</td><td>'+dots(h.num)+'</td></tr>'}).join(''):'<tr><td colspan="4" class="empty">No results yet.</td></tr>';
+    $('mybets').innerHTML=S.pending.length?S.pending.map(function(b){return label(b.target)+' · '+b.amount+' coins'}).join('<br>'):'No bets yet.';
+    $('mybets').className=S.pending.length?'':'empty';
+    renderClock(left());
+  }
+  function loadMine(){
+    api('my_history',{p_token:S.token}).then(function(h){S.mine=h;
+      $('mine').innerHTML=h.length?h.map(function(m){var net=m.payout-m.amount;
+        return '<tr><td>'+rl(m.round)+'</td><td>'+label(m.target)+'</td><td>'+m.amount+'</td><td style="color:'+(!m.settled?'var(--mute)':net>=0?'var(--green)':'var(--red)')+'">'+(m.settled?(net>=0?'+':'')+net:'Pending')+'</td></tr>'}).join(''):'<tr><td colspan="4" class="empty">You have not placed any bets yet.</td></tr>';
+    }).catch(function(e){toast(e.message)});
+  }
+
+  // ---- admin ----
+  function loadUsers(){
+    api('admin_list_users',{p_token:S.token}).then(function(us){S.users=us;
+      $('users').innerHTML=us.length?us.map(function(u){var who=u.email||u.display_name||u.id;return '<tr><td>'+esc(who)+'</td><td>'+esc(u.phone||'–')+'</td><td>'+u.balance+'</td><td><button class="mini" data-add="'+esc(u.id)+'">Add</button> <button class="mini" data-sub="'+esc(u.id)+'">Deduct</button> <button class="mini" data-ph="'+esc(u.id)+'">Phone</button> <button class="mini" data-rp="'+esc(u.id)+'">Reset password</button> <button class="mini" data-del="'+esc(u.id)+'">Delete</button></td></tr>'}).join(''):'<tr><td colspan="4" class="empty">No users yet. Create one above.</td></tr>';
+    }).catch(function(e){toast(e.message)});
+  }
+  $('n-go').onclick=function(){
+    var id=$('n-id').value.trim(),pw=$('n-pw').value,e=$('n-err');e.textContent='';
+    api('admin_create_user',{p_token:S.token,p_id:id,p_pw:pw,p_phone:$('n-phone').value.trim()})
+      .then(function(){return api('admin_list_users',{p_token:S.token});})
+      .then(function(us){
+        var u=(us||[]).find(function(x){return x.id===id});
+        var diff=u?20-Number(u.balance||0):0;
+        return diff!==0?api('admin_add_coins',{p_token:S.token,p_id:id,p_amount:diff}):Promise.resolve();
+      })
+      .then(function(){$('n-id').value='';$('n-pw').value='';$('n-phone').value='';toast('User created: '+id+' (20 starting coins)');loadUsers()})
+      .catch(function(x){e.textContent=x.message});
+  };
+  $('users').addEventListener('click',function(e){
+    var a=e.target.dataset.add,sb=e.target.dataset.sub,d=e.target.dataset.del,ph=e.target.dataset.ph,rp=e.target.dataset.rp;
+    if(a){var v=parseInt(prompt('Coins to add to '+a+':','100'),10);if(v>0)api('admin_add_coins',{p_token:S.token,p_id:a,p_amount:v}).then(function(){toast('Added '+v+' coins to '+a);loadUsers()}).catch(function(x){toast(x.message)})}
+    if(ph){var p=prompt('New phone number for '+ph+':');if(p)api('admin_set_phone',{p_token:S.token,p_id:ph,p_phone:p.trim()}).then(function(){toast('Phone updated for '+ph);loadUsers()}).catch(function(x){toast(x.message)})}
+    if(rp){var np=prompt('New password for '+rp+' (min 6 characters):');if(np)api('admin_set_password',{p_token:S.token,p_id:rp,p_new:np}).then(function(){toast('Password reset for '+rp+'. The user must log in again.')}).catch(function(x){toast(x.message)})}
+    if(sb){var w=parseInt(prompt('Coins to deduct from '+sb+':','100'),10);if(w>0)api('admin_add_coins',{p_token:S.token,p_id:sb,p_amount:-w}).then(function(){toast('Deducted '+w+' coins from '+sb);loadUsers()}).catch(function(x){toast(x.message)})}
+    if(d&&confirm('Delete user '+d+'? This cannot be undone.'))api('admin_delete_user',{p_token:S.token,p_id:d}).then(loadUsers).catch(function(x){toast(x.message)});
+  });
+
+  // ---- UPI withdrawal requests (manual payout; no payout provider connected) ----
+  $('save-withdraw-upi').onclick=function(){
+    var u=$('withdraw-upi').value.trim(),m=$('withdraw-msg');m.style.color='var(--red)';m.textContent='';
+    if(!/^[A-Za-z0-9._-]{2,}@[A-Za-z]{2,}$/.test(u)){m.textContent='Valid UPI ID enter karein.';return}
+    api('save_withdraw_upi',{p_token:S.token,p_upi_id:u}).then(function(){m.style.color='var(--green)';m.textContent='UPI ID saved.';}).catch(function(e){m.textContent=e.message});
+  };
+  $('withdraw-submit').onclick=function(){
+    var a=Number($('withdraw-amount').value),m=$('withdraw-msg');m.style.color='var(--red)';m.textContent='';
+    if(!Number.isSafeInteger(a)||a<100){m.textContent='Minimum withdrawal ₹100 hai.';return}
+    if(a>S.balance){m.textContent='Wallet mein itne coins nahi hain.';return}
+    api('create_withdrawal_request',{p_token:S.token,p_amount:a}).then(function(){m.style.color='var(--green)';m.textContent='Withdrawal request submitted. Coins are reserved until admin review.';return Promise.all([refresh(),loadMyWithdrawals()]);}).catch(function(e){m.textContent=e.message});
+  };
+  function loadMyWithdrawals(){
+    if(!S.token||isAdmin())return Promise.resolve();
+    return Promise.all([api('my_withdrawal_requests',{p_token:S.token}),api('get_my_withdrawal_upi',{p_token:S.token})]).then(function(result){
+      var rows=result[0], saved=result[1]; if(saved&&saved.upi_id)$('withdraw-upi').value=saved.upi_id;
+      $('my-withdrawals').innerHTML=rows.length?rows.map(function(w){return '<div class="srow" style="padding:9px 0;border-bottom:1px solid var(--line)"><div><b>₹'+w.amount+'</b><div class="note">'+esc(w.upi_id)+' · '+fmtTime(w.created_at)+'</div></div><span class="mini">'+esc(w.status)+'</span></div>'}).join(''):'<div class="empty">No withdrawal requests yet.</div>';
+      if(rows.length&&rows[0].upi_id)$('withdraw-upi').value=rows[0].upi_id;
+    }).catch(function(e){$('my-withdrawals').textContent=e.message});
+  }
+  function loadWithdrawalRequests(){
+    if(!S.token||!isAdmin())return Promise.resolve();
+    return api('admin_list_withdrawal_requests',{p_token:S.token}).then(function(rows){
+      $('withdraw-pending-count').textContent=rows.filter(function(w){return w.status==='pending'}).length+' Pending';
+      $('withdraw-requests').innerHTML=rows.length?rows.map(function(w){var actions=w.status==='pending'?'<button class="mini" data-wpaid="'+w.id+'">Mark Paid</button> <button class="mini" data-wreject="'+w.id+'">Reject</button>':'<span class="mini">'+esc(w.status)+'</span>';return '<tr><td>'+fmtTime(w.created_at)+'</td><td>'+esc(w.email||w.display_name||w.user_id)+'</td><td>'+esc(w.upi_id)+'</td><td>₹'+w.amount+'</td><td>'+actions+'</td></tr>'}).join(''):'<tr><td colspan="5" class="empty">No withdrawal requests.</td></tr>';
+    }).catch(function(e){$('withdraw-requests').innerHTML='<tr><td colspan="5" class="empty">'+esc(e.message)+'</td></tr>'});
+  }
+  $('withdraw-requests').addEventListener('click',function(e){
+    var paid=e.target.dataset.wpaid,reject=e.target.dataset.wreject,id=paid||reject;if(!id)return;
+    var status=paid?'paid':'rejected';
+    if(paid&&!confirm('Kya aapne UPI/bank se ₹ payout bhej diya hai?'))return;
+    if(reject&&!confirm('Request reject karein? Reserved coins user ko refund honge.'))return;
+    api('admin_review_withdrawal',{p_token:S.token,p_request_id:Number(id),p_status:status}).then(function(){toast(paid?'Withdrawal marked paid.':'Withdrawal rejected; coins refunded.');return Promise.all([loadWithdrawalRequests(),loadUsers()])}).catch(function(e){toast(e.message)});
+  });
+
+  // ---- betting UI ----
+  var nb=$('nums');
+  for(var i=0;i<10;i++){(function(i){var cs=colorsOf(i),b=document.createElement('button');b.className='ball';b.textContent=i;b.style.background=cs.length>1?'linear-gradient(135deg,'+COLORS[cs[0]]+' 50%,'+COLORS[cs[1]]+' 50%)':COLORS[cs[0]];b.dataset.t='num:'+i;b.setAttribute('aria-label','Number '+i+', 9x');nb.appendChild(b)})(i)}
+  var base=10,mult=1;
+  function recalc(){amount=base*mult;$('total').textContent='Total bet: '+base+' × '+mult+' = '+amount+' coins';updatePlace(left()<=5)}
+  function markChips(){document.querySelectorAll('#amt button').forEach(function(x){x.classList.toggle('on',+x.dataset.v===base)});document.querySelectorAll('#mult button').forEach(function(x){x.classList.toggle('on',+x.dataset.v===mult)})}
+  AMTS.forEach(function(a){var b=document.createElement('button');b.textContent=a;b.dataset.v=a;b.onclick=function(){base=a;$('base').value=a;markChips();recalc()};$('amt').appendChild(b)});
+  [1,5,10,20,50,100].forEach(function(m){var b=document.createElement('button');b.textContent='X'+m;b.dataset.v=m;b.onclick=function(){mult=m;markChips();recalc()};$('mult').appendChild(b)});
+  $('base').addEventListener('input',function(){var v=parseInt(this.value,10);base=isNaN(v)||v<1?0:v;markChips();recalc()});
+  markChips();recalc();
+  document.addEventListener('click',function(e){var el=e.target.closest('[data-t]');if(!el)return;target=target===el.dataset.t?null:el.dataset.t;render()});
+  $('place').onclick=function(){
+    if(!target)return;var t=target,a=amount;$('place').disabled=true;
+    api('place_bet',{p_token:S.token,p_target:t,p_amount:a}).then(function(){toast('Bet placed: '+label(t)+' · '+a+' coins');return refresh()}).catch(function(e){toast(e.message);render()});
+  };
+
+  // ---- admin: live bets ----
+  var OPTS=['num:0','num:1','num:2','num:3','num:4','num:5','num:6','num:7','num:8','num:9','color:green','color:violet','color:red','size:big','size:small'];
+  function loadBets(){
+    if(!isAdmin())return;
+    api('admin_bets',{p_token:S.token}).then(function(d){
+      $('b-round').textContent=rl(d.round);
+      var agg={},total=0;OPTS.forEach(function(o){agg[o]={n:{},c:0}});
+      d.current.forEach(function(b){var a=agg[b.target];if(!a)return;a.n[b.user_id]=1;a.c+=b.amount;total+=b.amount});
+      $('b-total').textContent=total;
+      $('b-opts').innerHTML=OPTS.map(function(o){var a=agg[o],n=Object.keys(a.n).length;
+        return '<tr style="opacity:'+(a.c?1:.45)+'"><td>'+label(o)+'</td><td>'+n+'</td><td><b>'+a.c+'</b></td></tr>'}).join('');
+      $('b-cur').innerHTML=d.current.length?d.current.map(function(b){return '<tr><td>'+esc(b.email||b.display_name||b.user_id)+'</td><td>'+label(b.target)+'</td><td>'+b.amount+'</td></tr>'}).join(''):'<tr><td colspan="3" class="empty">No bets in this round yet.</td></tr>';
+      $('b-rec').innerHTML=d.recent.length?d.recent.map(function(b){var net=b.payout-b.amount;
+        return '<tr><td>'+rl(b.round)+'</td><td>'+esc(b.email||b.display_name||b.user_id)+'</td><td>'+label(b.target)+'</td><td>'+b.amount+'</td><td style="color:'+(!b.settled?'var(--mute)':net>=0?'var(--green)':'var(--red)')+'">'+(b.settled?(net>=0?'+':'')+net:'Pending')+'</td></tr>'}).join(''):'<tr><td colspan="5" class="empty">No bets yet.</td></tr>';
+    }).catch(function(e){toast(e.message)});
+  }
+  setInterval(function(){if(S.token&&!document.hidden&&location.hash==='#/bets')loadBets()},4000);
+
+
+  // ---- UPI QR wallet top-up (manual UTR verification) ----
+  var paymentBusy=false, currentDeposit=null;
+  $('pay-now').onclick=function(){
+    var rupees=Number($('pay-amount').value),err=$('pay-err');
+    err.textContent='';err.style.color='var(--red)';
+    if(isAdmin()){err.textContent='Admin accounts cannot add wallet coins.';return}
+    if(!Number.isSafeInteger(rupees)||rupees<10||rupees>50000){err.textContent='Enter an amount between ₹10 and ₹50,000.';return}
+    if(typeof QRCode==='undefined'){err.textContent='QR library load nahi hui. Page refresh karein.';return}
+    $('pay-now').disabled=true;$('pay-now').textContent='Loading payment UPI...';
+    api('get_active_payment_upi',{p_token:S.token}).then(function(receiver){
+      MERCHANT_UPI_ID=receiver&&receiver.upi_id||'';
+      MERCHANT_NAME=receiver&&receiver.payee_name||'Play2Win';
+      if(!MERCHANT_UPI_ID||MERCHANT_UPI_ID.indexOf('@')<1)throw new Error('Admin ne abhi receiving UPI ID configure nahi ki hai.');
+      var ref='P2W'+Date.now().toString().slice(-10)+Math.floor(Math.random()*90+10);
+      var note='Wallet '+ref+' '+S.id;
+      var link='upi://pay?pa='+encodeURIComponent(MERCHANT_UPI_ID)+'&pn='+encodeURIComponent(MERCHANT_NAME)+'&am='+rupees+'&cu=INR&tn='+encodeURIComponent(note);
+      currentDeposit={amount:rupees,ref:ref,receiverUpi:MERCHANT_UPI_ID};
+      $('upi-qr').innerHTML='';
+      new QRCode($('upi-qr'),{text:link,width:200,height:200});
+      $('upi-details').textContent='Pay ₹'+rupees+' to '+MERCHANT_UPI_ID+' · Ref '+ref;
+      $('upi-utr').value='';$('upi-err').textContent='';
+      $('upi-payment').classList.remove('hide');
+      err.style.color='var(--green)';err.textContent='QR ready hai. Payment complete karke UTR submit karein.';
+    }).catch(function(e){err.textContent=e.message})
+      .then(function(){$('pay-now').disabled=false;$('pay-now').textContent='Generate UPI QR'});
+  };
+  $('upi-cancel').onclick=function(){$('upi-payment').classList.add('hide');currentDeposit=null};
+  $('upi-submit').onclick=function(){
+    var utr=$('upi-utr').value.trim(),err=$('upi-err');
+    err.style.color='var(--red)';err.textContent='';
+    if(!currentDeposit){err.textContent='Pehle payment QR generate karein.';return}
+    if(!/^\d{12}$/.test(utr)){err.textContent='12 digit UTR number enter karein.';return}
+    if(paymentBusy)return;
+    paymentBusy=true;$('upi-submit').disabled=true;$('upi-submit').textContent='Submitting...';
+    api('submit_coin_deposit',{p_token:S.token,p_amount:currentDeposit.amount,p_utr:utr,p_reference:currentDeposit.ref})
+      .then(function(){
+        err.style.color='var(--green)';err.textContent='UTR submit ho gaya. Admin verification ke baad coins add honge.';
+        $('upi-payment').classList.add('hide');$('pay-amount').value='100';currentDeposit=null;
+        return loadMyDeposits();
+      }).catch(function(e){err.textContent=e.message})
+      .then(function(){paymentBusy=false;$('upi-submit').disabled=false;$('upi-submit').textContent='Submit UTR for verification'});
+  };
+  function loadMyDeposits(){
+    if(!S.token||isAdmin())return Promise.resolve();
+    return api('my_coin_deposits',{p_token:S.token}).then(function(rows){
+      $('my-deposits').innerHTML=rows.length?rows.map(function(d){
+        return '<div class="srow" style="padding:9px 0;border-bottom:1px solid var(--line)"><div><b>₹'+d.amount+'</b><div class="note">UTR: '+esc(d.utr)+' · '+fmtTime(d.created_at)+'</div></div><span class="mini">'+esc(d.status)+'</span></div>';
+      }).join(''):'<div class="empty">No deposit requests yet.</div>';
+    }).catch(function(e){$('my-deposits').textContent=e.message});
+  }
+  // ---- Admin-managed payment receiving UPI IDs ----
+  function loadAdminPaymentUpis(){
+    if(!S.token||!isAdmin())return Promise.resolve();
+    return api('admin_list_payment_upis',{p_token:S.token}).then(function(rows){
+      $('admin-upi-list').innerHTML=rows.length?rows.map(function(u){
+        var active=u.is_active?'<span class="mini" style="color:var(--green)">Active</span>':'<span class="mini">Inactive</span>';
+        var actions='<button class="mini" data-upi-qr="'+u.id+'">QR</button> ';
+        if(!u.is_active)actions+='<button class="mini" data-upi-active="'+u.id+'">Set Active</button> ';
+        actions+='<button class="mini" data-upi-delete="'+u.id+'">Delete</button>';
+        return '<tr><td>'+esc(u.upi_id)+'</td><td>'+esc(u.payee_name||'Play2Win')+'</td><td>'+active+'</td><td>'+actions+'</td></tr>';
+      }).join(''):'<tr><td colspan="4" class="empty">No UPI ID saved. Add one above to enable customer QR payments.</td></tr>';
+    }).catch(function(e){$('admin-upi-list').innerHTML='<tr><td colspan="4" class="empty">'+esc(e.message)+'</td></tr>'});
+  }
+  $('admin-upi-add').onclick=function(){
+    var upi=$('admin-upi-id').value.trim(),name=$('admin-upi-name').value.trim()||'Play2Win',err=$('admin-upi-error');
+    err.style.color='var(--red)';err.textContent='';
+    if(!/^[A-Za-z0-9][A-Za-z0-9._-]{1,}@[A-Za-z]{2,}$/.test(upi)){err.textContent='Valid UPI ID enter karein, jaise name@upi.';return}
+    $('admin-upi-add').disabled=true;
+    api('admin_add_payment_upi',{p_token:S.token,p_upi_id:upi,p_payee_name:name})
+      .then(function(){err.style.color='var(--green)';err.textContent='UPI ID saved. First UPI automatically active ho jayegi.';$('admin-upi-id').value='';return loadAdminPaymentUpis()})
+      .catch(function(e){err.textContent=e.message})
+      .then(function(){$('admin-upi-add').disabled=false});
+  };
+  $('admin-upi-list').addEventListener('click',function(e){
+    var qr=e.target.dataset.upiQr,active=e.target.dataset.upiActive,del=e.target.dataset.upiDelete,id=qr||active||del;
+    if(!id)return;
+    if(qr){
+      api('admin_list_payment_upis',{p_token:S.token}).then(function(rows){
+        var row=rows.find(function(x){return String(x.id)===String(qr)});if(!row)throw new Error('UPI ID not found.');
+        if(typeof QRCode==='undefined')throw new Error('QR library load nahi hui. Page refresh karein.');
+        var link='upi://pay?pa='+encodeURIComponent(row.upi_id)+'&pn='+encodeURIComponent(row.payee_name||'Play2Win')+'&cu=INR';
+        $('admin-upi-qr').innerHTML='';new QRCode($('admin-upi-qr'),{text:link,width:220,height:220});
+        $('admin-upi-qr-title').textContent=row.upi_id+' · '+(row.payee_name||'Play2Win');
+        $('admin-upi-qr-wrap').classList.remove('hide');
+      }).catch(function(x){toast(x.message)});
+      return;
+    }
+    if(active){
+      api('admin_set_active_payment_upi',{p_token:S.token,p_id:Number(active)})
+        .then(function(){toast('Active receiving UPI updated.');return loadAdminPaymentUpis()})
+        .catch(function(x){toast(x.message)});
+      return;
+    }
+    if(del&&confirm('Is UPI ID ko delete karna hai? Active UPI delete hone par customer QR payment tab tak unavailable rahega jab tak doosri UPI activate na karein.')){
+      api('admin_delete_payment_upi',{p_token:S.token,p_id:Number(del)})
+        .then(function(){toast('UPI ID deleted.');$('admin-upi-qr-wrap').classList.add('hide');return loadAdminPaymentUpis()})
+        .catch(function(x){toast(x.message)});
+    }
+  });
+  $('admin-upi-qr-close').onclick=function(){$('admin-upi-qr-wrap').classList.add('hide')};
+
+  function loadDepositRequests(){
+    if(!S.token||!isAdmin())return Promise.resolve();
+    return api('admin_list_coin_deposits',{p_token:S.token}).then(function(rows){
+      var pending=rows.filter(function(d){return d.status==='pending'}).length;
+      $('deposit-pending-count').textContent=pending+' Pending';
+      $('deposit-requests').innerHTML=rows.length?rows.map(function(d){
+        var action=d.status==='pending'?'<button class="mini" data-deposit-approve="'+d.id+'">Approve</button> <button class="mini" data-deposit-reject="'+d.id+'">Reject</button>':'<span class="mini">'+esc(d.status)+'</span>';
+        return '<tr><td>'+fmtTime(d.created_at)+'</td><td>'+esc(d.email||d.display_name||d.user_id)+'</td><td>₹'+d.amount+'</td><td>'+esc(d.utr)+'</td><td>'+action+'</td></tr>';
+      }).join(''):'<tr><td colspan="5" class="empty">No UPI deposit requests.</td></tr>';
+    }).catch(function(e){$('deposit-requests').innerHTML='<tr><td colspan="5" class="empty">'+esc(e.message)+'</td></tr>'});
+  }
+  $('deposit-requests').addEventListener('click',function(e){
+    var approve=e.target.dataset.depositApprove,reject=e.target.dataset.depositReject,id=approve||reject;
+    if(!id)return;
+    var status=approve?'approved':'rejected';
+    if(approve&&!confirm('Bank statement mein payment aur UTR match kar liya hai? Approve karne par coins add honge.'))return;
+    if(reject&&!confirm('Is deposit request ko reject karna hai?'))return;
+    api('admin_review_coin_deposit',{p_token:S.token,p_deposit_id:Number(id),p_status:status})
+      .then(function(){toast(approve?'Deposit approved; coins credited.':'Deposit rejected.');return Promise.all([loadDepositRequests(),loadUsers()])})
+      .catch(function(x){toast(x.message)});
+  });
+  // ---- Admin sound + browser alerts for new deposit/withdrawal requests ----
+  var adminAlertsEnabled=true,adminAlertAudio=null,adminAlertNeedsGesture=false;
+  var lastSeenDepositId=null,lastSeenWithdrawalId=null,adminAlertPrimed=false;
+  var ADMIN_ALERT_PREF_KEY='play2win_admin_sound_alerts';
+  function updateAdminAlertUi(){
+    var status=$('admin-alert-status'),enable=$('admin-alert-enable'),disable=$('admin-alert-disable'),msg=$('admin-alert-message');
+    if(!status)return;
+    status.textContent=adminAlertsEnabled?'Sound on':'Muted';
+    if(enable)enable.classList.add('hide');
+    if(disable)disable.textContent=adminAlertsEnabled?'Mute Sound':'Unmute Sound';
+    if(msg)msg.textContent=adminAlertsEnabled
+      ?(adminAlertNeedsGesture?'Sound alerts ready. Browser may start audio after your first click on this page.':'Sound alerts start automatically on admin login.')
+      :'Sound muted. Click Unmute Sound to turn alerts back on.';
+  }
+  function armAdminAlerts(){
+    adminAlertsEnabled=true;
+    try{localStorage.setItem(ADMIN_ALERT_PREF_KEY,'1')}catch(e){}
+    try{
+      var AC=window.AudioContext||window.webkitAudioContext;
+      if(!AC){adminAlertNeedsGesture=true;updateAdminAlertUi();return false;}
+      if(!adminAlertAudio)adminAlertAudio=new AC();
+      if(adminAlertAudio.state==='suspended'){
+        var resumeResult=adminAlertAudio.resume();
+        if(resumeResult&&resumeResult.catch)resumeResult.catch(function(){adminAlertNeedsGesture=true;});
+      }
+      adminAlertNeedsGesture=adminAlertAudio.state!=='running';
+      updateAdminAlertUi();
+      return !adminAlertNeedsGesture;
+    }catch(e){
+      adminAlertNeedsGesture=true;updateAdminAlertUi();return false;
+    }
+  }
+  function primeAdminAlertAudio(){
+    var wasEnabled=adminAlertsEnabled;
+    armAdminAlerts();
+    if(adminAlertNeedsGesture){
+      // Chrome may require a user gesture for audio playback. Resume silently on the
+      // first ordinary click/tap; users do not need to press a separate Enable button.
+      var resumeOnce=function(){
+        if(!adminAlertsEnabled)return;
+        try{
+          if(adminAlertAudio&&adminAlertAudio.state==='suspended')adminAlertAudio.resume().then(function(){
+            adminAlertNeedsGesture=false;updateAdminAlertUi();
+          }).catch(function(){});
+        }catch(e){}
+      };
+      document.addEventListener('pointerdown',resumeOnce,{once:true,capture:true});
+      document.addEventListener('keydown',resumeOnce,{once:true,capture:true});
+    }
+    if(!wasEnabled)playAdminAlertTone(true);
+    return true;
+  }
+  function playAdminAlertTone(testOnly){
+    if(!adminAlertsEnabled||!adminAlertAudio)return;
+    try{
+      if(adminAlertAudio.state==='suspended')adminAlertAudio.resume();
+      var ctx=adminAlertAudio,now=ctx.currentTime;
+      [0,0.42,0.84].forEach(function(offset,index){
+        var osc=ctx.createOscillator(),gain=ctx.createGain();
+        osc.type='sine';osc.frequency.value=index===1?1046:880;
+        gain.gain.setValueAtTime(0.0001,now+offset);
+        gain.gain.exponentialRampToValueAtTime(0.22,now+offset+0.025);
+        gain.gain.exponentialRampToValueAtTime(0.0001,now+offset+0.24);
+        osc.connect(gain);gain.connect(ctx.destination);
+        osc.start(now+offset);osc.stop(now+offset+0.26);
+      });
+      if(testOnly)toast('Sound alert test successful.');
+    }catch(e){}
+  }
+  function notifyAdminRequest(title,body,tag){
+    toast(body);
+    playAdminAlertTone(false);
+    if('Notification' in window&&Notification.permission==='granted'){
+      try{
+        var n=new Notification(title,{body:body,tag:tag,renotify:true});
+        n.onclick=function(){window.focus();location.hash='#/admin';n.close()};
+      }catch(e){}
+    }
+  }
+  $('admin-alert-enable').onclick=function(){primeAdminAlertAudio()};
+  $('admin-alert-disable').onclick=function(){
+    adminAlertsEnabled=!adminAlertsEnabled;
+    try{localStorage.setItem(ADMIN_ALERT_PREF_KEY,adminAlertsEnabled?'1':'0')}catch(e){}
+    if(adminAlertsEnabled)primeAdminAlertAudio();
+    updateAdminAlertUi();
+  };
+  // Restore preference and automatically arm sound as soon as an admin session is active.
+  try{
+    var savedAlertPref=localStorage.getItem(ADMIN_ALERT_PREF_KEY);
+    if(savedAlertPref==='0')adminAlertsEnabled=false;
+    else adminAlertsEnabled=true; // default ON for admins; preference survives logout/re-login.
+  }catch(e){adminAlertsEnabled=true;}
+  updateAdminAlertUi();
+  document.addEventListener('pointerdown',function(){
+    if(S.token&&isAdmin()&&adminAlertsEnabled&&adminAlertNeedsGesture)primeAdminAlertAudio();
+  },{passive:true});
+  document.addEventListener('keydown',function(){
+    if(S.token&&isAdmin()&&adminAlertsEnabled&&adminAlertNeedsGesture)primeAdminAlertAudio();
+  });
+  function pollAdminRequests(){
+    if(!S.token||!isAdmin()||document.hidden)return;
+    Promise.all([
+      api('admin_list_coin_deposits',{p_token:S.token}),
+      api('admin_list_withdrawal_requests',{p_token:S.token})
+    ]).then(function(result){
+      var deposits=result[0]||[],withdrawals=result[1]||[];
+      var maxDeposit=deposits.reduce(function(max,d){return Math.max(max,Number(d.id)||0)},0);
+      var maxWithdrawal=withdrawals.reduce(function(max,w){return Math.max(max,Number(w.id)||0)},0);
+      if(!adminAlertPrimed){
+        lastSeenDepositId=maxDeposit;lastSeenWithdrawalId=maxWithdrawal;adminAlertPrimed=true;
+      }else{
+        var newDeposits=deposits.filter(function(d){return Number(d.id)>lastSeenDepositId&&d.status==='pending'});
+        var newWithdrawals=withdrawals.filter(function(w){return Number(w.id)>lastSeenWithdrawalId&&w.status==='pending'});
+        if(newDeposits.length){
+          var d=newDeposits.length;
+          notifyAdminRequest('Play2Win · New Add Coins Request',
+            d+' new payment request'+(d>1?'s':'')+' received. Please verify UTR and payment.',
+            'play2win-deposit-'+maxDeposit);
+        }
+        if(newWithdrawals.length){
+          var w=newWithdrawals.length;
+          notifyAdminRequest('Play2Win · New Withdrawal Request',
+            w+' new withdrawal request'+(w>1?'s':'')+' received. Please check UPI ID and amount.',
+            'play2win-withdrawal-'+maxWithdrawal);
+        }
+        lastSeenDepositId=Math.max(lastSeenDepositId,maxDeposit);
+        lastSeenWithdrawalId=Math.max(lastSeenWithdrawalId,maxWithdrawal);
+      }
+      if(location.hash==='#/admin'){
+        $('deposit-pending-count').textContent=deposits.filter(function(d){return d.status==='pending'}).length+' Pending';
+        $('withdraw-pending-count').textContent=withdrawals.filter(function(w){return w.status==='pending'}).length+' Pending';
+        loadDepositRequests();loadWithdrawalRequests();
+      }
+    }).catch(function(){});
+  }
+  setInterval(function(){
+    if(S.token&&isAdmin())pollAdminRequests();
+    if(S.token&&!document.hidden&&!isAdmin()&&location.hash==='#/settings'){loadMyDeposits();loadMyWithdrawals();}
+  },5000);
+  document.addEventListener('visibilitychange',function(){
+    if(!document.hidden&&S.token&&isAdmin())pollAdminRequests();
+  });
+
+  // ---- settings pages ----
+  function fmtTime(t){try{return new Date(t).toLocaleString([], {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}catch(e){return ''}}
+  function renderSettings(){
+    $('st-name').textContent=S.displayName||S.id||'';
+    $('st-amt').textContent=isAdmin()?'Admin':S.balance+' coins';
+    $('st-sub').textContent=[S.email,S.phone?'Phone: '+S.phone:''].filter(Boolean).join(' · ');
+    if(!isAdmin()){loadMyDeposits();loadMyWithdrawals();}
+    $('st-admin').classList.toggle('hide',!isAdmin());
+    $('settings-wallet-links').classList.toggle('hide',isAdmin());
+    if(isAdmin())api('admin_list_users',{p_token:S.token}).then(function(us){
+      var t=0;us.forEach(function(u){t+=u.balance});$('st-users').textContent=us.length;$('st-total').textContent=t;
+    }).catch(function(){});
+  }
+  function fillTxUsers(){
+    var sel=$('tx-user'),cur=sel.value;sel.classList.remove('hide');
+    return api('admin_list_users',{p_token:S.token}).then(function(us){
+      sel.innerHTML='<option value="">All users</option>'+us.map(function(u){return '<option value="'+esc(u.id)+'">'+esc(u.id)+(u.phone?' ('+esc(u.phone)+')':'')+'</option>'}).join('');sel.value=cur;
+    }).catch(function(){});
+  }
+  function loadTx(){
+    if(!isAdmin()){$('tx-user').classList.add('hide');$('tx-user').innerHTML=''}
+    var args={p_token:S.token},f=isAdmin()?$('tx-user').value:'';if(f)args.p_user=f;
+    $('cl-head').innerHTML=isAdmin()?'<th>Time</th><th>User</th><th>Coins</th>':'<th>Time</th><th>Type</th><th>Coins</th>';
+    $('coinlog').innerHTML='<tr><td colspan="3" class="empty">Loading...</td></tr>';
+    api('my_coin_log',args).then(function(l){
+      $('coinlog').innerHTML=l.length?l.map(function(c){var add=c.amount>0;
+        return '<tr><td>'+fmtTime(c.created_at)+'</td><td>'+(isAdmin()?esc(c.email||c.display_name||c.user_id):(add?'Added':'Deducted'))+'</td><td style="color:'+(add?'var(--green)':'var(--red)')+'">'+(add?'+':'')+c.amount+'</td></tr>'}).join(''):'<tr><td colspan="3" class="empty">'+(f?'No transactions for this user.':'No coins have been added or deducted yet.')+'</td></tr>';
+    }).catch(function(e){$('coinlog').innerHTML='<tr><td colspan="3" class="empty">'+esc(e.message)+'</td></tr>'});
+  }
+  $('tx-user').addEventListener('change',loadTx);
+  function setTheme(t){
+    document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem('np_theme',t)}catch(e){}
+    var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',t==='day'?'#f3f5ff':'#0b0d22');
+    var cs=document.querySelector('meta[name="color-scheme"]');if(cs)cs.setAttribute('content',t==='day'?'light':'dark');
+    document.querySelectorAll('[data-theme-set]').forEach(function(b){b.classList.toggle('on',b.dataset.themeSet===t)});
+  }
+  document.querySelectorAll('[data-theme-set]').forEach(function(b){b.onclick=function(){setTheme(b.dataset.themeSet)}});
+  var t0='night';try{t0=localStorage.getItem('np_theme')||'night'}catch(e){}
+  setTheme(t0==='day'?'day':'night');
+  $('gear').onclick=function(){location.hash='#/settings'};
+  $('m-add').onclick=function(){location.hash='#/add'};
+  $('m-withdraw').onclick=function(){location.hash='#/withdraw'};
+  $('m-tx').onclick=function(){location.hash='#/tx'};
+  $('m-pw').onclick=function(){location.hash='#/pw'};
+  document.querySelectorAll('[data-back]').forEach(function(b){b.onclick=function(){location.hash='#/settings'}});
+  $('pw-go').onclick=function(){
+    var e=$('pw-err'),n=$('pw-new').value;e.style.color='var(--red)';e.textContent='';
+    if(n!==$('pw-new2').value){e.textContent='New passwords do not match.';return}
+    api('change_password',{p_token:S.token,p_old:$('pw-old').value,p_new:n}).then(function(){
+      ['pw-old','pw-new','pw-new2'].forEach(function(i){$(i).value=''});e.style.color='var(--green)';e.textContent='Password changed successfully.';
+    }).catch(function(x){e.textContent=x.message});
+  };
+  $('s-logout').onclick=function(){logout()};
+
+  setInterval(tick,1000);
+  setInterval(function(){if(S.token&&!document.hidden)refresh().catch(function(){})},15000);
+  try{var m=sessionStorage.getItem('np_msg');if(m){sessionStorage.removeItem('np_msg');toast(m)}}catch(e){}
+  if(S.token)start();else showAuth();
+})();
+</script>
+
+<script id="play2win-gold-ball-game">
+(function(){
+  'use strict';
+  var row=document.getElementById('gold-cup-row');
+  var startBtn=document.getElementById('gold-start');
+  if(!row||!startBtn)return;
+  var msg=document.getElementById('gold-message');
+  var game=document.getElementById('gold-game');
+  var history=document.getElementById('gold-history');
+  var amountInput=document.getElementById('gold-entry-amount');
+  var balanceEl=document.getElementById('gold-wallet-balance');
+  var totalEl=document.getElementById('gold-total-entry');
+  var mult=1,busy=false,activeRound=null,settled=false;
+  var bridge=window.Play2WinGoldBridge;
+  function cups(){return Array.prototype.slice.call(row.querySelectorAll('.gold-cup'));}
+  function session(){return bridge&&bridge.getSession?bridge.getSession():{token:null,role:null,balance:0};}
+  function total(){var n=Math.floor(Number(amountInput.value)||0);return n*mult;}
+  function setBalance(n){var v=Math.max(0,Number(n)||0);balanceEl.textContent=v.toLocaleString('en-IN')+' Coins';var top=document.getElementById('bal');if(top&&!top.dataset.admin||top&&top.dataset.admin!=='1')top.textContent=v.toLocaleString('en-IN')+' Coins';}
+  function renderTotal(){var n=Math.floor(Number(amountInput.value)||0);totalEl.textContent=(n*mult).toLocaleString('en-IN')+' Coins';document.querySelectorAll('[data-gold-mult]').forEach(function(b){b.classList.toggle('active',Number(b.dataset.goldMult)===mult)});}
+  function resetCups(){cups().forEach(function(c,i){c.classList.remove('revealed','is-picked');c.disabled=true;c.dataset.slot=String(i);c.style.left=(i*35)+'%';});}
+  function showHistory(rows){if(!Array.isArray(rows)||!rows.length){history.textContent='No Gold Ball rounds yet.';return;}history.innerHTML=rows.slice(0,8).map(function(h){var won=!!h.won,stake=Number(h.stake||h.total_entry||0),payout=Number(h.payout||0);return '<div style="display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.1)"><span>Round '+String(h.id||h.round_id||'')+'</span><strong style="color:'+(won?'#8ff0bd':'#ff9ba8')+'">'+(won?'+'+payout:'-'+stake)+' Coins</strong></div>';}).join('');}
+  function loadState(){var ss=session();if(!ss.token)return Promise.reject(new Error('Please log in with your existing Play2Win account.'));return bridge.api('gold_game_state',{p_token:ss.token}).then(function(st){setBalance(st.balance!==undefined?st.balance:st.credits);showHistory(st.history||[]);return st;});}
+  function init(){resetCups();var ss=session();if(!ss.token){msg.textContent='Please log in to Play2Win first.';startBtn.disabled=true;return;}if(ss.role==='admin'){msg.textContent='Gold Ball is available for player accounts only.';startBtn.disabled=true;return;}startBtn.disabled=true;msg.textContent='Loading shared wallet…';loadState().then(function(){msg.textContent='Choose your entry and press Start Round.';startBtn.disabled=false;}).catch(function(e){msg.textContent=e.message||'Could not load Gold Ball.';startBtn.disabled=false;});}
+  amountInput.addEventListener('input',renderTotal);
+  document.getElementById('gold-multipliers').addEventListener('click',function(e){var b=e.target.closest('[data-gold-mult]');if(!b||busy||activeRound)return;mult=Number(b.dataset.goldMult);renderTotal();});
+  startBtn.addEventListener('click',function(){
+    if(busy||activeRound)return;
+    var ss=session(),base=Math.floor(Number(amountInput.value)||0),entry=base*mult;
+    if(!ss.token){msg.textContent='Your Play2Win session has expired. Please log in again.';return;}
+    if(ss.role==='admin'){msg.textContent='Admin accounts cannot play Gold Ball.';return;}
+    if(!Number.isSafeInteger(base)||base<1||base>10000||!Number.isSafeInteger(entry)||entry>10000){msg.textContent='Enter a valid amount. Total entry must be 10,000 coins or less.';return;}
+    busy=true;startBtn.disabled=true;startBtn.textContent='CREATING ROUND…';msg.textContent='Deducting '+entry.toLocaleString('en-IN')+' coins from your shared wallet…';resetCups();
+    bridge.api('gold_start_round',{p_token:ss.token,p_amount:base,p_multiplier:mult}).then(function(res){activeRound=Number(res.round_id);settled=false;setBalance(res.balance!==undefined?res.balance:res.credits);msg.textContent='Watch the cups shuffle, then choose the cup hiding the Gold Ball.';startBtn.textContent='SHUFFLING…';startBtn.disabled=true;game.classList.add('is-shuffling');var steps=0;var timer=setInterval(function(){var list=cups(),a=Math.floor(Math.random()*3),b=(a+1+Math.floor(Math.random()*2))%3,ca=list[a],cb=list[b],sa=Number(ca.dataset.slot),sb=Number(cb.dataset.slot);ca.dataset.slot=String(sb);cb.dataset.slot=String(sa);ca.style.left=(sb*35)+'%';cb.style.left=(sa*35)+'%';steps++;if(steps>=12){clearInterval(timer);game.classList.remove('is-shuffling');msg.textContent='Choose the cup hiding the Gold Ball.';startBtn.textContent='CHOOSE A CUP';busy=false;cups().forEach(function(c){c.disabled=false;});}},330);}).catch(function(e){busy=false;startBtn.disabled=false;startBtn.textContent='START ROUND';msg.textContent=e.message||'Could not start round.';loadState().catch(function(){});});
+  });
+  cups().forEach(function(c){c.addEventListener('click',function(){
+    if(busy||!activeRound||settled||c.disabled)return;
+    var ss=session(),chosen=Number(c.dataset.slot);busy=true;c.disabled=true;c.classList.add('is-picked');cups().forEach(function(x){x.disabled=true;});msg.textContent='Checking your cup securely…';
+    bridge.api('gold_pick_cup',{p_token:ss.token,p_round_id:activeRound,p_cup:chosen}).then(function(res){settled=true;var winner=Number(res.winning_cup);cups().forEach(function(x){if(Number(x.dataset.slot)===winner)x.classList.add('revealed');});var won=!!res.won,payout=Number(res.payout||0);setBalance(res.balance!==undefined?res.balance:res.credits);var ballCup=cups().find(function(x){return Number(x.dataset.slot)===winner;});var ballCupLabel=ballCup?Number(ballCup.dataset.cup)+1:winner+1;msg.textContent=won?'🎉 WIN · +'+payout.toLocaleString('en-IN')+' Coins':'❌ LOSS · Entry deducted · Ball was under Cup '+ballCupLabel+'.';history.innerHTML='';
+      return bridge.refresh().catch(function(){});
+    }).catch(function(e){msg.textContent=(e.message||'Could not settle this round.')+' Your round is kept open; you can retry your cup selection.';cups().forEach(function(x){x.disabled=false;x.classList.remove('is-picked');});loadState().catch(function(){});}).then(function(){busy=false;if(settled){activeRound=null;startBtn.disabled=false;startBtn.textContent='PLAY AGAIN';}else{startBtn.disabled=true;startBtn.textContent='CHOOSE A CUP';}});
+  });});
+  window.addEventListener('hashchange',function(){if(location.hash==='#/goldball')init();});
+  renderTotal();if(location.hash==='#/goldball')init();
+})();
+</script>
+
+<script id="basic-copy-deterrence-js">
+(function(){
+  'use strict';
+  document.addEventListener('contextmenu',function(e){e.preventDefault();},true);
+  document.addEventListener('dragstart',function(e){if(e.target && e.target.tagName==='IMG') e.preventDefault();},true);
+  document.addEventListener('keydown',function(e){
+    var k=(e.key||'').toLowerCase();
+    if(e.key==='F12' || (e.ctrlKey && e.shiftKey && ['i','j','c'].includes(k)) ||
+       (e.ctrlKey && ['u','s'].includes(k))) { e.preventDefault(); e.stopPropagation(); return false; }
+  },true);
+})();
+</script>
+
+<script id="play2win-rewarded-ads">
+(function(){
+  'use strict';
+  // Configure these after Google Ad Manager approves the site and ad unit.
+  var AD_REWARDS_ENABLED = false; // keep false until policy review and live ad-unit setup are complete
+  var AD_UNIT_PATH = '/YOUR_NETWORK_CODE/PLAY2WIN_REWARDED';
+  var SUPABASE_URL = 'https://tcirnuhynvtwbprbogqp.supabase.co';
+  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRjaXJudWh5bnZ0d2JwcmJvZ3FwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwNjM4MDAsImV4cCI6MjEwOTYzOTgwMH0.ksoUk7ItTqcfcO01PbCRozztAErtvhEsIQa0QGORH_g';
+  var FUNCTION_URL = SUPABASE_URL + '/functions/v1/ad-rewards';
+  var DAILY_LIMIT = 5;
+  var $ = function(id){ return document.getElementById(id); };
+  var busy=false, slot=null, slotListenersAdded=false, currentNonce=null, rewardedGranted=false;
+  var btn=$('ad-watch-btn'), status=$('ad-reward-status'), balance=$('ad-bonus-balance');
+  function setStatus(t){ if(status) status.textContent=t; }
+  function session(){ return window.Play2WinAdBridge ? window.Play2WinAdBridge.getSession() : null; }
+  function call(action, extra){
+    var ss=session();
+    if(!ss || !ss.token) return Promise.reject(new Error('Please log in again.'));
+    return fetch(FUNCTION_URL,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON_KEY},body:JSON.stringify(Object.assign({action:action,p_token:ss.token},extra||{}))})
+      .then(function(r){return r.json().then(function(j){if(!r.ok||j.error)throw new Error(j.error||'Reward request failed.');return j;});});
+  }
+  function renderStatus(data){
+    if(!data)return;
+    if(balance)balance.textContent=Number(data.bonus_balance||0).toLocaleString('en-IN')+' Coins';
+    if(btn){var left=Math.max(0,DAILY_LIMIT-Number(data.claims_today||0));btn.disabled=!AD_REWARDS_ENABLED||busy||left<=0;btn.textContent=left>0?'Watch Ad · +1 Bonus Coin':'Daily ad limit reached';}
+    if(!AD_REWARDS_ENABLED)setStatus('Rewarded ads are disabled until your Google Ad Manager ad unit is configured.');
+    else setStatus('Today: '+Number(data.claims_today||0)+' / '+DAILY_LIMIT+' ads claimed.');
+  }
+  function loadStatus(){
+    var ss=session(); if(!ss||!ss.token||ss.role==='admin')return;
+    call('status').then(renderStatus).catch(function(e){setStatus(e.message||'Could not load Bonus Wallet.');});
+  }
+  function loadGpt(){
+    if(window.googletag&&window.googletag.apiReady)return Promise.resolve();
+    return new Promise(function(resolve,reject){
+      var existing=document.querySelector('script[data-p2w-gpt]');
+      if(existing){existing.addEventListener('load',resolve,{once:true});existing.addEventListener('error',reject,{once:true});return;}
+      var sc=document.createElement('script');sc.async=true;sc.src='https://securepubads.g.doubleclick.net/tag/js/gpt.js';sc.crossOrigin='anonymous';sc.dataset.p2wGpt='1';sc.onload=resolve;sc.onerror=function(){reject(new Error('Google ad library could not be loaded.'));};document.head.appendChild(sc);
+    });
+  }
+  function requestAd(){
+    return loadGpt().then(function(){return new Promise(function(resolve,reject){
+      window.googletag=window.googletag||{cmd:[]};
+      window.googletag.cmd.push(function(){
+        try{
+          if(!slot){
+            slot=googletag.defineOutOfPageSlot(AD_UNIT_PATH,googletag.enums.OutOfPageFormat.REWARDED);
+            if(!slot){reject(new Error('Rewarded ad is not available for this device or placement.'));return;}
+            slot.addService(googletag.pubads());
+          }
+          if(!slotListenersAdded){
+            googletag.pubads().addEventListener('rewardedSlotReady',function(ev){if(ev.slot===slot){ev.makeRewardedVisible();}});
+            googletag.pubads().addEventListener('rewardedSlotGranted',function(ev){
+              if(ev.slot!==slot||rewardedGranted||!currentNonce)return;
+              rewardedGranted=true;setStatus('Ad completed. Applying your Bonus Coin…');
+              call('claim',{p_nonce:currentNonce}).then(function(r){
+                setStatus('Success! 1 Bonus Coin added.');
+                if(window.Play2WinAdBridge){window.Play2WinAdBridge.toast('1 Bonus Coin added to Bonus Wallet.');window.Play2WinAdBridge.refresh().catch(function(){});}
+                renderStatus(r);
+              }).catch(function(e){setStatus(e.message||'Reward claim failed.');}).finally(function(){busy=false;currentNonce=null;if(btn)btn.disabled=false;loadStatus();});
+            });
+            googletag.pubads().addEventListener('rewardedSlotClosed',function(ev){
+              if(ev.slot!==slot)return;
+              if(!rewardedGranted){setStatus('Ad closed before reward completion. No Coin added.');busy=false;currentNonce=null;if(btn)btn.disabled=false;loadStatus();}
+              try{googletag.destroySlots([slot]);}catch(e){} slot=null;slotListenersAdded=false;
+            });
+            slotListenersAdded=true;
+          }
+          googletag.enableServices();googletag.display(slot);googletag.pubads().refresh([slot]);resolve();
+        }catch(e){reject(e);}
+      });
+    });});
+  }
+  if(btn){btn.addEventListener('click',function(){
+    if(!AD_REWARDS_ENABLED||busy)return;
+    var ss=session();if(!ss||!ss.token){setStatus('Please log in again.');return;}
+    busy=true;btn.disabled=true;setStatus('Preparing a rewarded ad…');
+    call('start').then(function(r){currentNonce=r.nonce;rewardedGranted=false;return requestAd();})
+      .catch(function(e){busy=false;currentNonce=null;btn.disabled=false;setStatus(e.message||'Ad could not be started.');});
+  });}
+  window.addEventListener('hashchange',function(){if(location.hash.indexOf('#/rewards')>=0)loadStatus();});
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)loadStatus();});
+  // Status only; no reward is issued by this timer.
+  setInterval(function(){if(location.hash.indexOf('#/rewards')>=0)loadStatus();},60000);
+  loadStatus();
+})();
+</script>
+
+<script id="play2win-refer-earn">
+(function(){
+  'use strict';
+  var REF_KEY='p2w_pending_ref';
+  var bridge=window.Play2WinReferBridge;
+  if(!bridge)return;
+  var $=function(id){return document.getElementById(id)};
+  var currentInfo=null,claimBusy=false,shareBusy=false;
+
+  function savePendingRef(code){
+    var clean=String(code||'').trim().toUpperCase();
+    if(!clean||clean.length<4)return;
+    try{localStorage.setItem(REF_KEY,clean);}catch(e){}
+    renderAuthRefBanner();
+    var inp=$('ref-input-code');
+    if(inp&&!inp.value)inp.value=clean;
+  }
+  function getPendingRef(){
+    try{return (localStorage.getItem(REF_KEY)||'').trim().toUpperCase();}catch(e){return '';}
+  }
+  function clearPendingRef(){
+    try{localStorage.removeItem(REF_KEY);}catch(e){}
+    renderAuthRefBanner();
+  }
+  function renderAuthRefBanner(){
+    var banner=$('auth-ref-banner'),code=getPendingRef();
+    if(!banner)return;
+    if(code){
+      banner.textContent='🎁 Referral Code Applied: '+code+' — Log in karein aur dono ko 20 Bonus Coins milenge!';
+      banner.classList.remove('hide');
+    }else{
+      banner.classList.add('hide');
+    }
+  }
+  function captureUrlRef(){
+    try{
+      var q=new URLSearchParams(location.search||'');
+      var ref=q.get('ref');
+      if(ref)savePendingRef(ref);
+    }catch(e){}
+  }
+  captureUrlRef();
+  renderAuthRefBanner();
+
+  window.Play2WinApplyIncomingRef=function(code){
+    savePendingRef(code);
+    var ss=bridge.getSession();
+    if(ss&&ss.token&&ss.role!=='admin')tryAutoClaimPendingRef();
+  };
+
+  // Show Download APK button on web browser when someone opens a shared link
+  (function loadPublicDownload(){
+    var isNative=!!(window.Play2WinNative&&window.Play2WinNative.isNativeApp&&window.Play2WinNative.isNativeApp());
+    if(isNative)return;
+    bridge.api('get_public_download_info',{}).then(function(info){
+      var wrap=$('auth-download-wrap'),btn=$('auth-download-btn');
+      if(wrap&&btn&&info&&info.download_url){
+        btn.href=info.download_url;
+        wrap.classList.remove('hide');
+      }
+    }).catch(function(){});
+  })();
+
+  function copyValue(text,okMsg){
+    if(!text)return;
+    if(window.Play2WinNative&&window.Play2WinNative.copyToClipboard){
+      window.Play2WinNative.copyToClipboard('Play2Win',text);
+      bridge.toast(okMsg);
+      return;
+    }
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){bridge.toast(okMsg);}).catch(function(){bridge.toast(text);});
+      return;
+    }
+    bridge.toast(text);
+  }
+
+  function renderReferralInfo(info){
+    currentInfo=info;
+    if($('ref-my-code'))$('ref-my-code').textContent=info.referral_code||'—';
+    if($('ref-stat-shares'))$('ref-stat-shares').textContent=Number(info.total_shares||0);
+    if($('ref-stat-refers'))$('ref-stat-refers').textContent=Number(info.total_referrals||0);
+    if($('ref-stat-earned'))$('ref-stat-earned').textContent=Number(info.total_earned||0)+' 🪙';
+    var claimBox=$('ref-claim-box'),claimedBadge=$('ref-claimed-badge');
+    if(info.referral_rewarded){
+      if(claimBox)claimBox.classList.add('hide');
+      if(claimedBadge){
+        claimedBadge.textContent='✓ Referral bonus claimed'+(info.referred_code_used?' ('+info.referred_code_used+' · +20 Coins)':'');
+        claimedBadge.classList.remove('hide');
+      }
+      clearPendingRef();
+    }else{
+      if(claimBox)claimBox.classList.remove('hide');
+      if(claimedBadge)claimedBadge.classList.add('hide');
+      var pending=getPendingRef();
+      if(pending&&$('ref-input-code')&&!$('ref-input-code').value)$('ref-input-code').value=pending;
+    }
+    var hist=$('ref-my-history');
+    if(hist){
+      var rows=info.history||[];
+      hist.className=rows.length?'':'empty';
+      hist.innerHTML=rows.length?rows.map(function(r){
+        return '<div class="srow" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>'+bridge.esc(r.friend_label||'Friend')+' <small style="color:var(--mute)">'+bridge.fmtTime(r.created_at)+'</small></span><b style="color:var(--green)">+'+Number(r.coins||20)+' Coins</b></div>';
+      }).join(''):'Abhi tak kisi ne aapke referral code se join nahi kiya hai.';
+    }
+  }
+
+  function friendlyRefErr(e,fallback){
+    var m=(e&&e.message)||fallback||'';
+    if(/Could not find the function|schema cache/i.test(m)){
+      return 'Supabase setup baaki hai: Supabase SQL Editor mein supabase_refer_earn.sql run karein.';
+    }
+    return m;
+  }
+
+  function loadReferrals(){
+    var ss=bridge.getSession();
+    if(!ss||!ss.token||ss.role==='admin')return Promise.resolve();
+    return bridge.api('get_referral_info',{p_token:ss.token}).then(function(info){
+      renderReferralInfo(info);
+      return info;
+    }).catch(function(e){
+      if($('ref-my-code'))$('ref-my-code').textContent='Setup pending';
+      if($('ref-my-history'))$('ref-my-history').textContent=friendlyRefErr(e,'Referral system unavailable.');
+    });
+  }
+  window.Play2WinLoadReferrals=loadReferrals;
+
+  function claimCode(rawCode,silent){
+    var ss=bridge.getSession();
+    if(!ss||!ss.token||ss.role==='admin'||claimBusy)return;
+    var code=String(rawCode||'').trim().toUpperCase();
+    var err=$('ref-claim-err');
+    if(err)err.textContent='';
+    if(!code){if(!silent&&err)err.textContent='Referral code enter karein.';return;}
+    claimBusy=true;
+    if($('ref-claim-btn'))$('ref-claim-btn').disabled=true;
+    bridge.api('claim_referral_code',{p_token:ss.token,p_code:code}).then(function(res){
+      clearPendingRef();
+      if($('ref-input-code'))$('ref-input-code').value='';
+      bridge.toast('🎉 Mubarak ho! Dono ke wallet mein +'+(res.reward||20)+' Coins add ho gaye!');
+      return Promise.all([bridge.refresh(),loadReferrals()]);
+    }).catch(function(e){
+      if(!silent&&err)err.textContent=friendlyRefErr(e,'Referral code apply nahi ho saka.');
+    }).then(function(){
+      claimBusy=false;
+      if($('ref-claim-btn'))$('ref-claim-btn').disabled=false;
+    });
+  }
+
+  function tryAutoClaimPendingRef(){
+    var pending=getPendingRef();
+    if(!pending)return;
+    loadReferrals().then(function(info){
+      if(info&&!info.referral_rewarded&&info.referral_code!==pending){
+        claimCode(pending,true);
+      }
+    });
+  }
+  window.Play2WinOnSessionReady=function(){
+    var ss=bridge.getSession();
+    if(ss&&ss.token&&ss.role!=='admin')tryAutoClaimPendingRef();
+  };
+
+  if($('ref-copy-code-btn'))$('ref-copy-code-btn').onclick=function(){
+    if(currentInfo&&currentInfo.referral_code)copyValue(currentInfo.referral_code,'Referral code copied: '+currentInfo.referral_code);
+    else bridge.toast('Pehle Supabase mein supabase_refer_earn.sql run karein.');
+  };
+  if($('ref-copy-link-btn'))$('ref-copy-link-btn').onclick=function(){
+    if(currentInfo&&currentInfo.share_link)copyValue(currentInfo.share_link,'Download & referral link copied!');
+    else bridge.toast('Pehle Supabase mein supabase_refer_earn.sql run karein.');
+  };
+  if($('ref-share-btn'))$('ref-share-btn').onclick=function(){
+    var ss=bridge.getSession();
+    if(!ss||!ss.token||shareBusy)return;
+    shareBusy=true;
+    $('ref-share-btn').disabled=true;
+    bridge.api('record_referral_share',{p_token:ss.token}).then(function(res){
+      if($('ref-stat-shares'))$('ref-stat-shares').textContent=Number(res.total_shares||0);
+      var code=res.referral_code||(currentInfo&&currentInfo.referral_code)||'';
+      var link=res.share_link||(currentInfo&&currentInfo.share_link)||'https://splendorous-jalebi-a6d440.netlify.app/';
+      var shareMsg='Play2Win app download karein aur mera referral code '+code+' use karke 20 Bonus Coins paayein! Download link: '+link;
+      if(window.Play2WinNative&&window.Play2WinNative.shareText){
+        window.Play2WinNative.shareText('Play2Win · Earn 20 Coins',shareMsg);
+      }else if(navigator.share){
+        navigator.share({title:'Play2Win',text:shareMsg,url:link}).catch(function(){});
+      }else{
+        copyValue(shareMsg,'Share message & download link copied!');
+      }
+    }).catch(function(e){
+      bridge.toast(friendlyRefErr(e,'Share failed.'));
+    }).then(function(){
+      shareBusy=false;
+      $('ref-share-btn').disabled=false;
+    });
+  };
+  if($('ref-claim-btn'))$('ref-claim-btn').onclick=function(){
+    claimCode($('ref-input-code')?$('ref-input-code').value:'',false);
+  };
+
+  // ---- Admin referral analytics ----
+  function loadAdminReferrals(){
+    var ss=bridge.getSession();
+    if(!ss||!ss.token||ss.role!=='admin')return;
+    bridge.api('admin_referral_overview',{p_token:ss.token}).then(function(d){
+      if($('admin-ref-download-url'))$('admin-ref-download-url').value=d.download_url||'';
+      if($('admin-ref-total-shares'))$('admin-ref-total-shares').textContent=Number(d.total_shares||0);
+      if($('admin-ref-total-refers'))$('admin-ref-total-refers').textContent=Number(d.total_referrals||0);
+      if($('admin-ref-total-coins'))$('admin-ref-total-coins').textContent=Number(d.total_coins_distributed||0);
+      var users=d.users||[];
+      if($('admin-ref-users')){
+        $('admin-ref-users').innerHTML=users.length?users.map(function(u){
+          return '<tr><td>'+bridge.esc(u.user_label||u.user_id)+'</td><td><b>'+bridge.esc(u.referral_code||'')+'</b></td><td>'+Number(u.total_shares||0)+'</td><td>'+Number(u.total_referrals||0)+'</td><td style="color:var(--green)"><b>'+Number(u.total_earned||0)+'</b></td></tr>';
+        }).join(''):'<tr><td colspan="5" class="empty">Abhi tak kisi user ne share nahi kiya hai.</td></tr>';
+      }
+      var recent=d.recent||[];
+      if($('admin-ref-recent')){
+        $('admin-ref-recent').innerHTML=recent.length?recent.map(function(r){
+          return '<tr><td>'+bridge.fmtTime(r.created_at)+'</td><td>'+bridge.esc(r.referrer_label)+'</td><td>'+bridge.esc(r.referred_label)+'</td><td style="color:var(--green)">+'+Number(r.referrer_coins||20)+' / +'+Number(r.referred_coins||20)+'</td></tr>';
+        }).join(''):'<tr><td colspan="4" class="empty">Abhi tak koi referral claim nahi hua hai.</td></tr>';
+      }
+    }).catch(function(e){
+      if($('admin-ref-users'))$('admin-ref-users').innerHTML='<tr><td colspan="5" class="empty">'+bridge.esc(friendlyRefErr(e,'Run supabase_refer_earn.sql in Supabase.'))+'</td></tr>';
+    });
+  }
+  window.Play2WinLoadAdminReferrals=loadAdminReferrals;
+
+  if($('admin-ref-save-url'))$('admin-ref-save-url').onclick=function(){
+    var ss=bridge.getSession(),url=($('admin-ref-download-url')?$('admin-ref-download-url').value:'').trim(),msg=$('admin-ref-url-msg');
+    if(!ss||!ss.token||ss.role!=='admin')return;
+    msg.style.color='var(--red)';msg.textContent='';
+    if(!/^https?:\/\//i.test(url)){msg.textContent='Valid https:// ya http:// APK/App download URL enter karein.';return;}
+    $('admin-ref-save-url').disabled=true;
+    bridge.api('admin_set_download_url',{p_token:ss.token,p_download_url:url}).then(function(){
+      msg.style.color='var(--green)';msg.textContent='Download link saved! Sabhi users ko yahi link share hoga.';
+    }).catch(function(e){
+      msg.textContent=e.message||'Save failed.';
+    }).then(function(){
+      $('admin-ref-save-url').disabled=false;
+    });
+  };
+})();
+</script>
+
+
+</body>
+</html>
