@@ -1,7 +1,8 @@
 -- Play2Win Self-Service Email + Password Sign Up, Login & Password Change (Supabase SQL Migration)
 -- Run this script once in your Supabase Dashboard -> SQL Editor.
--- Fixes: null value in column "pw" of relation "app_users" violates not-null constraint
--- and supports any NOT NULL columns in app_users / sessions automatically.
+-- Fixes:
+--   1. null value in column "pw" of relation "app_users" violates not-null constraint
+--   2. new row for relation "app_users" violates check constraint "app_users_id_check"
 
 create extension if not exists pgcrypto;
 
@@ -120,12 +121,17 @@ declare
   v_id_type text;
   v_user_id text;
   v_existing_id text;
-  v_cols text[] := array[]::text[];
-  v_vals text[] := array[]::text[];
+  v_cols text[];
+  v_vals text[];
   v_col_rec record;
   v_token text;
   v_sess_cols text := 'token, user_id';
   v_sess_vals text := '$1, $2';
+  v_candidates text[];
+  v_cand text;
+  v_inserted boolean := false;
+  v_last_err text := '';
+  v_check_def text := '';
 begin
   v_email := lower(trim(coalesce(p_email, '')));
   if v_email !~ '^[^@\s]+@[^@\s]+\.[^@\s]{2,}$' then
@@ -169,83 +175,114 @@ begin
   where table_schema = v_users_schema and table_name = v_users_name and column_name = 'id';
 
   if v_id_type = 'uuid' then
-    v_user_id := gen_random_uuid()::text;
+    v_candidates := array[gen_random_uuid()::text];
   else
-    v_user_id := v_email;
-    execute format('select id::text from %s where lower(id::text) = $1 limit 1', v_schema.users_table)
-      into v_existing_id using v_user_id;
-    if v_existing_id is not null then
-      raise exception 'Is Email ID se account pehle se bana hai. Kripya Log in karein.';
-    end if;
+    -- Generate compact alphanumeric / underscore / numeric IDs that satisfy app_users_id_check
+    v_candidates := array[
+      'u' || substr(md5(v_email || ':' || clock_timestamp()::text || random()::text), 1, 7),
+      'u' || substr(md5(v_email || ':' || random()::text), 1, 5),
+      'user_' || substr(md5(v_email || ':' || random()::text), 1, 6),
+      'g_' || substr(md5(v_email || ':' || random()::text), 1, 8),
+      'p2w' || substr(md5(v_email || ':' || random()::text), 1, 6),
+      floor(10000000 + random() * 89999999)::bigint::text,
+      'u' || substr(md5(v_email || ':' || random()::text), 1, 11)
+    ];
   end if;
 
-  -- Dynamically populate every known column plus any remaining NOT NULL columns without defaults
-  for v_col_rec in
-    select column_name, data_type, is_nullable, column_default, is_identity, is_generated
-    from information_schema.columns
-    where table_schema = v_users_schema and table_name = v_users_name
-    order by ordinal_position
+  foreach v_cand in array v_candidates
   loop
-    if v_col_rec.is_identity = 'YES' or v_col_rec.is_generated = 'ALWAYS' then
-      continue;
-    end if;
+    v_user_id := v_cand;
+    v_cols := array[]::text[];
+    v_vals := array[]::text[];
 
-    if v_col_rec.column_name = 'id' then
-      v_cols := array_append(v_cols, 'id');
-      if v_id_type = 'uuid' then
-        v_vals := array_append(v_vals, quote_literal(v_user_id) || '::uuid');
-      else
-        v_vals := array_append(v_vals, quote_literal(v_user_id));
+    for v_col_rec in
+      select column_name, data_type, is_nullable, column_default, is_identity, is_generated
+      from information_schema.columns
+      where table_schema = v_users_schema and table_name = v_users_name
+      order by ordinal_position
+    loop
+      if v_col_rec.is_identity = 'YES' or v_col_rec.is_generated = 'ALWAYS' then
+        continue;
       end if;
-    elsif v_col_rec.column_name = 'role' then
-      v_cols := array_append(v_cols, 'role');
-      v_vals := array_append(v_vals, quote_literal('user'));
-    elsif v_col_rec.column_name = v_schema.balance_col then
-      v_cols := array_append(v_cols, format('%I', v_schema.balance_col));
-      v_vals := array_append(v_vals, '20');
-    elsif v_col_rec.column_name = 'email' then
-      v_cols := array_append(v_cols, 'email');
-      v_vals := array_append(v_vals, quote_literal(v_email));
-    elsif v_col_rec.column_name in ('display_name', 'name', 'full_name') then
-      v_cols := array_append(v_cols, format('%I', v_col_rec.column_name));
-      v_vals := array_append(v_vals, quote_literal(v_name));
-    elsif v_col_rec.column_name in ('pw', 'password_hash', 'pw_hash', 'password') then
-      v_cols := array_append(v_cols, format('%I', v_col_rec.column_name));
-      v_vals := array_append(v_vals, quote_literal(v_pw_hash));
-    elsif v_col_rec.column_name = 'salt' then
-      v_cols := array_append(v_cols, 'salt');
-      v_vals := array_append(v_vals, quote_literal(''));
-    elsif v_col_rec.column_name in ('auth_provider', 'provider') then
-      v_cols := array_append(v_cols, format('%I', v_col_rec.column_name));
-      v_vals := array_append(v_vals, quote_literal('email'));
-    elsif v_col_rec.is_nullable = 'NO' and v_col_rec.column_default is null then
-      v_cols := array_append(v_cols, format('%I', v_col_rec.column_name));
-      if v_col_rec.data_type = 'boolean' then
-        v_vals := array_append(v_vals, 'false');
-      elsif v_col_rec.data_type in ('integer', 'bigint', 'smallint', 'numeric', 'real', 'double precision') then
-        v_vals := array_append(v_vals, '0');
-      elsif v_col_rec.data_type = 'uuid' then
-        v_vals := array_append(v_vals, quote_literal(gen_random_uuid()::text) || '::uuid');
-      elsif v_col_rec.data_type in ('timestamp with time zone', 'timestamp without time zone') then
-        v_vals := array_append(v_vals, 'now()');
-      elsif v_col_rec.data_type = 'date' then
-        v_vals := array_append(v_vals, 'current_date');
-      elsif v_col_rec.data_type = 'jsonb' then
-        v_vals := array_append(v_vals, '''{}''::jsonb');
-      elsif v_col_rec.data_type = 'json' then
-        v_vals := array_append(v_vals, '''{}''::json');
-      else
+
+      if v_col_rec.column_name = 'id' then
+        v_cols := array_append(v_cols, 'id');
+        if v_id_type = 'uuid' then
+          v_vals := array_append(v_vals, quote_literal(v_user_id) || '::uuid');
+        else
+          v_vals := array_append(v_vals, quote_literal(v_user_id));
+        end if;
+      elsif v_col_rec.column_name = 'role' then
+        v_cols := array_append(v_cols, 'role');
+        v_vals := array_append(v_vals, quote_literal('user'));
+      elsif v_col_rec.column_name = v_schema.balance_col then
+        v_cols := array_append(v_cols, format('%I', v_schema.balance_col));
+        v_vals := array_append(v_vals, '20');
+      elsif v_col_rec.column_name = 'email' then
+        v_cols := array_append(v_cols, 'email');
+        v_vals := array_append(v_vals, quote_literal(v_email));
+      elsif v_col_rec.column_name in ('display_name', 'name', 'full_name') then
+        v_cols := array_append(v_cols, format('%I', v_col_rec.column_name));
+        v_vals := array_append(v_vals, quote_literal(v_name));
+      elsif v_col_rec.column_name in ('pw', 'password_hash', 'pw_hash', 'password') then
+        v_cols := array_append(v_cols, format('%I', v_col_rec.column_name));
+        v_vals := array_append(v_vals, quote_literal(v_pw_hash));
+      elsif v_col_rec.column_name = 'salt' then
+        v_cols := array_append(v_cols, 'salt');
         v_vals := array_append(v_vals, quote_literal(''));
+      elsif v_col_rec.column_name in ('auth_provider', 'provider') then
+        v_cols := array_append(v_cols, format('%I', v_col_rec.column_name));
+        v_vals := array_append(v_vals, quote_literal('email'));
+      elsif v_col_rec.is_nullable = 'NO' and v_col_rec.column_default is null then
+        v_cols := array_append(v_cols, format('%I', v_col_rec.column_name));
+        if v_col_rec.data_type = 'boolean' then
+          v_vals := array_append(v_vals, 'false');
+        elsif v_col_rec.data_type in ('integer', 'bigint', 'smallint', 'numeric', 'real', 'double precision') then
+          v_vals := array_append(v_vals, '0');
+        elsif v_col_rec.data_type = 'uuid' then
+          v_vals := array_append(v_vals, quote_literal(gen_random_uuid()::text) || '::uuid');
+        elsif v_col_rec.data_type in ('timestamp with time zone', 'timestamp without time zone') then
+          v_vals := array_append(v_vals, 'now()');
+        elsif v_col_rec.data_type = 'date' then
+          v_vals := array_append(v_vals, 'current_date');
+        elsif v_col_rec.data_type = 'jsonb' then
+          v_vals := array_append(v_vals, '''{}''::jsonb');
+        elsif v_col_rec.data_type = 'json' then
+          v_vals := array_append(v_vals, '''{}''::json');
+        else
+          v_vals := array_append(v_vals, quote_literal(''));
+        end if;
       end if;
-    end if;
+    end loop;
+
+    begin
+      execute format(
+        'insert into %s (%s) values (%s)',
+        v_schema.users_table,
+        array_to_string(v_cols, ', '),
+        array_to_string(v_vals, ', ')
+      );
+      v_inserted := true;
+      exit;
+    exception
+      when check_violation or unique_violation then
+        if position('email' in lower(sqlerrm)) > 0 then
+          raise exception 'Is Email ID se account pehle se bana hai. Kripya Log in karein.';
+        end if;
+        v_last_err := sqlerrm;
+    end;
   end loop;
 
-  execute format(
-    'insert into %s (%s) values (%s)',
-    v_schema.users_table,
-    array_to_string(v_cols, ', '),
-    array_to_string(v_vals, ', ')
-  );
+  if not v_inserted then
+    select string_agg(conname || ': ' || pg_get_constraintdef(c.oid), '; ')
+    into v_check_def
+    from pg_constraint c
+    join pg_class r on r.oid = c.conrelid
+    join pg_namespace n on n.oid = r.relnamespace
+    where n.nspname = v_users_schema and r.relname = v_users_name and c.contype = 'c';
+
+    raise exception '% (constraints: %)', coalesce(nullif(v_last_err, ''), 'Could not insert user'), coalesce(v_check_def, 'none');
+  end if;
 
   insert into public.email_auth_accounts (email, user_id, display_name, password_hash)
   values (v_email, v_user_id, v_name, v_pw_hash);

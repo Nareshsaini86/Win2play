@@ -51,6 +51,22 @@ class ExampleRobolectricTest {
     assertTrue(html.contains("id=\"pw-show\""))
     assertTrue(html.contains("id=\"su-match\""))
     assertTrue(html.contains("email_signup"))
+    assertTrue(html.contains("data-open-route=\"aviator\""))
+    assertTrue(html.contains("id=\"v-aviator\""))
+    assertTrue(html.contains("id=\"av-canvas\""))
+    assertTrue(html.contains("id=\"av-bet\""))
+    assertTrue(html.contains("max=\"1000\""))
+    assertTrue(html.contains("id=\"av-action\""))
+    assertTrue(html.contains("aviator_place_bet"))
+    assertTrue(html.contains("aviator_cashout"))
+    assertTrue(html.contains("id=\"av-tab-results\""))
+    assertTrue(html.contains("id=\"av-tab-bets\""))
+    assertTrue(html.contains("id=\"av-swipe-viewport\""))
+    assertTrue(html.contains("id=\"bets-pane-number\""))
+    assertTrue(html.contains("id=\"bets-pane-gold\""))
+    assertTrue(html.contains("id=\"bets-pane-aviator\""))
+    assertTrue(html.contains("admin_gold_bets"))
+    assertTrue(html.contains("admin_aviator_bets"))
   }
 
   @Test

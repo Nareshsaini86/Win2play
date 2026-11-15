@@ -311,10 +311,24 @@ label{display:block}
   background:radial-gradient(circle at 29% 22%,#fffbd0 0,#ffe76b 22%,#ffb900 58%,#d76b00 100%);
   box-shadow:0 0 0 3px rgba(255,236,145,.2),0 0 15px 5px rgba(255,207,48,.75),0 5px 8px rgba(104,54,0,.35);
 }
-@media(max-width:360px){
-  #v-home .game-launch-grid{gap:16px!important}
-  #v-home .game-launch-item{width:100px!important}
-  #v-home .game-launch-box{width:96px!important;height:106px!important;min-height:106px!important}
+#v-home .game-launch-grid{
+  display:flex!important;flex-wrap:wrap!important;justify-content:center!important;align-items:flex-start;
+  gap:16px!important;padding:14px 2px 22px!important;
+}
+#v-home .game-launch-box:has(.aviator-launch-icon){
+  background:radial-gradient(circle at 25% 12%,#ff9bb0 0,#f43f5e 36%,#be123c 76%,#7f0928 100%)!important;
+}
+#v-home .aviator-launch-icon{
+  width:64px!important;height:64px!important;border-radius:18px;
+  background:radial-gradient(circle at 50% 35%,rgba(255,255,255,.26),rgba(0,0,0,.15));
+  border:2px solid rgba(255,235,238,.85);
+  box-shadow:inset 0 2px 8px rgba(255,255,255,.35),0 6px 14px rgba(100,0,28,.4);
+}
+#v-home .aviator-launch-icon svg{width:40px;height:40px;display:block;filter:drop-shadow(0 3px 5px rgba(0,0,0,.35))}
+@media(max-width:420px){
+  #v-home .game-launch-grid{gap:10px!important}
+  #v-home .game-launch-item{width:98px!important;max-width:98px!important}
+  #v-home .game-launch-box{width:94px!important;height:106px!important;min-height:106px!important}
 }
 
 </style>
@@ -351,6 +365,72 @@ img{ -webkit-user-drag:none; user-drag:none; }
 .gold-total-line{margin-top:8px}
 @keyframes goldPulse{50%{filter:brightness(1.35)}}.gold-game.is-shuffling .gold-title{animation:goldPulse .4s infinite}
 @media(max-width:370px){.gold-stage{min-height:290px}.gold-cup-row{height:135px}.gold-cup{height:100px}.gold-cup-shape{height:74px}}
+</style>
+
+<style id="aviator-game-style">
+.av-card{margin-top:12px;padding:16px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(160deg,rgba(32,12,28,.96),rgba(10,12,24,.98));color:#fff5f7;box-shadow:0 16px 38px rgba(0,0,0,.34);overflow:hidden}
+.av-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.av-head h2{margin:0;color:#fff;font-size:1.25rem}
+.av-round-meta{display:flex;align-items:center;gap:6px}
+.av-round-tag{font-size:.72rem;font-weight:900;color:#d6d9f0;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:99px;padding:4px 9px}
+.av-phase-pill{font-size:.68rem;font-weight:950;letter-spacing:.04em;border-radius:99px;padding:4px 9px;background:rgba(46,230,160,.16);color:#48e9ae;border:1px solid rgba(46,230,160,.35)}
+.av-phase-pill.flying{background:rgba(255,200,50,.18);color:#ffe066;border-color:rgba(255,200,50,.4)}
+.av-phase-pill.crashed{background:rgba(255,77,109,.18);color:#ff6b86;border-color:rgba(255,77,109,.4)}
+.av-crashes{display:flex;gap:6px;overflow-x:auto;padding:10px 2px 4px;scrollbar-width:none}
+.av-crashes::-webkit-scrollbar{display:none}
+.av-pill{flex:0 0 auto;padding:4px 10px;border-radius:99px;font-size:.75rem;font-weight:900;font-variant-numeric:tabular-nums;border:1px solid rgba(255,255,255,.12);background:rgba(99,115,171,.2);color:#9cc2ff}
+.av-pill.mid{background:rgba(155,93,229,.25);color:#dfb8ff;border-color:rgba(181,131,255,.35)}
+.av-pill.high{background:rgba(247,37,133,.25);color:#ffd166;border-color:rgba(255,209,102,.45)}
+.av-stage{position:relative;height:226px;margin-top:10px;border-radius:18px;border:1px solid rgba(255,77,109,.28);background:radial-gradient(circle at 20% 85%,rgba(244,63,94,.22),transparent 58%),radial-gradient(circle at 80% 20%,rgba(59,130,246,.14),transparent 55%),#090b16;overflow:hidden}
+#av-canvas{width:100%;height:100%;display:block}
+.av-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;padding:12px;text-align:center}
+.av-mult{font-size:2.9rem;font-weight:1000;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 4px 20px rgba(0,0,0,.65);transition:color .15s,transform .15s}
+.av-mult.betting{color:#ffe066;font-size:2.4rem}
+.av-mult.flying{color:#ffe066;text-shadow:0 0 24px rgba(255,200,50,.45)}
+.av-mult.crashed{color:#ff5c77;text-shadow:0 0 24px rgba(255,77,109,.55)}
+.av-status{margin-top:6px;padding:5px 12px;border-radius:99px;background:rgba(0,0,0,.48);border:1px solid rgba(255,255,255,.14);font-size:.78rem;font-weight:800;color:#e8eaf6;max-width:94%}
+.av-status.cashed{background:rgba(13,163,108,.26);border-color:rgba(72,233,174,.55);color:#9cf7d3}
+.av-bet-bar{position:absolute;left:0;right:0;bottom:0;height:5px;background:rgba(255,255,255,.08)}
+.av-bet-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#38f2aa,#ffd45e,#ff5c77)}
+.av-label{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:.8rem;font-weight:800;color:#f5cad4}
+#av-bet{margin:6px 0 8px;background:rgba(0,0,0,.28);border-color:rgba(255,255,255,.22);color:#fff;font-weight:800}
+.av-chips{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-bottom:10px}
+.av-chips button{border:1px solid rgba(255,255,255,.18);border-radius:10px;background:rgba(255,255,255,.08);color:#fff;padding:10px 2px;font-weight:900;font-size:.78rem;cursor:pointer}
+.av-chips button.active{background:linear-gradient(135deg,#ffd45e,#ff9812);color:#2a1700;border-color:transparent}
+.av-chips button:disabled{opacity:.45;cursor:not-allowed}
+.av-auto-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:rgba(255,255,255,.05);margin-bottom:10px}
+.av-check{display:flex;align-items:center;gap:8px;font-size:.82rem;font-weight:700;color:#f7dce2;cursor:pointer;user-select:none}
+.av-check input[type="checkbox"]{width:18px;height:18px;min-width:18px;margin:0;padding:0;accent-color:var(--gold);cursor:pointer}
+#av-auto-val{width:92px;margin:0;padding:8px 10px;text-align:right;background:rgba(0,0,0,.3);border-color:rgba(255,255,255,.2);color:#fff;font-weight:800}
+.av-btn{width:100%;margin-top:4px;padding:15px 12px;border:0;border-radius:14px;background:linear-gradient(135deg,#ff5e78,#e11d48);color:#fff;font-weight:1000;font-size:.98rem;letter-spacing:.02em;box-shadow:0 8px 24px rgba(225,29,72,.38);cursor:pointer;transition:transform .12s,opacity .15s}
+.av-btn.cashout{background:linear-gradient(135deg,#38f2aa,#0da36c);color:#042416;box-shadow:0 8px 24px rgba(13,163,108,.42)}
+.av-btn:disabled{opacity:.55;cursor:not-allowed}
+.av-tabs-card{margin-top:14px;padding:12px;border-radius:18px;border:1px solid rgba(255,255,255,.12);background:rgba(8,10,20,.65)}
+.av-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:4px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+.av-tab{border:0;border-radius:9px;background:transparent;color:#c9b4be;padding:10px 8px;font-weight:900;font-size:.85rem;cursor:pointer;transition:background .15s,color .15s}
+.av-tab.on{background:linear-gradient(135deg,#ffd45e,#ff9812);color:#271700}
+.av-swipe-hint{text-align:center;font-size:.68rem;color:#9da6c8;margin:6px 0 4px}
+.av-swipe-viewport{overflow:hidden;width:100%;touch-action:pan-y}
+.av-swipe-track{display:flex;width:200%;transition:transform .24s cubic-bezier(.22,.8,.28,1)}
+.av-swipe-track.is-bets{transform:translateX(-50%)}
+.av-pane{width:50%;flex:0 0 50%;max-height:260px;overflow:auto;-webkit-overflow-scrolling:touch}
+.av-table{width:100%;border-collapse:collapse;background:transparent;border:0;font-size:.8rem}
+.av-table th,.av-table td{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left;white-space:nowrap}
+.av-table th{background:rgba(12,14,28,.96);color:#c2c8e6;font-size:.7rem;position:sticky;top:0}
+</style>
+
+<style id="admin-game-bets-tabs-style">
+.bets-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:5px;border-radius:14px;background:var(--panel);border:1px solid var(--line);margin-bottom:12px}
+.bets-tab{border:0;border-radius:10px;background:transparent;color:var(--mute);padding:10px 4px;font-weight:850;font-size:.8rem;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bets-tab.on{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--onaccent);box-shadow:0 4px 12px rgba(255,159,28,.25)}
+.bets-summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+.bets-stat{padding:10px 8px;border-radius:12px;border:1px solid var(--line);background:var(--panel);text-align:center}
+.bets-stat small{display:block;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--mute)}
+.bets-stat b{display:block;margin-top:3px;font-size:1.05rem;font-weight:950;color:var(--gold-text)}
+.bets-pill{display:inline-block;padding:3px 8px;border-radius:99px;font-size:.72rem;font-weight:850}
+.bets-pill.win{background:rgba(46,230,160,.16);color:var(--green)}
+.bets-pill.loss{background:rgba(255,93,115,.16);color:var(--red)}
+.bets-pill.live{background:rgba(255,201,77,.16);color:var(--gold-text)}
 </style>
 
 <style id="play2win-ad-rewards-style">
@@ -474,6 +554,79 @@ img{ -webkit-user-drag:none; user-drag:none; }
             <span class="game-launch-name">Gold Ball</span>
           </span>
         </button>
+        <button class="game-launch-item" type="button" data-open-route="aviator" aria-label="Open Aviator Crash Game">
+          <span class="game-launch-box" aria-hidden="true">
+            <span class="game-launch-icon aviator-launch-icon">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M21 3L10.5 13.5" stroke="#ffd866" stroke-width="2" stroke-linecap="round"/>
+                <path d="M21 3L14.2 21L10.5 13.5L3 9.8L21 3Z" fill="#ffffff" stroke="#ffe08a" stroke-width="1.4" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="game-launch-name">Aviator</span>
+          </span>
+        </button>
+      </div>
+    </section>
+
+    <section id="v-aviator" class="hide">
+      <div class="av-card" id="av-card">
+        <div class="av-head">
+          <h2>Aviator</h2>
+          <div class="av-round-meta">
+            <span class="av-round-tag" id="av-round-id">Round #–</span>
+            <span class="av-phase-pill" id="av-phase-pill">LOADING</span>
+          </div>
+        </div>
+        <div class="av-crashes" id="av-crashes" aria-label="Recent crash multipliers"></div>
+        <div class="av-stage">
+          <canvas id="av-canvas"></canvas>
+          <div class="av-overlay">
+            <div class="av-mult" id="av-mult">1.00x</div>
+            <div class="av-status" id="av-status" aria-live="polite">Loading round…</div>
+          </div>
+          <div class="av-bet-bar"><i id="av-bet-bar"></i></div>
+        </div>
+        <div class="av-label">
+          <label for="av-bet">Bet amount (Coins)</label>
+          <span>Limit: 1 – 1,000 Coins</span>
+        </div>
+        <input id="av-bet" type="number" min="1" max="1000" step="1" value="10" inputmode="numeric">
+        <div class="av-chips" id="av-chips" aria-label="Quick bet amounts">
+          <button type="button" data-av-amt="10" class="active">10</button>
+          <button type="button" data-av-amt="50">50</button>
+          <button type="button" data-av-amt="100">100</button>
+          <button type="button" data-av-amt="500">500</button>
+          <button type="button" data-av-amt="1000">MAX 1K</button>
+        </div>
+        <div class="av-auto-row">
+          <label class="av-check"><input type="checkbox" id="av-auto-on"> Auto Cashout (x)</label>
+          <input id="av-auto-val" type="number" min="1.05" max="100" step="0.05" value="2.00" inputmode="decimal" aria-label="Auto cashout multiplier">
+        </div>
+        <button class="av-btn" id="av-action" type="button">PLACE BET · 10 COINS</button>
+
+        <div class="av-tabs-card" id="av-tabs-card">
+          <div class="av-tabs" role="tablist">
+            <button type="button" class="av-tab on" id="av-tab-results" data-av-tab="results" role="tab" aria-selected="true">Results</button>
+            <button type="button" class="av-tab" id="av-tab-bets" data-av-tab="bets" role="tab" aria-selected="false">My Bets</button>
+          </div>
+          <div class="av-swipe-hint">← Results / My Bets dekhne ke liye swipe ya tap karein →</div>
+          <div class="av-swipe-viewport" id="av-swipe-viewport">
+            <div class="av-swipe-track" id="av-swipe-track">
+              <div class="av-pane" id="av-pane-results">
+                <table class="av-table">
+                  <thead><tr><th>Round</th><th>Result (Crash)</th><th>Time</th></tr></thead>
+                  <tbody id="av-results-body"><tr><td colspan="3" class="empty">Loading…</td></tr></tbody>
+                </table>
+              </div>
+              <div class="av-pane" id="av-pane-bets">
+                <table class="av-table">
+                  <thead><tr><th>Round</th><th>Bet</th><th>Cash Out</th><th>Crash</th></tr></thead>
+                  <tbody id="av-bets-body"><tr><td colspan="4" class="empty">Abhi tak koi bet nahi hai.</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -731,14 +884,42 @@ img{ -webkit-user-drag:none; user-drag:none; }
     </section>
 
     <section id="v-bets" class="hide">
-      <div class="timer"><div><small>Round</small><b id="b-round">–</b></div><div style="text-align:right"><small>Total staked</small><div class="clock" id="b-total" style="font-size:1.5rem">0</div></div></div>
-      <p class="note" style="margin-top:8px">Live bets for the current round. Results are generated randomly by the server and are never affected by bets.</p>
-      <h2 style="margin-top:8px">Bets by option</h2>
-      <div class="scroll" style="max-height:40vh;max-height:40dvh"><table><thead><tr><th>Option</th><th>Players</th><th>Coins</th></tr></thead><tbody id="b-opts"></tbody></table></div>
-      <h2>Bets in this round</h2>
-      <div class="scroll" style="max-height:30vh;max-height:30dvh"><table><thead><tr><th>User</th><th>Bet on</th><th>Coins</th></tr></thead><tbody id="b-cur"></tbody></table></div>
-      <h2>Recent bets</h2>
-      <div class="scroll" style="max-height:35vh;max-height:35dvh"><table><thead><tr><th>Round</th><th>User</th><th>Bet on</th><th>Coins</th><th>Net</th></tr></thead><tbody id="b-rec"></tbody></table></div>
+      <div class="bets-tabs" id="bets-tabs" role="tablist" aria-label="Game Live Bets">
+        <button type="button" class="bets-tab on" id="bets-tab-number" data-bets-tab="number" role="tab" aria-selected="true">Number Game</button>
+        <button type="button" class="bets-tab" id="bets-tab-gold" data-bets-tab="gold" role="tab" aria-selected="false">Gold Ball</button>
+        <button type="button" class="bets-tab" id="bets-tab-aviator" data-bets-tab="aviator" role="tab" aria-selected="false">Aviator</button>
+      </div>
+
+      <div id="bets-pane-number">
+        <div class="timer"><div><small>Round</small><b id="b-round">–</b></div><div style="text-align:right"><small>Total staked</small><div class="clock" id="b-total" style="font-size:1.5rem">0</div></div></div>
+        <p class="note" style="margin-top:8px">Live bets for the current round. Results are generated randomly by the server and are never affected by bets.</p>
+        <h2 style="margin-top:8px">Bets by option</h2>
+        <div class="scroll" style="max-height:40vh;max-height:40dvh"><table><thead><tr><th>Option</th><th>Players</th><th>Coins</th></tr></thead><tbody id="b-opts"></tbody></table></div>
+        <h2>Bets in this round</h2>
+        <div class="scroll" style="max-height:30vh;max-height:30dvh"><table><thead><tr><th>User</th><th>Bet on</th><th>Coins</th></tr></thead><tbody id="b-cur"></tbody></table></div>
+        <h2>Recent bets</h2>
+        <div class="scroll" style="max-height:35vh;max-height:35dvh"><table><thead><tr><th>Round</th><th>User</th><th>Bet on</th><th>Coins</th><th>Net</th></tr></thead><tbody id="b-rec"></tbody></table></div>
+      </div>
+
+      <div id="bets-pane-gold" class="hide">
+        <div class="timer"><div><small>Game</small><b>Gold Ball</b></div><div style="text-align:right"><small>Total staked (recent 50)</small><div class="clock" id="gb-total" style="font-size:1.5rem">0</div></div></div>
+        <div class="bets-summary-grid">
+          <div class="bets-stat"><small>Total Payout</small><b id="gb-payout">0</b></div>
+          <div class="bets-stat"><small>Won</small><b id="gb-wins" style="color:var(--green)">0</b></div>
+          <div class="bets-stat"><small>Lost</small><b id="gb-losses" style="color:var(--red)">0</b></div>
+        </div>
+        <h2>Gold Ball Bets (Kisne lagaya · Jeet/Haar)</h2>
+        <div class="scroll" style="max-height:55vh;max-height:55dvh"><table><thead><tr><th>Round</th><th>User</th><th>Bet</th><th>Result</th><th>Net</th></tr></thead><tbody id="gb-rows"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody></table></div>
+      </div>
+
+      <div id="bets-pane-aviator" class="hide">
+        <div class="timer"><div><small>Aviator Round</small><b id="ab-round">–</b> <span class="bets-pill live" id="ab-phase">–</span></div><div style="text-align:right"><small>Current round staked</small><div class="clock" id="ab-total" style="font-size:1.5rem">0</div></div></div>
+        <p class="note" style="margin-top:8px">Crash rules: No bet → 25x–50x · 1–500 Coins → max 25x · &gt;500 Coins → max 1.10x.</p>
+        <h2 style="margin-top:8px">Bets in current round</h2>
+        <div class="scroll" style="max-height:32vh;max-height:32dvh"><table><thead><tr><th>User</th><th>Bet</th><th>Auto</th><th>Cash Out</th><th>Status</th></tr></thead><tbody id="ab-cur"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody></table></div>
+        <h2>Recent Aviator bets</h2>
+        <div class="scroll" style="max-height:38vh;max-height:38dvh"><table><thead><tr><th>Round</th><th>User</th><th>Bet</th><th>Cash Out</th><th>Crash</th><th>Net</th></tr></thead><tbody id="ab-rec"><tr><td colspan="6" class="empty">Loading...</td></tr></tbody></table></div>
+      </div>
     </section>
 
     <section id="v-admin" class="hide">
@@ -1362,10 +1543,10 @@ img{ -webkit-user-drag:none; user-drag:none; }
     $('gear').classList.remove('hide');
     if(!$('nav').children.length)buildNav();
     if(r==='logout'){logout();return}
-    if(isAdmin()&&(r==='play'||r==='mine'||r==='add'||r==='withdraw'||r==='rewards'||r==='goldball'||r==='share'))r='admin';
+    if(isAdmin()&&(r==='play'||r==='mine'||r==='add'||r==='withdraw'||r==='rewards'||r==='goldball'||r==='aviator'||r==='share'))r='admin';
     if(!isAdmin()&&(r==='admin'||r==='bets'))r='play';
     var mainRoute=(r==='add'||r==='withdraw'||r==='share')?'settings':r;
-    ['home','rewards','goldball','play','results','mine','admin','bets','settings','tx','pw'].forEach(function(k){$('v-'+k).classList.toggle('hide',k!==mainRoute)});
+    ['home','rewards','goldball','aviator','play','results','mine','admin','bets','settings','tx','pw'].forEach(function(k){$('v-'+k).classList.toggle('hide',k!==mainRoute)});
     $('v-add').classList.toggle('hide',r!=='add');
     $('v-withdraw').classList.toggle('hide',r!=='withdraw');
     if($('v-share'))$('v-share').classList.toggle('hide',r!=='share');
@@ -1383,6 +1564,7 @@ img{ -webkit-user-drag:none; user-drag:none; }
     if(r==='withdraw'){loadMyWithdrawals();}
     if(r==='tx'){if(isAdmin())fillTxUsers().then(loadTx);else loadTx()}
     if(r==='pw'){['pw-old','pw-new','pw-new2'].forEach(function(i){$(i).value=''});$('pw-err').textContent=''}
+    if(window.Play2WinAviatorOnRoute)window.Play2WinAviatorOnRoute(r==='aviator');
     render();
   }
   window.addEventListener('hashchange',route);
@@ -1641,10 +1823,26 @@ img{ -webkit-user-drag:none; user-drag:none; }
     api('place_bet',{p_token:S.token,p_target:t,p_amount:a}).then(function(){toast('Bet placed: '+label(t)+' · '+a+' coins');return refresh()}).catch(function(e){toast(e.message);render()});
   };
 
-  // ---- admin: live bets ----
+  // ---- admin: live bets (Number Game / Gold Ball / Aviator) ----
   var OPTS=['num:0','num:1','num:2','num:3','num:4','num:5','num:6','num:7','num:8','num:9','color:green','color:violet','color:red','size:big','size:small'];
-  function loadBets(){
-    if(!isAdmin())return;
+  var activeBetTab='number';
+  function setBetTab(tab){
+    if(tab!=='gold'&&tab!=='aviator')tab='number';
+    activeBetTab=tab;
+    ['number','gold','aviator'].forEach(function(k){
+      var btn=$('bets-tab-'+k),pane=$('bets-pane-'+k);
+      if(btn){btn.classList.toggle('on',k===tab);btn.setAttribute('aria-selected',k===tab?'true':'false');}
+      if(pane)pane.classList.toggle('hide',k!==tab);
+    });
+    if(isAdmin()&&location.hash==='#/bets')loadBets();
+  }
+  if($('bets-tabs')){
+    $('bets-tabs').addEventListener('click',function(e){
+      var btn=e.target.closest('[data-bets-tab]');
+      if(btn)setBetTab(btn.dataset.betsTab);
+    });
+  }
+  function loadNumberBets(){
     api('admin_bets',{p_token:S.token}).then(function(d){
       $('b-round').textContent=rl(d.round);
       var agg={},total=0;OPTS.forEach(function(o){agg[o]={n:{},c:0}});
@@ -1656,6 +1854,62 @@ img{ -webkit-user-drag:none; user-drag:none; }
       $('b-rec').innerHTML=d.recent.length?d.recent.map(function(b){var net=b.payout-b.amount;
         return '<tr><td>'+rl(b.round)+'</td><td>'+esc(b.email||b.display_name||b.user_id)+'</td><td>'+label(b.target)+'</td><td>'+b.amount+'</td><td style="color:'+(!b.settled?'var(--mute)':net>=0?'var(--green)':'var(--red)')+'">'+(b.settled?(net>=0?'+':'')+net:'Pending')+'</td></tr>'}).join(''):'<tr><td colspan="5" class="empty">No bets yet.</td></tr>';
     }).catch(function(e){toast(e.message)});
+  }
+  function loadGoldBets(){
+    api('admin_gold_bets',{p_token:S.token}).then(function(d){
+      if(!d||!d.found){
+        $('gb-total').textContent='0';$('gb-payout').textContent='0';$('gb-wins').textContent='0';$('gb-losses').textContent='0';
+        $('gb-rows').innerHTML='<tr><td colspan="5" class="empty">Gold Ball table not found in Supabase yet.</td></tr>';
+        return;
+      }
+      $('gb-total').textContent=Number(d.total_staked||0).toLocaleString('en-IN');
+      $('gb-payout').textContent=Number(d.total_payout||0).toLocaleString('en-IN');
+      $('gb-wins').textContent=Number(d.wins||0);
+      $('gb-losses').textContent=Number(d.losses||0);
+      var rows=Array.isArray(d.rows)?d.rows:[];
+      $('gb-rows').innerHTML=rows.length?rows.map(function(r){
+        var stake=Number(r.stake||0),pay=Number(r.payout||0),net=r.settled?(r.won?(pay-stake):-stake):0;
+        var pill=!r.settled?'<span class="bets-pill live">Open</span>':(r.won?'<span class="bets-pill win">WIN</span>':'<span class="bets-pill loss">LOSS</span>');
+        var netHtml=!r.settled?'<span style="color:var(--mute)">Pending</span>':'<b style="color:'+(net>=0?'var(--green)':'var(--red)')+'">'+(net>=0?'+':'')+net+'</b>';
+        return '<tr><td>#'+esc(String(r.round_id||''))+'</td><td>'+esc(r.user_label||r.user_id||'')+'</td><td>'+stake+'</td><td>'+pill+'</td><td>'+netHtml+'</td></tr>';
+      }).join(''):'<tr><td colspan="5" class="empty">No Gold Ball bets yet.</td></tr>';
+    }).catch(function(e){
+      $('gb-rows').innerHTML='<tr><td colspan="5" class="empty">'+esc(e.message||'Run supabase_aviator.sql in Supabase first.')+'</td></tr>';
+    });
+  }
+  function loadAviatorBets(){
+    api('admin_aviator_bets',{p_token:S.token}).then(function(d){
+      $('ab-round').textContent=d&&d.round_id?'#'+d.round_id:'–';
+      var phase=(d&&d.phase)?String(d.phase).toUpperCase():'–';
+      var phEl=$('ab-phase');
+      if(phEl){
+        phEl.textContent=phase+(d&&d.crash_point&&phase==='CRASHED'?' @ '+Number(d.crash_point).toFixed(2)+'x':'');
+        phEl.className='bets-pill '+(phase==='CRASHED'?'loss':phase==='FLYING'?'win':'live');
+      }
+      $('ab-total').textContent=Number(d&&d.total_staked||0).toLocaleString('en-IN');
+      var cur=Array.isArray(d&&d.current)?d.current:[];
+      $('ab-cur').innerHTML=cur.length?cur.map(function(b){
+        var st=b.status==='cashed_out'?'<span class="bets-pill win">WIN</span>':b.status==='lost'?'<span class="bets-pill loss">LOSS</span>':'<span class="bets-pill live">LIVE</span>';
+        var co=b.cashout_mult?Number(b.cashout_mult).toFixed(2)+'x':'—';
+        return '<tr><td>'+esc(b.user_label||b.user_id||'')+'</td><td>'+Number(b.stake||0)+'</td><td>'+(b.auto_cashout?Number(b.auto_cashout).toFixed(2)+'x':'—')+'</td><td>'+co+'</td><td>'+st+'</td></tr>';
+      }).join(''):'<tr><td colspan="5" class="empty">No Aviator bets in this round yet.</td></tr>';
+      var rec=Array.isArray(d&&d.recent)?d.recent:[];
+      $('ab-rec').innerHTML=rec.length?rec.map(function(b){
+        var stake=Number(b.stake||0),pay=Number(b.payout||0);
+        var settled=b.status!=='active';
+        var net=settled?(b.status==='cashed_out'?(pay-stake):-stake):0;
+        var netHtml=!settled?'<span style="color:var(--mute)">Live</span>':'<b style="color:'+(net>=0?'var(--green)':'var(--red)')+'">'+(net>=0?'+':'')+net+'</b>';
+        return '<tr><td>#'+esc(String(b.round_id||''))+'</td><td>'+esc(b.user_label||b.user_id||'')+'</td><td>'+stake+'</td><td>'+(b.cashout_mult?Number(b.cashout_mult).toFixed(2)+'x':'—')+'</td><td>'+(b.crash_point?Number(b.crash_point).toFixed(2)+'x':'Live')+'</td><td>'+netHtml+'</td></tr>';
+      }).join(''):'<tr><td colspan="6" class="empty">No Aviator bets yet.</td></tr>';
+    }).catch(function(e){
+      $('ab-cur').innerHTML='<tr><td colspan="5" class="empty">'+esc(e.message||'Run supabase_aviator.sql in Supabase first.')+'</td></tr>';
+    });
+  }
+  function loadBets(){
+    if(!isAdmin())return;
+    if(activeBetTab==='gold')loadGoldBets();
+    else if(activeBetTab==='aviator')loadAviatorBets();
+    else loadNumberBets();
   }
   setInterval(function(){if(S.token&&!document.hidden&&location.hash==='#/bets')loadBets()},4000);
 
@@ -2434,6 +2688,605 @@ img{ -webkit-user-drag:none; user-drag:none; }
 })();
 </script>
 
+<script id="play2win-aviator-game">
+(function(){
+  'use strict';
+  var card=document.getElementById('av-card');
+  var canvas=document.getElementById('av-canvas');
+  var multEl=document.getElementById('av-mult');
+  var statusEl=document.getElementById('av-status');
+  var roundIdEl=document.getElementById('av-round-id');
+  var phasePill=document.getElementById('av-phase-pill');
+  var betBar=document.getElementById('av-bet-bar');
+  var betInput=document.getElementById('av-bet');
+  var chips=document.getElementById('av-chips');
+  var autoOn=document.getElementById('av-auto-on');
+  var autoVal=document.getElementById('av-auto-val');
+  var actionBtn=document.getElementById('av-action');
+  var crashesEl=document.getElementById('av-crashes');
+  var resultsBody=document.getElementById('av-results-body');
+  var betsBody=document.getElementById('av-bets-body');
+  var swipeViewport=document.getElementById('av-swipe-viewport');
+  var swipeTrack=document.getElementById('av-swipe-track');
+  var tabResults=document.getElementById('av-tab-results');
+  var tabBets=document.getElementById('av-tab-bets');
+  if(!card||!canvas||!actionBtn)return;
+
+  var MAX_BET=1000,GROWTH_RATE=0.11,BET_WINDOW_MS=10000;
+  var bridge=window.Play2WinGoldBridge;
+  var state=null,busy=false,rafId=0,syncTimer=0,autoFired=false,lastMult=1.00,activeTab='results';
+  var syncing=false,resyncPending=false,actionSeq=0,cachedMyBets=[];
+  var syncTrack={takeoffId:null,takeoffAt:0,crashId:null,nextId:null,nextAt:0};
+
+  function session(){return bridge&&bridge.getSession?bridge.getSession():{token:null,role:null,balance:0};}
+  function isActiveRoute(){
+    var sec=document.getElementById('v-aviator');
+    var appEl=document.getElementById('app');
+    return location.hash==='#/aviator'&&(!appEl||!appEl.classList.contains('hide'))&&(!sec||!sec.classList.contains('hide'));
+  }
+  function setBal(n){
+    var v=Math.max(0,Number(n)||0);
+    var top=document.getElementById('bal');
+    if(top&&top.dataset.admin!=='1')top.textContent=v.toLocaleString('en-IN')+' Coins';
+  }
+  function clampedBet(){
+    var raw=Math.floor(Number(betInput.value)||0);
+    if(raw>MAX_BET){raw=MAX_BET;betInput.value='1000';}
+    if(raw<0){raw=1;betInput.value='1';}
+    return raw;
+  }
+  function setTab(tab){
+    activeTab=(tab==='bets')?'bets':'results';
+    if(tabResults){tabResults.classList.toggle('on',activeTab==='results');tabResults.setAttribute('aria-selected',activeTab==='results'?'true':'false');}
+    if(tabBets){tabBets.classList.toggle('on',activeTab==='bets');tabBets.setAttribute('aria-selected',activeTab==='bets'?'true':'false');}
+    if(swipeTrack)swipeTrack.classList.toggle('is-bets',activeTab==='bets');
+  }
+  function fmtRoundTime(ts){
+    if(!ts)return '–';
+    try{return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});}catch(e){return '–';}
+  }
+  function renderCrashes(results){
+    if(!Array.isArray(results)||!results.length){
+      crashesEl.innerHTML='<span class="av-pill">1.84x</span><span class="av-pill mid">3.12x</span><span class="av-pill">1.45x</span>';
+      return;
+    }
+    crashesEl.innerHTML=results.slice(0,15).map(function(r){
+      var v=Number(r.crash_point)||1.00;
+      var cls=v>=10?'high':(v>=2?'mid':'');
+      return '<span class="av-pill '+cls+'">'+v.toFixed(2)+'x</span>';
+    }).join('');
+  }
+  function renderResultsTable(results){
+    if(!Array.isArray(results)||!results.length){
+      resultsBody.innerHTML='<tr><td colspan="3" class="empty">Abhi tak koi round complete nahi hua hai.</td></tr>';
+      return;
+    }
+    resultsBody.innerHTML=results.map(function(r){
+      var v=Number(r.crash_point)||1.00;
+      var col=v>=10?'#ffd166':(v>=2?'#48e9ae':'#ff758f');
+      return '<tr><td>#'+Number(r.round_id||0)+'</td><td style="font-weight:900;color:'+col+'">'+v.toFixed(2)+'x</td><td style="color:#aeb5d7">'+fmtRoundTime(r.crashes_at)+'</td></tr>';
+    }).join('');
+  }
+  function renderBetsTable(rows){
+    if(Array.isArray(rows))cachedMyBets=rows.slice();
+    var list=cachedMyBets;
+    if(!Array.isArray(list)||!list.length){
+      betsBody.innerHTML='<tr><td colspan="4" class="empty">Abhi tak aapne koi bet nahi lagayi hai.</td></tr>';
+      return;
+    }
+    betsBody.innerHTML=list.map(function(b){
+      var stake=Number(b.stake||0);
+      var cashHtml='<span style="color:#ff758f">Lost</span>';
+      if(b.status==='cashed_out'){
+        cashHtml='<span style="color:#48e9ae;font-weight:900">+'+Number(b.payout||0)+' ('+Number(b.cashout_mult||1).toFixed(2)+'x)</span>';
+      }else if(b.status==='active'){
+        cashHtml='<span style="color:#ffe066;font-weight:800">Active</span>';
+      }
+      var isWaitingTakeoff=(b.status==='active'&&state&&state.round&&Number(state.round.id)===Number(b.round_id)&&state.phase==='betting');
+      var crashTxt=(b.crash_point!==null&&b.crash_point!==undefined)?(Number(b.crash_point).toFixed(2)+'x'):(isWaitingTakeoff?'Pending':'Flying…');
+      return '<tr><td>#'+Number(b.round_id||0)+'</td><td>'+stake+'</td><td>'+cashHtml+'</td><td style="font-weight:800">'+crashTxt+'</td></tr>';
+    }).join('');
+  }
+  function upsertLocalBetRow(bet){
+    if(!bet)return;
+    var next=cachedMyBets.filter(function(row){return Number(row.round_id)!==Number(bet.round_id);});
+    next.unshift({
+      id:bet.id,
+      round_id:bet.round_id,
+      stake:bet.stake,
+      auto_cashout:bet.auto_cashout,
+      cashout_mult:bet.cashout_mult||null,
+      payout:bet.payout||0,
+      status:bet.status,
+      crash_point:null
+    });
+    renderBetsTable(next.slice(0,20));
+  }
+  function drawScene(progress,crashed,cashedOut){
+    var dpr=window.devicePixelRatio||1;
+    var w=canvas.clientWidth||320,h=canvas.clientHeight||226;
+    if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){
+      canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);
+    }
+    var ctx=canvas.getContext('2d');
+    if(!ctx)return;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,h);
+
+    ctx.strokeStyle='rgba(255,255,255,0.06)';
+    ctx.lineWidth=1;
+    for(var gx=1;gx<5;gx++){var xx=(w/5)*gx;ctx.beginPath();ctx.moveTo(xx,0);ctx.lineTo(xx,h);ctx.stroke();}
+    for(var gy=1;gy<4;gy++){var yy=(h/4)*gy;ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(w,yy);ctx.stroke();}
+
+    var padX=22,padBottom=24,padTop=26;
+    var p=Math.max(0,Math.min(1,progress));
+    if(p<=0.001)return;
+
+    var endX=padX+(w-padX*2.2)*p;
+    var endY=(h-padBottom)-(h-padBottom-padTop)*Math.pow(p,0.82);
+    var ctrlX=padX+(endX-padX)*0.55;
+    var ctrlY=h-padBottom-6;
+
+    var grad=ctx.createLinearGradient(0,endY,0,h-padBottom);
+    if(crashed){
+      grad.addColorStop(0,'rgba(255,77,109,0.34)');
+      grad.addColorStop(1,'rgba(255,77,109,0.02)');
+    }else if(cashedOut){
+      grad.addColorStop(0,'rgba(46,230,160,0.28)');
+      grad.addColorStop(1,'rgba(46,230,160,0.02)');
+    }else{
+      grad.addColorStop(0,'rgba(255,190,60,0.32)');
+      grad.addColorStop(1,'rgba(225,29,72,0.03)');
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(padX,h-padBottom);
+    ctx.quadraticCurveTo(ctrlX,ctrlY,endX,endY);
+    ctx.lineTo(endX,h-padBottom);
+    ctx.closePath();
+    ctx.fillStyle=grad;
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(padX,h-padBottom);
+    ctx.quadraticCurveTo(ctrlX,ctrlY,endX,endY);
+    ctx.lineWidth=3.5;
+    ctx.strokeStyle=crashed?'#ff5c77':(cashedOut?'#48e9ae':'#ffcf48');
+    ctx.stroke();
+
+    ctx.save();
+    ctx.translate(endX,endY);
+    ctx.rotate(crashed?0.35:-0.28);
+    ctx.fillStyle=crashed?'#ff5c77':'#ffffff';
+    ctx.beginPath();
+    ctx.moveTo(15,0);
+    ctx.lineTo(-10,-8);
+    ctx.lineTo(-5,0);
+    ctx.lineTo(-10,8);
+    ctx.closePath();
+    ctx.fill();
+    if(!crashed){
+      ctx.fillStyle='#ff9f1c';
+      ctx.beginPath();
+      ctx.moveTo(-6,0);
+      ctx.lineTo(-16,-3);
+      ctx.lineTo(-16,3);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+  function stopTimers(){
+    if(rafId){cancelAnimationFrame(rafId);rafId=0;}
+    if(syncTimer){clearTimeout(syncTimer);syncTimer=0;}
+  }
+  function scheduleSync(delayMs){
+    if(syncTimer)clearTimeout(syncTimer);
+    if(!isActiveRoute())return;
+    syncTimer=setTimeout(function(){
+      syncTimer=0;
+      if(isActiveRoute())fetchState(true);
+    },Math.max(120,delayMs));
+  }
+  function updateInputLock(){
+    var phase=state?state.phase:'loading';
+    var myBet=state?state.my_bet:null;
+    var canEditBet=(phase==='betting'&&!myBet&&!busy);
+    betInput.disabled=!canEditBet;
+    autoOn.disabled=!canEditBet;
+    autoVal.disabled=!canEditBet;
+    document.querySelectorAll('[data-av-amt]').forEach(function(b){
+      b.disabled=!canEditBet;
+      b.classList.toggle('active',Number(b.dataset.avAmt)===clampedBet());
+    });
+  }
+  function applyPhaseUi(nowMs){
+    if(!state||!state.round)return;
+    var r=state.round,myBet=state.my_bet,bet=clampedBet();
+    roundIdEl.textContent='Round #'+r.id;
+
+    if(nowMs<state.betEndsLocal){
+      state.phase='betting';
+      updateInputLock();
+      var leftMs=Math.max(0,state.betEndsLocal-nowMs);
+      var leftSec=(leftMs/1000);
+      phasePill.className='av-phase-pill';
+      phasePill.textContent='BETTING '+Math.ceil(leftSec)+'s';
+      multEl.className='av-mult betting';
+      multEl.textContent=leftSec.toFixed(1)+'s';
+      betBar.style.width=Math.min(100,Math.max(0,(leftMs/BET_WINDOW_MS)*100))+'%';
+      drawScene(0,false,false);
+
+      if(myBet){
+        statusEl.className='av-status cashed';
+        statusEl.textContent='✓ Bet Placed ('+myBet.stake+' Coins) · Takeoff ka wait karein';
+        actionBtn.classList.remove('cashout');
+        actionBtn.disabled=true;
+        actionBtn.textContent='BET PLACED ('+myBet.stake+' COINS) · TAKING OFF…';
+      }else{
+        statusEl.className='av-status';
+        statusEl.textContent='10s Betting Window — Apni bet lagayein (Max 1,000)';
+        actionBtn.classList.remove('cashout');
+        actionBtn.disabled=busy;
+        actionBtn.textContent=busy?'PLACING BET…':'PLACE BET · '+(bet>0?bet.toLocaleString('en-IN'):0)+' COINS';
+      }
+      return;
+    }
+
+    betBar.style.width='0%';
+
+    // Betting window ended: ensure we have crash_point & flying timestamps from server
+    if(state.crashPoint===null||state.crashPoint===undefined){
+      state.phase='flying';
+      updateInputLock();
+      phasePill.className='av-phase-pill flying';
+      phasePill.textContent='TAKEOFF';
+      multEl.className='av-mult flying';
+      multEl.textContent='1.00x';
+      statusEl.className='av-status';
+      statusEl.textContent='✈️ Plane taking off…';
+      drawScene(0.04,false,false);
+      actionBtn.classList.remove('cashout');
+      actionBtn.disabled=true;
+      actionBtn.textContent='STARTING FLIGHT…';
+      if(!syncing&&(syncTrack.takeoffId!==r.id||nowMs-syncTrack.takeoffAt>=450)){
+        syncTrack.takeoffId=r.id;
+        syncTrack.takeoffAt=nowMs;
+        fetchState(true);
+      }
+      return;
+    }
+
+    var cp=Number(state.crashPoint||1.00);
+    if(nowMs<state.crashesLocal){
+      state.phase='flying';
+      updateInputLock();
+      var flySec=Math.max(0,(nowMs-state.betEndsLocal)/1000);
+      var cur=cp<=1.00?1.00:Math.min(cp,Math.exp(GROWTH_RATE*flySec));
+      cur=Math.floor(cur*100)/100;
+      if(cur<1.00)cur=1.00;
+      lastMult=cur;
+
+      phasePill.className='av-phase-pill flying';
+      phasePill.textContent='FLYING';
+      multEl.className='av-mult flying';
+      multEl.textContent=cur.toFixed(2)+'x';
+
+      var cashed=!!(myBet&&myBet.status==='cashed_out');
+      var visualProg=cp<=1.00?Math.min(0.24,0.06+flySec*0.2):Math.min(0.95,0.06+(Math.log(Math.max(1,cur))/Math.log(20))*0.89+Math.min(0.08,flySec*0.03));
+      drawScene(visualProg,false,cashed);
+
+      if(cashed){
+        statusEl.className='av-status cashed';
+        statusEl.textContent='✓ Cashed Out +'+Number(myBet.payout||0).toLocaleString('en-IN')+' Coins @ '+Number(myBet.cashout_mult||1).toFixed(2)+'x · Plane ud raha hai!';
+        actionBtn.classList.remove('cashout');
+        actionBtn.disabled=true;
+        actionBtn.textContent='✓ CASHED OUT · +'+Number(myBet.payout||0).toLocaleString('en-IN')+' COINS';
+      }else if(myBet&&myBet.status==='active'){
+        statusEl.className='av-status';
+        statusEl.textContent='✈️ Plane ud raha hai! Crash hone se pehle Cash Out dabayein';
+        var livePay=Math.floor(myBet.stake*cur);
+        actionBtn.classList.add('cashout');
+        actionBtn.disabled=busy;
+        actionBtn.textContent=busy?'CASHING OUT…':'CASH OUT · +'+livePay.toLocaleString('en-IN')+' COINS';
+
+        var autoTarget=myBet.auto_cashout?Number(myBet.auto_cashout):0;
+        if(autoTarget>=1.05&&!autoFired&&cur>=autoTarget&&!busy){
+          autoFired=true;
+          doCashout(autoTarget);
+        }
+      }else{
+        statusEl.className='av-status';
+        statusEl.textContent='✈️ Plane ud raha hai · Agle round me bet lagayein';
+        actionBtn.classList.remove('cashout');
+        actionBtn.disabled=true;
+        actionBtn.textContent='PLANE FLYING · BETTING CLOSED';
+      }
+      return;
+    }
+
+    // Crashed phase
+    state.phase='crashed';
+    updateInputLock();
+    phasePill.className='av-phase-pill crashed';
+    phasePill.textContent='CRASHED';
+    multEl.className='av-mult crashed';
+    multEl.textContent=cp.toFixed(2)+'x';
+    var nextSec=Math.max(0,Math.ceil((state.nextRoundLocal-nowMs)/1000));
+    drawScene(cp<=1.00?0.22:Math.min(0.95,Math.max(0.2,Math.log(Math.max(cp,1.05))/3.2)),true,false);
+
+    if(myBet&&myBet.status==='cashed_out'){
+      statusEl.className='av-status cashed';
+      statusEl.textContent='💥 Crashed @ '+cp.toFixed(2)+'x · Aapne +'+Number(myBet.payout||0).toLocaleString('en-IN')+' Coins jeete!';
+    }else if(myBet){
+      statusEl.className='av-status';
+      statusEl.textContent='💥 FLEW AWAY @ '+cp.toFixed(2)+'x · Agla round '+nextSec+'s me';
+    }else{
+      statusEl.className='av-status';
+      statusEl.textContent='💥 FLEW AWAY @ '+cp.toFixed(2)+'x · Next round in '+nextSec+'s';
+    }
+    actionBtn.classList.remove('cashout');
+    actionBtn.disabled=true;
+    actionBtn.textContent='NEXT ROUND IN '+nextSec+'s…';
+
+    if(!syncing&&syncTrack.crashId!==r.id){
+      syncTrack.crashId=r.id;
+      fetchState(true);
+    }else if(nowMs>=state.nextRoundLocal&&!syncing&&(syncTrack.nextId!==r.id||nowMs-syncTrack.nextAt>=450)){
+      syncTrack.nextId=r.id;
+      syncTrack.nextAt=nowMs;
+      fetchState(true);
+    }
+  }
+  function runLoop(){
+    if(rafId)cancelAnimationFrame(rafId);
+    function frame(){
+      if(!isActiveRoute()){rafId=0;return;}
+      if(state)applyPhaseUi(performance.now());
+      rafId=requestAnimationFrame(frame);
+    }
+    rafId=requestAnimationFrame(frame);
+  }
+  function hydrateState(res,reqActionSeq){
+    if(!res||!res.round)return;
+    var baseLocal=performance.now();
+    var betLeft=(res.bet_left_ms!==undefined&&res.bet_left_ms!==null)?Number(res.bet_left_ms):null;
+    var flyElapsed=(res.fly_elapsed_ms!==undefined&&res.fly_elapsed_ms!==null)?Number(res.fly_elapsed_ms):null;
+    var crashLeft=(res.crash_left_ms!==undefined&&res.crash_left_ms!==null)?Number(res.crash_left_ms):null;
+    var nextLeft=(res.next_left_ms!==undefined&&res.next_left_ms!==null)?Number(res.next_left_ms):null;
+
+    var betEndsLocal,crashesLocal,nextRoundLocal;
+    if(betLeft!==null&&crashLeft!==null&&nextLeft!==null){
+      if(res.phase==='betting'){
+        betEndsLocal=baseLocal+betLeft;
+        crashesLocal=baseLocal+crashLeft;
+        nextRoundLocal=baseLocal+nextLeft;
+      }else if(res.phase==='flying'){
+        betEndsLocal=baseLocal-(flyElapsed||0);
+        crashesLocal=baseLocal+crashLeft;
+        nextRoundLocal=baseLocal+nextLeft;
+      }else{
+        betEndsLocal=baseLocal-(flyElapsed||1000);
+        crashesLocal=baseLocal;
+        nextRoundLocal=baseLocal+nextLeft;
+      }
+    }else{
+      var serverNowMs=new Date(res.server_now).getTime();
+      betEndsLocal=baseLocal+(new Date(res.round.betting_ends_at).getTime()-serverNowMs);
+      crashesLocal=baseLocal+(new Date(res.round.crashes_at).getTime()-serverNowMs);
+      nextRoundLocal=baseLocal+(new Date(res.round.next_round_at).getTime()-serverNowMs);
+    }
+
+    var prevRoundId=state&&state.round?state.round.id:null;
+    var isNewRound=(prevRoundId!==res.round.id);
+    if(isNewRound){
+      autoFired=false;
+      syncTrack={takeoffId:null,takeoffAt:0,crashId:null,nextId:null,nextAt:0};
+    }
+
+    // Preserve a fresher local bet/cashout if this state fetch started before a user action completed
+    var nextMyBet=res.my_bet||null;
+    if(reqActionSeq!==actionSeq&&state&&state.round&&state.round.id===res.round.id&&state.my_bet){
+      if(!nextMyBet||(state.my_bet.status==='cashed_out'&&nextMyBet.status!=='cashed_out')){
+        nextMyBet=state.my_bet;
+      }
+    }
+
+    state={
+      phase:res.phase,
+      round:res.round,
+      my_bet:nextMyBet,
+      crashPoint:(res.round.crash_point!==null&&res.round.crash_point!==undefined)?Number(res.round.crash_point):null,
+      betEndsLocal:betEndsLocal,
+      crashesLocal:crashesLocal,
+      nextRoundLocal:nextRoundLocal
+    };
+
+    if(res.phase==='crashed')syncTrack.crashId=res.round.id;
+    setBal(res.balance);
+    renderCrashes(res.results||[]);
+    renderResultsTable(res.results||[]);
+    renderBetsTable(res.my_bets||[]);
+    applyPhaseUi(performance.now());
+
+    if(res.phase==='betting'){
+      scheduleSync(Math.max(150,(betEndsLocal-baseLocal)+80));
+    }else if(res.phase==='flying'){
+      scheduleSync(Math.max(180,(crashesLocal-baseLocal)+120));
+    }else{
+      scheduleSync(Math.max(180,(nextRoundLocal-baseLocal)+120));
+    }
+    if(!rafId)runLoop();
+  }
+  function fetchState(force){
+    var ss=session();
+    if(!ss.token||ss.role==='admin')return Promise.resolve();
+    if(syncing){
+      if(force)resyncPending=true;
+      return Promise.resolve();
+    }
+    syncing=true;
+    var reqSeq=actionSeq;
+    return bridge.api('aviator_state',{p_token:ss.token}).then(function(res){
+      syncing=false;
+      if(isActiveRoute())hydrateState(res,reqSeq);
+      if(resyncPending&&isActiveRoute()){
+        resyncPending=false;
+        fetchState(false);
+      }
+    }).catch(function(e){
+      syncing=false;
+      resyncPending=false;
+      if(statusEl)statusEl.textContent=e.message||'Run supabase_aviator.sql in Supabase first.';
+      scheduleSync(2500);
+    });
+  }
+  function doCashout(claimMult){
+    if(!state||!state.round||!state.my_bet||state.my_bet.status!=='active'||busy)return;
+    var targetRoundId=state.round.id;
+    busy=true;
+    updateInputLock();
+    bridge.api('aviator_cashout',{
+      p_token:session().token,
+      p_round_id:targetRoundId,
+      p_claim_mult:Number(claimMult.toFixed(2))
+    }).then(function(res){
+      busy=false;
+      actionSeq++;
+      if(res.won){
+        var cm=Number(res.cashout_mult||claimMult);
+        var pay=Number(res.payout||0);
+        if(state&&state.round&&state.round.id===targetRoundId&&state.my_bet){
+          state.my_bet.status='cashed_out';
+          state.my_bet.cashout_mult=cm;
+          state.my_bet.payout=pay;
+          upsertLocalBetRow(state.my_bet);
+        }
+        setBal(res.balance);
+        if(bridge.toast)bridge.toast('Aviator Win: +'+pay+' Coins @ '+cm.toFixed(2)+'x');
+        applyPhaseUi(performance.now());
+        bridge.refresh().catch(function(){});
+        fetchState(true);
+      }else{
+        fetchState(true);
+      }
+    }).catch(function(e){
+      busy=false;
+      if(bridge.toast)bridge.toast(e.message||'Cashout failed.');
+      fetchState(true);
+    });
+  }
+  function init(){
+    stopTimers();
+    state=null;busy=false;autoFired=false;lastMult=1.00;syncing=false;resyncPending=false;
+    syncTrack={takeoffId:null,takeoffAt:0,crashId:null,nextId:null,nextAt:0};
+    var ss=session();
+    if(!ss.token){statusEl.textContent='Please log in to Play2Win first.';actionBtn.disabled=true;updateInputLock();return;}
+    if(ss.role==='admin'){statusEl.textContent='Aviator sirf player accounts ke liye hai.';actionBtn.disabled=true;updateInputLock();return;}
+    statusEl.textContent='Syncing round…';
+    fetchState(true);
+  }
+
+  betInput.addEventListener('input',function(){updateInputLock();if(state)applyPhaseUi(performance.now());});
+  chips.addEventListener('click',function(e){
+    var b=e.target.closest('[data-av-amt]');
+    if(!b||b.disabled)return;
+    betInput.value=String(Math.min(MAX_BET,Number(b.dataset.avAmt)||10));
+    updateInputLock();
+    if(state)applyPhaseUi(performance.now());
+  });
+  actionBtn.addEventListener('click',function(){
+    if(busy||!state||!state.round)return;
+    if(state.phase==='flying'){
+      if(state.my_bet&&state.my_bet.status==='active'){
+        doCashout(Math.max(1.01,lastMult));
+      }
+      return;
+    }
+    if(state.phase!=='betting'||state.my_bet)return;
+    var ss=session();
+    if(!ss.token){statusEl.textContent='Session expired. Please log in again.';return;}
+    if(ss.role==='admin'){statusEl.textContent='Admin accounts cannot play Aviator.';return;}
+    var bet=Math.floor(Number(betInput.value)||0);
+    if(!Number.isSafeInteger(bet)||bet<1||bet>MAX_BET){
+      statusEl.textContent='Bet 1 se 1,000 Coins ke beech rakhein (Max 1,000).';
+      return;
+    }
+    var auto=null;
+    if(autoOn.checked){
+      auto=Math.round((Number(autoVal.value)||0)*100)/100;
+      if(!Number.isFinite(auto)||auto<1.05||auto>100){
+        statusEl.textContent='Auto Cashout 1.05x se 100.00x ke beech rakhein.';
+        return;
+      }
+    }
+    var targetRoundId=state.round.id;
+    busy=true;
+    updateInputLock();
+    bridge.api('aviator_place_bet',{
+      p_token:ss.token,
+      p_round_id:targetRoundId,
+      p_amount:bet,
+      p_auto_cashout:auto
+    }).then(function(res){
+      busy=false;
+      actionSeq++;
+      setBal(res.balance);
+      if(state&&state.round&&state.round.id===targetRoundId){
+        state.my_bet={
+          id:res.bet_id,
+          round_id:res.round_id,
+          stake:res.stake,
+          auto_cashout:res.auto_cashout,
+          status:'active',
+          cashout_mult:null,
+          payout:0
+        };
+        upsertLocalBetRow(state.my_bet);
+        applyPhaseUi(performance.now());
+      }
+      bridge.refresh().catch(function(){});
+      fetchState(true);
+    }).catch(function(e){
+      busy=false;
+      updateInputLock();
+      if(statusEl)statusEl.textContent=e.message||'Could not place bet.';
+      if(bridge.toast)bridge.toast(e.message||'Could not place bet.');
+      fetchState(true);
+    });
+  });
+
+  if(tabResults)tabResults.addEventListener('click',function(){setTab('results');});
+  if(tabBets)tabBets.addEventListener('click',function(){setTab('bets');});
+  if(swipeViewport){
+    var touchX=0,touchY=0;
+    swipeViewport.addEventListener('touchstart',function(e){
+      if(!e.touches||!e.touches[0])return;
+      touchX=e.touches[0].clientX;touchY=e.touches[0].clientY;
+    },{passive:true});
+    swipeViewport.addEventListener('touchend',function(e){
+      if(!e.changedTouches||!e.changedTouches[0])return;
+      var dx=e.changedTouches[0].clientX-touchX;
+      var dy=e.changedTouches[0].clientY-touchY;
+      if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)*1.2){
+        setTab(dx<0?'bets':'results');
+      }
+    },{passive:true});
+  }
+
+  window.Play2WinAviatorOnRoute=function(active){
+    if(active){
+      if(!state&&!syncing)init();
+    }else{
+      stopTimers();
+      state=null;
+    }
+  };
+  setTab('results');
+  renderCrashes([]);
+  if(isActiveRoute())init();
+})();
+</script>
 
 </body>
 </html>
