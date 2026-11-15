@@ -5,7 +5,7 @@
 -- 1. Referral configuration (App/APK download link, reward amount, detected schema tables)
 create table if not exists public.referral_settings (
   id integer primary key default 1 check (id = 1),
-  download_url text not null default 'https://splendorous-jalebi-a6d440.netlify.app/',
+  download_url text not null default '',
   reward_coins integer not null default 20 check (reward_coins > 0),
   users_table text,
   balance_col text not null default 'balance',
@@ -20,7 +20,7 @@ alter table public.referral_settings add column if not exists sessions_table tex
 alter table public.referral_settings add column if not exists coin_log_table text;
 
 insert into public.referral_settings (id, download_url, reward_coins)
-values (1, 'https://splendorous-jalebi-a6d440.netlify.app/', 20)
+values (1, '', 20)
 on conflict (id) do nothing;
 
 -- Auto-detect existing users, sessions, and coin_log tables in this Supabase project
@@ -238,7 +238,7 @@ declare
 begin
   select * into v_cfg from public.referral_settings where id = 1;
   return jsonb_build_object(
-    'download_url', coalesce(v_cfg.download_url, 'https://splendorous-jalebi-a6d440.netlify.app/'),
+    'download_url', coalesce(v_cfg.download_url, ''),
     'reward_coins', coalesce(v_cfg.reward_coins, 20)
   );
 end;
@@ -263,7 +263,7 @@ begin
   v_profile := public._p2w_ensure_referral_profile(v_auth.user_id);
   select * into v_cfg from public.referral_settings where id = 1;
 
-  v_base_url := coalesce(v_cfg.download_url, 'https://splendorous-jalebi-a6d440.netlify.app/');
+  v_base_url := trim(coalesce(v_cfg.download_url, ''));
   v_sep := case when position('?' in v_base_url) > 0 then '&' else '?' end;
 
   execute format($q$
@@ -285,7 +285,7 @@ begin
   return jsonb_build_object(
     'referral_code', v_profile.referral_code,
     'download_url', v_base_url,
-    'share_link', v_base_url || v_sep || 'ref=' || v_profile.referral_code,
+    'share_link', case when v_base_url = '' then '' else v_base_url end,
     'reward_coins', coalesce(v_cfg.reward_coins, 20),
     'total_shares', v_profile.total_shares,
     'total_referrals', v_profile.total_referrals,
@@ -321,13 +321,14 @@ begin
   returning * into v_profile;
 
   select * into v_cfg from public.referral_settings where id = 1;
-  v_base_url := coalesce(v_cfg.download_url, 'https://splendorous-jalebi-a6d440.netlify.app/');
+  v_base_url := trim(coalesce(v_cfg.download_url, ''));
   v_sep := case when position('?' in v_base_url) > 0 then '&' else '?' end;
 
   return jsonb_build_object(
     'total_shares', v_profile.total_shares,
     'referral_code', v_profile.referral_code,
-    'share_link', v_base_url || v_sep || 'ref=' || v_profile.referral_code
+    'download_url', v_base_url,
+    'share_link', case when v_base_url = '' then '' else v_base_url end
   );
 end;
 $$;
@@ -484,7 +485,7 @@ begin
   $q$, v_cfg.users_table, v_cfg.users_table) into v_recent;
 
   return jsonb_build_object(
-    'download_url', coalesce(v_cfg.download_url, 'https://splendorous-jalebi-a6d440.netlify.app/'),
+    'download_url', coalesce(v_cfg.download_url, ''),
     'reward_coins', coalesce(v_cfg.reward_coins, 20),
     'total_shares', v_total_shares,
     'total_referrals', v_total_refs,

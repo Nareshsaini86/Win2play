@@ -454,13 +454,6 @@ img{ -webkit-user-drag:none; user-drag:none; }
           </span>
         </button>
       </div>
-      <button class="ref-banner" type="button" data-open-route="rewards" aria-label="Refer and earn 20 coins">
-        <div>
-          <b>🎁 Share App &amp; Earn 20 Coins</b>
-          <span>Dost ko link bhejein — install par dono ko 20 Coins milenge</span>
-        </div>
-        <span style="font-size:1.3rem;font-weight:900;color:var(--gold-text)" aria-hidden="true">›</span>
-      </button>
     </section>
 
     <section id="v-goldball" class="hide">
@@ -513,42 +506,6 @@ img{ -webkit-user-drag:none; user-drag:none; }
         <div class="ad-bonus-wallet"><span>🎁 Bonus Wallet <small>(non-withdrawable)</small></span><strong id="ad-bonus-balance">0 Coins</strong></div>
         <button class="ad-watch-btn" id="ad-watch-btn" type="button" disabled>Watch Ad · +1 Bonus Coin</button>
         <p class="ad-reward-status" id="ad-reward-status" aria-live="polite">Rewarded ads are not configured yet.</p>
-      </section>
-
-      <section class="ref-card" id="referral-card" aria-label="Refer and earn 20 coins">
-        <div class="ref-head">
-          <div>
-            <h2>Refer &amp; Earn 20 Coins</h2>
-            <p>Share download link · Friend joins &amp; installs → Both get +20 Coins</p>
-          </div>
-          <span class="ref-badge-icon" aria-hidden="true">🤝</span>
-        </div>
-        <div class="ref-code-row">
-          <div>
-            <div style="font-size:.66rem;color:var(--mute);font-weight:800;letter-spacing:.06em">YOUR REFERRAL CODE</div>
-            <div class="ref-code-val" id="ref-my-code">Loading…</div>
-          </div>
-          <button class="mini" id="ref-copy-code-btn" type="button">Copy Code</button>
-        </div>
-        <div class="ref-stats-grid">
-          <div class="ref-stat"><span>Shares</span><b id="ref-stat-shares">0</b></div>
-          <div class="ref-stat"><span>Installs</span><b id="ref-stat-refers">0</b></div>
-          <div class="ref-stat"><span>Earned</span><b id="ref-stat-earned">0</b></div>
-        </div>
-        <div class="ref-actions">
-          <button class="ref-share-btn" id="ref-share-btn" type="button">Share App &amp; Download Link</button>
-          <button class="ref-copy-btn" id="ref-copy-link-btn" type="button">Copy Link</button>
-        </div>
-        <div id="ref-claim-box" class="ref-claim-box">
-          <label for="ref-input-code" style="font-size:.78rem;color:var(--mute);font-weight:700">Friend ka referral code daalein (+20 Coins dono ko)</label>
-          <div class="ref-claim-row">
-            <input id="ref-input-code" placeholder="Enter code (e.g. P2W...)" autocapitalize="characters" autocomplete="off">
-            <button id="ref-claim-btn" type="button">Claim +20</button>
-          </div>
-          <div class="err" id="ref-claim-err" style="margin-top:6px"></div>
-        </div>
-        <div id="ref-claimed-badge" class="ref-claimed-pill hide"></div>
-        <div id="ref-my-history" class="empty" style="margin-top:10px"></div>
       </section>
 
     </section>
@@ -615,6 +572,13 @@ img{ -webkit-user-drag:none; user-drag:none; }
       <div id="settings-wallet-links">
         <button class="menu-btn" id="m-add"><span>Add Coins</span><span aria-hidden="true">›</span></button>
         <button class="menu-btn" id="m-withdraw"><span>Withdraw Coins</span><span aria-hidden="true">›</span></button>
+        <button class="ref-banner" id="m-share" type="button" data-open-route="share" aria-label="Share app and earn 20 coins" style="margin-top:10px">
+          <div>
+            <b>🎁 Share App &amp; Earn 20 Coins</b>
+            <span>Dost ko app APK link bhejein — auto-download aur install par dono ko 20 Coins</span>
+          </div>
+          <span style="font-size:1.3rem;font-weight:900;color:var(--gold-text)" aria-hidden="true">›</span>
+        </button>
       </div>
       <section id="v-add" class="hide">
       <button class="mini" data-back style="margin:12px 0 0">‹ Back to Settings</button>
@@ -656,6 +620,45 @@ img{ -webkit-user-drag:none; user-drag:none; }
         <button class="place" id="withdraw-submit" type="button">Request Withdrawal</button>
         <h2>My Withdrawal Requests</h2><div id="my-withdrawals" class="empty">Loading...</div>
       </div>
+      </section>
+      <section id="v-share" class="hide">
+      <button class="mini" data-back style="margin:12px 0 0">‹ Back to Settings</button>
+      <section class="ref-card" id="referral-card" aria-label="Share app and earn 20 coins">
+        <div class="ref-head">
+          <div>
+            <h2>Share App &amp; Earn 20 Coins</h2>
+            <p>Share direct APK download link · Friend installs &amp; enters code → Both get +20 Coins</p>
+          </div>
+          <span class="ref-badge-icon" aria-hidden="true">🤝</span>
+        </div>
+        <div class="ref-code-row">
+          <div>
+            <div style="font-size:.66rem;color:var(--mute);font-weight:800;letter-spacing:.06em">YOUR REFERRAL CODE</div>
+            <div class="ref-code-val" id="ref-my-code">Loading…</div>
+          </div>
+          <button class="mini" id="ref-copy-code-btn" type="button">Copy Code</button>
+        </div>
+        <div class="ref-stats-grid">
+          <div class="ref-stat"><span>Shares</span><b id="ref-stat-shares">0</b></div>
+          <div class="ref-stat"><span>Installs</span><b id="ref-stat-refers">0</b></div>
+          <div class="ref-stat"><span>Earned</span><b id="ref-stat-earned">0</b></div>
+        </div>
+        <div class="err" id="ref-link-warn" style="margin-bottom:8px"></div>
+        <div class="ref-actions">
+          <button class="ref-share-btn" id="ref-share-btn" type="button">Share App Download Link</button>
+          <button class="ref-copy-btn" id="ref-copy-link-btn" type="button">Copy App Link</button>
+        </div>
+        <div id="ref-claim-box" class="ref-claim-box">
+          <label for="ref-input-code" style="font-size:.78rem;color:var(--mute);font-weight:700">Friend ka referral code daalein (+20 Coins dono ko)</label>
+          <div class="ref-claim-row">
+            <input id="ref-input-code" placeholder="Enter code (e.g. P2W...)" autocapitalize="characters" autocomplete="off">
+            <button id="ref-claim-btn" type="button">Claim +20</button>
+          </div>
+          <div class="err" id="ref-claim-err" style="margin-top:6px"></div>
+        </div>
+        <div id="ref-claimed-badge" class="ref-claimed-pill hide"></div>
+        <div id="ref-my-history" class="empty" style="margin-top:10px"></div>
+      </section>
       </section>
       <div id="settings-other">
       <div class="card hide" id="st-admin">
@@ -761,12 +764,12 @@ img{ -webkit-user-drag:none; user-drag:none; }
       </div>
       <div class="card" id="admin-referrals-card">
         <div class="srow"><h2 style="margin-top:0">Refer &amp; Earn Analytics</h2><span class="bal" id="admin-ref-badge">20 Coins / Refer</span></div>
-        <p class="note">Yahan app/APK download link set karein aur dekhein kis user ne kitne share kiye, kitne installs hue, aur kitne coins earn kiye.</p>
-        <label>App / APK Download Link
-          <input id="admin-ref-download-url" type="url" placeholder="https://splendorous-jalebi-a6d440.netlify.app/" autocapitalize="off" autocomplete="off">
+        <p class="note">Yahan direct App / APK auto-download link (.apk file, GitHub Release, ya Google Drive file link) set karein. Website link set na karein.</p>
+        <label>App / APK Auto-Download Link
+          <input id="admin-ref-download-url" type="url" placeholder="https://github.com/user/repo/releases/latest/download/Play2Win.apk" autocapitalize="off" autocomplete="off">
         </label>
         <div class="err" id="admin-ref-url-msg" role="alert"></div>
-        <button class="place" id="admin-ref-save-url" type="button" style="margin-top:4px">Save Download Link</button>
+        <button class="place" id="admin-ref-save-url" type="button" style="margin-top:4px">Save App Download Link</button>
         <div class="ref-stats-grid" style="margin-top:14px">
           <div class="ref-stat"><span>Total Shares</span><b id="admin-ref-total-shares">0</b></div>
           <div class="ref-stat"><span>Total Installs</span><b id="admin-ref-total-refers">0</b></div>
@@ -1098,21 +1101,23 @@ img{ -webkit-user-drag:none; user-drag:none; }
     $('gear').classList.remove('hide');
     if(!$('nav').children.length)buildNav();
     if(r==='logout'){logout();return}
-    if(isAdmin()&&(r==='play'||r==='mine'||r==='add'||r==='withdraw'||r==='rewards'||r==='goldball'))r='admin';
+    if(isAdmin()&&(r==='play'||r==='mine'||r==='add'||r==='withdraw'||r==='rewards'||r==='goldball'||r==='share'))r='admin';
     if(!isAdmin()&&(r==='admin'||r==='bets'))r='play';
-    var mainRoute=(r==='add'||r==='withdraw')?'settings':r;
+    var mainRoute=(r==='add'||r==='withdraw'||r==='share')?'settings':r;
     ['home','rewards','goldball','play','results','mine','admin','bets','settings','tx','pw'].forEach(function(k){$('v-'+k).classList.toggle('hide',k!==mainRoute)});
     $('v-add').classList.toggle('hide',r!=='add');
     $('v-withdraw').classList.toggle('hide',r!=='withdraw');
+    if($('v-share'))$('v-share').classList.toggle('hide',r!=='share');
     clearPlayOnlyEffects();
-    var inSettingsSub=(r==='add'||r==='withdraw');
+    var inSettingsSub=(r==='add'||r==='withdraw'||r==='share');
     ['settings-profile','settings-wallet-links','settings-other'].forEach(function(id){$(id).classList.toggle('hide',inSettingsSub)});
     document.querySelectorAll('#nav a').forEach(function(a){a.classList.toggle('on',a.dataset.r===r)});
-    if(r==='rewards'){loadDailyRewards();if(window.Play2WinLoadReferrals)window.Play2WinLoadReferrals();}
+    if(r==='rewards'){loadDailyRewards();}
     if(r==='mine')loadMine();
     if(r==='admin'){if(adminAlertsEnabled)primeAdminAlertAudio();loadUsers();loadAdminPaymentUpis();loadDepositRequests();loadWithdrawalRequests();pollAdminRequests();if(window.Play2WinLoadAdminReferrals)window.Play2WinLoadAdminReferrals();}
     if(r==='bets')loadBets();
-    if(r==='settings'){renderSettings();}
+    if(r==='settings'){renderSettings();if(!isAdmin()&&window.Play2WinLoadReferrals)window.Play2WinLoadReferrals();}
+    if(r==='share'){if(window.Play2WinLoadReferrals)window.Play2WinLoadReferrals();}
     if(r==='add'){loadMyDeposits();}
     if(r==='withdraw'){loadMyWithdrawals();}
     if(r==='tx'){if(isAdmin())fillTxUsers().then(loadTx);else loadTx()}
@@ -1917,15 +1922,50 @@ img{ -webkit-user-drag:none; user-drag:none; }
     if(ss&&ss.token&&ss.role!=='admin')tryAutoClaimPendingRef();
   };
 
+  function isWebsiteHomeUrl(url){
+    if(!url)return true;
+    var clean=String(url).trim().split('#')[0].split('?')[0].replace(/\/+$/,'').toLowerCase();
+    return clean==='https://splendorous-jalebi-a6d440.netlify.app'||clean==='http://splendorous-jalebi-a6d440.netlify.app';
+  }
+  function normalizeDirectDownloadUrl(url){
+    var u=String(url||'').trim();
+    if(!u||isWebsiteHomeUrl(u))return '';
+    var gd=u.match(/^https?:\/\/drive\.google\.com\/file\/d\/([^\/?#]+)/i)||u.match(/^https?:\/\/drive\.google\.com\/open\?(?:.*&)?id=([^&#]+)/i);
+    if(gd&&gd[1]){
+      return 'https://drive.google.com/uc?export=download&id='+encodeURIComponent(gd[1]);
+    }
+    if(/^https?:\/\/(?:www\.)?dropbox\.com\//i.test(u)){
+      if(/[?&]dl=0\b/i.test(u))return u.replace(/([?&])dl=0\b/i,'$1dl=1');
+      if(!/[?&]dl=1\b/i.test(u))return u+(u.indexOf('?')>=0?'&':'?')+'dl=1';
+    }
+    return u;
+  }
+  function resolveAppDownloadUrl(res){
+    var raw=(res&&res.download_url)||(currentInfo&&currentInfo.download_url)||'';
+    if(!raw&&res&&res.share_link){
+      var base=String(res.share_link).split('#')[0].split('?')[0];
+      if(!isWebsiteHomeUrl(base))raw=res.share_link;
+    }
+    return normalizeDirectDownloadUrl(raw);
+  }
+
   // Show Download APK button on web browser when someone opens a shared link
   (function loadPublicDownload(){
     var isNative=!!(window.Play2WinNative&&window.Play2WinNative.isNativeApp&&window.Play2WinNative.isNativeApp());
     if(isNative)return;
     bridge.api('get_public_download_info',{}).then(function(info){
       var wrap=$('auth-download-wrap'),btn=$('auth-download-btn');
-      if(wrap&&btn&&info&&info.download_url){
-        btn.href=info.download_url;
+      var apkUrl=normalizeDirectDownloadUrl(info&&info.download_url);
+      if(wrap&&btn&&apkUrl){
+        btn.href=apkUrl;
+        btn.setAttribute('download','Play2Win.apk');
         wrap.classList.remove('hide');
+        try{
+          var q=new URLSearchParams(location.search||'');
+          if(q.get('download')==='1'||q.get('autodownload')==='1'){
+            window.location.href=apkUrl;
+          }
+        }catch(e){}
       }
     }).catch(function(){});
   })();
@@ -1950,6 +1990,10 @@ img{ -webkit-user-drag:none; user-drag:none; }
     if($('ref-stat-shares'))$('ref-stat-shares').textContent=Number(info.total_shares||0);
     if($('ref-stat-refers'))$('ref-stat-refers').textContent=Number(info.total_referrals||0);
     if($('ref-stat-earned'))$('ref-stat-earned').textContent=Number(info.total_earned||0)+' 🪙';
+    var warn=$('ref-link-warn');
+    if(warn){
+      warn.textContent=resolveAppDownloadUrl(info)?'':'App auto-download (.apk) link abhi Admin dwara set nahi hua hai. Admin → Refer & Earn Analytics mein APK link save karein.';
+    }
     var claimBox=$('ref-claim-box'),claimedBadge=$('ref-claimed-badge');
     if(info.referral_rewarded){
       if(claimBox)claimBox.classList.add('hide');
@@ -2036,25 +2080,35 @@ img{ -webkit-user-drag:none; user-drag:none; }
     else bridge.toast('Pehle Supabase mein supabase_refer_earn.sql run karein.');
   };
   if($('ref-copy-link-btn'))$('ref-copy-link-btn').onclick=function(){
-    if(currentInfo&&currentInfo.share_link)copyValue(currentInfo.share_link,'Download & referral link copied!');
-    else bridge.toast('Pehle Supabase mein supabase_refer_earn.sql run karein.');
+    var appLink=resolveAppDownloadUrl(currentInfo);
+    if(appLink)copyValue(appLink,'App auto-download link copied!');
+    else bridge.toast('App APK download link abhi Admin ne set nahi kiya hai.');
   };
   if($('ref-share-btn'))$('ref-share-btn').onclick=function(){
     var ss=bridge.getSession();
     if(!ss||!ss.token||shareBusy)return;
+    var preCheckLink=resolveAppDownloadUrl(currentInfo);
+    if(currentInfo&&!preCheckLink){
+      bridge.toast('Site link nahi, pehle Admin panel mein App APK auto-download link set karein.');
+      return;
+    }
     shareBusy=true;
     $('ref-share-btn').disabled=true;
     bridge.api('record_referral_share',{p_token:ss.token}).then(function(res){
       if($('ref-stat-shares'))$('ref-stat-shares').textContent=Number(res.total_shares||0);
       var code=res.referral_code||(currentInfo&&currentInfo.referral_code)||'';
-      var link=res.share_link||(currentInfo&&currentInfo.share_link)||'https://splendorous-jalebi-a6d440.netlify.app/';
-      var shareMsg='Play2Win app download karein aur mera referral code '+code+' use karke 20 Bonus Coins paayein! Download link: '+link;
+      var appLink=resolveAppDownloadUrl(res);
+      if(!appLink){
+        bridge.toast('App APK auto-download link abhi set nahi hai. Admin panel mein .apk link save karein.');
+        return;
+      }
+      var shareMsg='Play2Win Android App download karein (Auto-Download): '+appLink+'\n\nApp open karke Settings → Share App mein mera referral code '+code+' daalein — dono ko 20 Bonus Coins milenge!';
       if(window.Play2WinNative&&window.Play2WinNative.shareText){
-        window.Play2WinNative.shareText('Play2Win · Earn 20 Coins',shareMsg);
+        window.Play2WinNative.shareText('Play2Win App · Earn 20 Coins',shareMsg);
       }else if(navigator.share){
-        navigator.share({title:'Play2Win',text:shareMsg,url:link}).catch(function(){});
+        navigator.share({title:'Play2Win App',text:shareMsg,url:appLink}).catch(function(){});
       }else{
-        copyValue(shareMsg,'Share message & download link copied!');
+        copyValue(shareMsg,'Share message & app download link copied!');
       }
     }).catch(function(e){
       bridge.toast(friendlyRefErr(e,'Share failed.'));
@@ -2072,7 +2126,7 @@ img{ -webkit-user-drag:none; user-drag:none; }
     var ss=bridge.getSession();
     if(!ss||!ss.token||ss.role!=='admin')return;
     bridge.api('admin_referral_overview',{p_token:ss.token}).then(function(d){
-      if($('admin-ref-download-url'))$('admin-ref-download-url').value=d.download_url||'';
+      if($('admin-ref-download-url'))$('admin-ref-download-url').value=normalizeDirectDownloadUrl(d.download_url||'');
       if($('admin-ref-total-shares'))$('admin-ref-total-shares').textContent=Number(d.total_shares||0);
       if($('admin-ref-total-refers'))$('admin-ref-total-refers').textContent=Number(d.total_referrals||0);
       if($('admin-ref-total-coins'))$('admin-ref-total-coins').textContent=Number(d.total_coins_distributed||0);
@@ -2095,13 +2149,16 @@ img{ -webkit-user-drag:none; user-drag:none; }
   window.Play2WinLoadAdminReferrals=loadAdminReferrals;
 
   if($('admin-ref-save-url'))$('admin-ref-save-url').onclick=function(){
-    var ss=bridge.getSession(),url=($('admin-ref-download-url')?$('admin-ref-download-url').value:'').trim(),msg=$('admin-ref-url-msg');
+    var ss=bridge.getSession(),rawUrl=($('admin-ref-download-url')?$('admin-ref-download-url').value:'').trim(),msg=$('admin-ref-url-msg');
     if(!ss||!ss.token||ss.role!=='admin')return;
     msg.style.color='var(--red)';msg.textContent='';
-    if(!/^https?:\/\//i.test(url)){msg.textContent='Valid https:// ya http:// APK/App download URL enter karein.';return;}
+    if(!/^https?:\/\//i.test(rawUrl)){msg.textContent='Valid https:// ya http:// APK auto-download URL enter karein.';return;}
+    if(isWebsiteHomeUrl(rawUrl)){msg.textContent='Website link nahi, direct App/APK auto-download link (.apk ya direct download URL) enter karein.';return;}
+    var url=normalizeDirectDownloadUrl(rawUrl);
+    if($('admin-ref-download-url'))$('admin-ref-download-url').value=url;
     $('admin-ref-save-url').disabled=true;
     bridge.api('admin_set_download_url',{p_token:ss.token,p_download_url:url}).then(function(){
-      msg.style.color='var(--green)';msg.textContent='Download link saved! Sabhi users ko yahi link share hoga.';
+      msg.style.color='var(--green)';msg.textContent='App auto-download link saved! Ab share karne par sabhi users ko yahi direct app link jayega.';
     }).catch(function(e){
       msg.textContent=e.message||'Save failed.';
     }).then(function(){

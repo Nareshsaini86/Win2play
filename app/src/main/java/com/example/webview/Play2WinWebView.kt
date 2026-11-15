@@ -261,13 +261,34 @@ fun createConfiguredWebView(
                 }
                 if (!window.__p2wPullHook) {
                   window.__p2wPullHook = true;
-                  document.addEventListener('touchstart', function(ev) {
-                    var sc = ev.target && ev.target.closest ? ev.target.closest('.scroll') : null;
-                    var atTop = !sc || sc.scrollTop <= 0;
-                    if (window.Play2WinNative && window.Play2WinNative.setCanPullRefresh) {
-                      window.Play2WinNative.setCanPullRefresh(atTop);
+                  var hasScrolledAncestor = function(target) {
+                    var el = target && target.nodeType === 1 ? target : (target && target.parentElement ? target.parentElement : null);
+                    while (el && el !== document.body && el !== document.documentElement) {
+                      if (el.scrollTop > 0) {
+                        var style = window.getComputedStyle ? window.getComputedStyle(el) : null;
+                        var oy = style ? style.overflowY : '';
+                        if (oy === 'auto' || oy === 'scroll' || oy === 'overlay' || el.classList.contains('scroll')) {
+                          return true;
+                        }
+                      }
+                      el = el.parentElement;
                     }
-                  }, { passive: true });
+                    var docScroll = document.scrollingElement || document.documentElement || document.body;
+                    return !!(docScroll && docScroll.scrollTop > 0);
+                  };
+                  document.addEventListener('touchstart', function(ev) {
+                    var blocked = hasScrolledAncestor(ev.target);
+                    if (window.Play2WinNative && window.Play2WinNative.setCanPullRefresh) {
+                      window.Play2WinNative.setCanPullRefresh(!blocked);
+                    }
+                  }, { capture: true, passive: true });
+                  var resetPull = function() {
+                    if (window.Play2WinNative && window.Play2WinNative.setCanPullRefresh) {
+                      window.Play2WinNative.setCanPullRefresh(true);
+                    }
+                  };
+                  document.addEventListener('touchend', resetPull, { capture: true, passive: true });
+                  document.addEventListener('touchcancel', resetPull, { capture: true, passive: true });
                 }
               } catch (e) {}
             })();

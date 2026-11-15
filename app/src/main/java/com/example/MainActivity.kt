@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -59,16 +58,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowCompat
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.ui.theme.DayBackground
 import com.example.ui.theme.MidnightNavy
 import com.example.ui.theme.MyApplicationTheme
 import com.example.ui.theme.PlayGold
 import com.example.webview.APP_START_URL
 import com.example.webview.JsDialogState
+import com.example.webview.WebViewSwipeRefreshLayout
 import com.example.webview.createConfiguredWebView
 import com.example.webview.isNetworkAvailable
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlinx.coroutines.delay
 import org.json.JSONObject
 
 class MainActivity : ComponentActivity() {
@@ -131,12 +131,13 @@ fun Play2WinShell(
 
   var progress by remember { mutableIntStateOf(0) }
   var isLoading by remember { mutableStateOf(true) }
+  var isPullRefreshing by remember { mutableStateOf(false) }
   var hasLoadedOnce by remember { mutableStateOf(false) }
   var errorMessage by remember { mutableStateOf<String?>(null) }
   var canGoBack by remember { mutableStateOf(false) }
   var jsDialog by remember { mutableStateOf<JsDialogState?>(null) }
   val canPullRefresh = remember { AtomicBoolean(true) }
-  var swipeRefreshRef by remember { mutableStateOf<SwipeRefreshLayout?>(null) }
+  var swipeRefreshRef by remember { mutableStateOf<WebViewSwipeRefreshLayout?>(null) }
 
   val startUrl = remember {
     val ref = initialReferralCode
@@ -151,6 +152,7 @@ fun Play2WinShell(
       onLoadingChanged = { loading -> isLoading = loading },
       onRefreshFinished = {
         hasLoadedOnce = true
+        isPullRefreshing = false
         swipeRefreshRef?.isRefreshing = false
       },
       onErrorChanged = { errorMessage = it },
@@ -180,26 +182,38 @@ fun Play2WinShell(
   }
 
   val swipeRefreshLayout = remember(webView) {
-    SwipeRefreshLayout(context).apply {
-      setColorSchemeColors(
-        android.graphics.Color.parseColor("#FFC94D"),
-        android.graphics.Color.parseColor("#FF9F1C"),
-      )
-      setProgressBackgroundColorSchemeColor(android.graphics.Color.parseColor("#171A3C"))
-      setOnChildScrollUpCallback { _, _ ->
-        !canPullRefresh.get() || webView.scrollY > 0 || webView.canScrollVertically(-1)
-      }
+    WebViewSwipeRefreshLayout(context, webView, canPullRefresh).apply {
+      applyThemeColors(isDayTheme)
       setOnRefreshListener {
         if (isNetworkAvailable(context)) {
           errorMessage = null
-          webView.reload()
+          isPullRefreshing = true
+          if (webView.url.isNullOrBlank()) {
+            webView.loadUrl(startUrl)
+          } else {
+            webView.reload()
+          }
         } else {
+          isPullRefreshing = false
           isRefreshing = false
           errorMessage = context.getString(R.string.offline_body)
         }
       }
-      addView(webView)
       swipeRefreshRef = this
+    }
+  }
+
+  LaunchedEffect(isDayTheme, swipeRefreshLayout) {
+    swipeRefreshLayout.applyThemeColors(isDayTheme)
+  }
+
+  LaunchedEffect(isPullRefreshing, swipeRefreshLayout) {
+    if (isPullRefreshing) {
+      delay(15_000L)
+      isPullRefreshing = false
+      swipeRefreshLayout.isRefreshing = false
+    } else {
+      swipeRefreshLayout.isRefreshing = false
     }
   }
 
@@ -229,18 +243,12 @@ fun Play2WinShell(
       AndroidView(
         factory = { swipeRefreshLayout },
         update = { refreshLayout ->
-          val bgHex = if (isDayTheme) "#FFFFFF" else "#171A3C"
-          val fgHex = if (isDayTheme) "#FF8A00" else "#FFC94D"
-          refreshLayout.setProgressBackgroundColorSchemeColor(android.graphics.Color.parseColor(bgHex))
-          refreshLayout.setColorSchemeColors(
-            android.graphics.Color.parseColor(fgHex),
-            android.graphics.Color.parseColor("#FF9F1C"),
-          )
+          refreshLayout.isEnabled = hasLoadedOnce && errorMessage == null
         },
         modifier = Modifier.fillMaxSize().testTag("play2win_webview"),
       )
 
-      if (isLoading && progress in 1..99) {
+      if (isLoading && !isPullRefreshing && progress in 1..99) {
         LinearProgressIndicator(
           progress = { progress / 100f },
           modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter),

@@ -30,19 +30,46 @@ jobs:
         with:
           gradle-version: "9.3.1"
 
-      - name: Prepare debug keystore
+      - name: Restore cached release keystore
+        uses: actions/cache@v4
+        id: cache-keystore
+        with:
+          path: release-key.jks
+          key: play2win-release-keystore-v1
+
+      - name: Prepare release keystore
         run: |
-          if [ -f debug.keystore.base64 ] && [ ! -f debug.keystore ]; then
-            base64 -d debug.keystore.base64 > debug.keystore
-          elif [ ! -f debug.keystore ]; then
-            keytool -genkeypair -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          if [ ! -f release-key.jks ]; then
+            keytool -genkeypair -noprompt \
+              -keystore release-key.jks \
+              -storepass play2win123 \
+              -alias upload \
+              -keypass play2win123 \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Play2Win,O=Play2Win,C=IN"
           fi
 
-      - name: Build Debug APK
-        run: gradle :app:assembleDebug --no-daemon
+      - name: Build Release APK
+        env:
+          KEYSTORE_PATH: ${{ github.workspace }}/release-key.jks
+          STORE_PASSWORD: play2win123
+          KEY_PASSWORD: play2win123
+        run: gradle :app:assembleRelease --no-daemon
 
-      - name: Prepare Play2Win.apk
-        run: cp app/build/outputs/apk/debug/app-debug.apk Play2Win.apk
+      - name: Sign APK with v1, v2, and v3 schemes
+        run: |
+          BUILD_TOOLS_DIR=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -n 1)
+          "$BUILD_TOOLS_DIR/apksigner" sign \
+            --ks release-key.jks \
+            --ks-key-alias upload \
+            --ks-pass pass:play2win123 \
+            --key-pass pass:play2win123 \
+            --v1-signing-enabled true \
+            --v2-signing-enabled true \
+            --v3-signing-enabled true \
+            --out Play2Win.apk \
+            app/build/outputs/apk/release/app-release.apk
+          "$BUILD_TOOLS_DIR/apksigner" verify --verbose Play2Win.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
