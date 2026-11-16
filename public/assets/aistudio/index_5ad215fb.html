@@ -431,6 +431,20 @@ img{ -webkit-user-drag:none; user-drag:none; }
 .bets-pill.win{background:rgba(46,230,160,.16);color:var(--green)}
 .bets-pill.loss{background:rgba(255,93,115,.16);color:var(--red)}
 .bets-pill.live{background:rgba(255,201,77,.16);color:var(--gold-text)}
+.admin-ctrl-card{margin-top:10px;padding:12px;border-radius:14px;border:1px solid var(--line);background:var(--panel)}
+.admin-ctrl-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.admin-ctrl-head h3{margin:0;font-size:.92rem;font-weight:900}
+.admin-num-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:8px}
+.admin-num-btn{min-height:46px;border:2px solid transparent;border-radius:12px;color:#fff;font-weight:950;font-size:1.05rem;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.22);transition:transform .1s,border-color .15s,box-shadow .15s}
+.admin-num-btn.is-set{border-color:#fff;box-shadow:0 0 0 3px rgba(255,209,102,.85),0 6px 16px rgba(0,0,0,.35);transform:scale(1.04)}
+.admin-num-btn:disabled{opacity:.5;cursor:not-allowed}
+.admin-ctrl-row{display:flex;gap:8px;align-items:center;margin-top:8px}
+.admin-ctrl-row input{flex:1;min-width:0;margin:0}
+.admin-ctrl-row button{min-height:44px;padding:10px 14px;white-space:nowrap}
+.admin-ctrl-chips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:8px}
+.admin-ctrl-chips button{min-height:42px;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--ink);font-weight:850;font-size:.82rem;cursor:pointer}
+.admin-ctrl-chips button.is-set{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--onaccent);border-color:transparent}
+.admin-ctrl-chips button:disabled{opacity:.5;cursor:not-allowed}
 </style>
 
 <style id="play2win-ad-rewards-style">
@@ -749,9 +763,12 @@ img{ -webkit-user-drag:none; user-drag:none; }
         <button class="ref-banner" id="m-share" type="button" data-open-route="share" aria-label="Share app and earn 20 coins" style="margin-top:10px">
           <div>
             <b>🎁 Share App &amp; Earn 20 Coins</b>
-            <span>Dost ko app APK link bhejein — auto-download aur install par dono ko 20 Coins</span>
+            <span>Dost ko app link bhejein — friend ko login par 20 Coins, aur code apply par aapko +20 Coins</span>
           </div>
           <span style="font-size:1.3rem;font-weight:900;color:var(--gold-text)" aria-hidden="true">›</span>
+        </button>
+        <button class="menu-btn hide" id="m-ref-network" type="button" data-open-route="ref-network" aria-label="My Referral Network" style="margin-top:10px">
+          <span>📊 My Referral Network</span><span aria-hidden="true">›</span>
         </button>
       </div>
       <section id="v-add" class="hide">
@@ -786,10 +803,10 @@ img{ -webkit-user-drag:none; user-drag:none; }
       <button class="mini" data-back style="margin:12px 0 0">‹ Back to Settings</button>
       <div class="card" id="withdraw-card">
         <h2 style="margin-top:0">Withdraw Coins</h2>
-        <p class="note">Minimum withdrawal ₹100 (100 coins). Add and save your UPI ID before requesting withdrawal.</p>
+        <p class="note">Minimum withdrawal ₹300 (300 coins). Add and save your UPI ID before requesting withdrawal.</p>
         <label>UPI ID<input id="withdraw-upi" type="text" placeholder="name@upi" autocapitalize="off" autocomplete="off"></label>
         <button class="mini" id="save-withdraw-upi" type="button">Save UPI ID</button>
-        <label style="margin-top:10px">Amount (₹)<input id="withdraw-amount" type="number" min="100" step="1" value="100" inputmode="numeric"></label>
+        <label style="margin-top:10px">Amount (₹)<input id="withdraw-amount" type="number" min="300" step="1" value="300" inputmode="numeric"></label>
         <div class="err" id="withdraw-msg" role="alert"></div>
         <button class="place" id="withdraw-submit" type="button">Request Withdrawal</button>
         <h2>My Withdrawal Requests</h2><div id="my-withdrawals" class="empty">Loading...</div>
@@ -801,7 +818,7 @@ img{ -webkit-user-drag:none; user-drag:none; }
         <div class="ref-head">
           <div>
             <h2>Share App &amp; Earn 20 Coins</h2>
-            <p>Share direct APK download link · Friend installs &amp; enters code → Both get +20 Coins</p>
+            <p>Share direct APK download link · Naye user ko 20 Coins login par · Code apply karne par aapko +20 Coins</p>
           </div>
           <span class="ref-badge-icon" aria-hidden="true">🤝</span>
         </div>
@@ -823,15 +840,42 @@ img{ -webkit-user-drag:none; user-drag:none; }
           <button class="ref-copy-btn" id="ref-copy-link-btn" type="button">Copy App Link</button>
         </div>
         <div id="ref-claim-box" class="ref-claim-box">
-          <label for="ref-input-code" style="font-size:.78rem;color:var(--mute);font-weight:700">Friend ka referral code daalein (+20 Coins dono ko)</label>
+          <label for="ref-input-code" style="font-size:.78rem;color:var(--mute);font-weight:700">Friend ka referral code daalein (Referrer ko +20 Coins milenge)</label>
           <div class="ref-claim-row">
             <input id="ref-input-code" placeholder="Enter code (e.g. P2W...)" autocapitalize="characters" autocomplete="off">
-            <button id="ref-claim-btn" type="button">Claim +20</button>
+            <button id="ref-claim-btn" type="button">Apply Code</button>
           </div>
           <div class="err" id="ref-claim-err" style="margin-top:6px"></div>
         </div>
         <div id="ref-claimed-badge" class="ref-claimed-pill hide"></div>
         <div id="ref-my-history" class="empty" style="margin-top:10px"></div>
+      </section>
+      </section>
+      <section id="v-ref-network" class="hide">
+      <button class="mini" data-back style="margin:12px 0 0">‹ Back to Settings</button>
+      <section class="ref-card" id="ref-network-card" aria-label="My Referral Network">
+        <div class="ref-head">
+          <div>
+            <h2>My Referral Network</h2>
+            <p>Aapke link/code se login hue users aur unke Add Coins / Withdrawal records</p>
+          </div>
+          <span class="ref-badge-icon" aria-hidden="true">📊</span>
+        </div>
+        <div class="ref-stats-grid" style="margin-top:10px">
+          <div class="ref-stat"><span>Users Login</span><b id="refnet-total-users">0</b></div>
+          <div class="ref-stat"><span>Total Added</span><b id="refnet-total-added" style="color:var(--green)">₹0</b></div>
+          <div class="ref-stat"><span>Withdrawn</span><b id="refnet-total-withdrawn" style="color:var(--gold-text)">₹0</b></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+          <button class="mini" id="refnet-refresh-btn" type="button" style="min-height:40px">Refresh Stats</button>
+        </div>
+        <div class="err" id="refnet-err" role="alert"></div>
+        <div class="scroll" style="max-height:55vh;max-height:55dvh">
+          <table>
+            <thead><tr><th>User</th><th>Added (₹)</th><th>Withdrawn (₹)</th></tr></thead>
+            <tbody id="refnet-rows"><tr><td colspan="3" class="empty">Loading...</td></tr></tbody>
+          </table>
+        </div>
       </section>
       </section>
       <div id="settings-other">
@@ -892,7 +936,18 @@ img{ -webkit-user-drag:none; user-drag:none; }
 
       <div id="bets-pane-number">
         <div class="timer"><div><small>Round</small><b id="b-round">–</b></div><div style="text-align:right"><small>Total staked</small><div class="clock" id="b-total" style="font-size:1.5rem">0</div></div></div>
-        <p class="note" style="margin-top:8px">Live bets for the current round. Results are generated randomly by the server and are never affected by bets.</p>
+        <p class="note" style="margin-top:8px">Live bets for the current round. Random by default; Admin can lock a winning number for the active round only.</p>
+        <div class="admin-ctrl-card" id="b-admin-ctrl">
+          <div class="admin-ctrl-head">
+            <h3>Admin Result Control (This Round Only)</h3>
+            <span class="bets-pill live" id="b-ctrl-badge">Random</span>
+          </div>
+          <div class="note" id="b-ctrl-status">Is round ke liye winning number (0–9) select karein. Next round automatic random rahega.</div>
+          <div class="admin-num-grid" id="b-ctrl-nums" role="group" aria-label="Select winning number 0 to 9"></div>
+          <div style="display:flex;justify-content:flex-end;margin-top:8px">
+            <button type="button" class="mini" id="b-ctrl-clear" style="min-height:44px">Reset to Random</button>
+          </div>
+        </div>
         <h2 style="margin-top:8px">Bets by option</h2>
         <div class="scroll" style="max-height:40vh;max-height:40dvh"><table><thead><tr><th>Option</th><th>Players</th><th>Coins</th></tr></thead><tbody id="b-opts"></tbody></table></div>
         <h2>Bets in this round</h2>
@@ -914,7 +969,27 @@ img{ -webkit-user-drag:none; user-drag:none; }
 
       <div id="bets-pane-aviator" class="hide">
         <div class="timer"><div><small>Aviator Round</small><b id="ab-round">–</b> <span class="bets-pill live" id="ab-phase">–</span></div><div style="text-align:right"><small>Current round staked</small><div class="clock" id="ab-total" style="font-size:1.5rem">0</div></div></div>
-        <p class="note" style="margin-top:8px">Crash rule: Any bet ≥ 300 Coins → crashes at 1.10x · Other rounds → random (1.00x–50.00x).</p>
+        <p class="note" style="margin-top:8px">Crash rules: Bet ≥300 → 1.00x–1.10x · Coins bet → mostly fast crash (rare 5x–10x) · No bet → random mix (10x–25x only when no bets).</p>
+        <div class="admin-ctrl-card" id="ab-admin-ctrl">
+          <div class="admin-ctrl-head">
+            <h3>Admin Crash Control (This Round Only)</h3>
+            <span class="bets-pill live" id="ab-ctrl-badge">Auto</span>
+          </div>
+          <div class="note" id="ab-ctrl-status">Betting phase me crash multiplier set karein (1.00x–100.00x). Sirf is round me wahi multiplier aayega.</div>
+          <div class="admin-ctrl-row">
+            <input id="ab-ctrl-mult" type="number" min="1.00" max="100.00" step="0.05" value="2.00" inputmode="decimal" aria-label="Admin crash multiplier">
+            <button type="button" class="mini" id="ab-ctrl-set" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--onaccent);font-weight:950">Set Crash</button>
+            <button type="button" class="mini" id="ab-ctrl-clear">Clear</button>
+          </div>
+          <div class="admin-ctrl-chips" id="ab-ctrl-chips" role="group" aria-label="Quick crash multiplier presets">
+            <button type="button" data-av-preset="1.10">1.10x</button>
+            <button type="button" data-av-preset="1.50">1.50x</button>
+            <button type="button" data-av-preset="2.00">2.00x</button>
+            <button type="button" data-av-preset="5.00">5.00x</button>
+            <button type="button" data-av-preset="10.00">10.00x</button>
+            <button type="button" data-av-preset="25.00">25.00x</button>
+          </div>
+        </div>
         <h2 style="margin-top:8px">Bets in current round</h2>
         <div class="scroll" style="max-height:32vh;max-height:32dvh"><table><thead><tr><th>User</th><th>Bet</th><th>Auto</th><th>Cash Out</th><th>Status</th></tr></thead><tbody id="ab-cur"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody></table></div>
         <h2>Recent Aviator bets</h2>
@@ -967,7 +1042,7 @@ img{ -webkit-user-drag:none; user-drag:none; }
         <div class="scroll" style="max-height:45vh;max-height:45dvh"><table><thead><tr><th>Time</th><th>User</th><th>UPI ID</th><th>Amount</th><th>Status / Action</th></tr></thead><tbody id="withdraw-requests"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody></table></div>
       </div>
       <div class="card" id="admin-referrals-card">
-        <div class="srow"><h2 style="margin-top:0">Refer &amp; Earn Analytics</h2><span class="bal" id="admin-ref-badge">20 Coins / Refer</span></div>
+        <div class="srow"><h2 style="margin-top:0">Refer &amp; Earn Analytics</h2><span class="bal" id="admin-ref-badge">20 Coins / Referrer</span></div>
         <p class="note">Yahan direct App / APK auto-download link (.apk file, GitHub Release, ya Google Drive file link) set karein. Website link set na karein.</p>
         <label>App / APK Auto-Download Link
           <input id="admin-ref-download-url" type="url" placeholder="https://github.com/user/repo/releases/latest/download/Play2Win.apk" autocapitalize="off" autocomplete="off">
@@ -979,10 +1054,10 @@ img{ -webkit-user-drag:none; user-drag:none; }
           <div class="ref-stat"><span>Total Installs</span><b id="admin-ref-total-refers">0</b></div>
           <div class="ref-stat"><span>Coins Earned</span><b id="admin-ref-total-coins">0</b></div>
         </div>
-        <div style="font-weight:700;margin:12px 0 8px">Shares &amp; Earnings by User</div>
+        <div style="font-weight:700;margin:12px 0 8px">Users, Referrals &amp; Network Tab Right</div>
         <div class="scroll" style="max-height:38vh;max-height:38dvh">
-          <table><thead><tr><th>User</th><th>Code</th><th>Shares</th><th>Installs</th><th>Earned</th></tr></thead>
-          <tbody id="admin-ref-users"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody></table>
+          <table><thead><tr><th>User</th><th>Code</th><th>Shares</th><th>Installs</th><th>Earned</th><th>Network Tab</th></tr></thead>
+          <tbody id="admin-ref-users"><tr><td colspan="6" class="empty">Loading...</td></tr></tbody></table>
         </div>
         <div style="font-weight:700;margin:14px 0 8px">Recent Referrals</div>
         <div class="scroll" style="max-height:35vh;max-height:35dvh">
@@ -1481,6 +1556,7 @@ img{ -webkit-user-drag:none; user-drag:none; }
   var loggingOut=false;
   function clearLocalLogin(silent){
     S.token=null;S.id=null;S.role=null;S.balance=0;S.displayName=null;S.email=null;
+    if($('m-ref-network'))$('m-ref-network').classList.add('hide');
     try{
       ['np_token','np_id','np_display_name','np_email'].forEach(function(k){localStorage.removeItem(k)});
       if(silent)sessionStorage.setItem('np_msg','Session expired. Please log in again.');
@@ -1543,15 +1619,16 @@ img{ -webkit-user-drag:none; user-drag:none; }
     $('gear').classList.remove('hide');
     if(!$('nav').children.length)buildNav();
     if(r==='logout'){logout();return}
-    if(isAdmin()&&(r==='play'||r==='mine'||r==='add'||r==='withdraw'||r==='rewards'||r==='goldball'||r==='aviator'||r==='share'))r='admin';
+    if(isAdmin()&&(r==='play'||r==='mine'||r==='add'||r==='withdraw'||r==='rewards'||r==='goldball'||r==='aviator'||r==='share'||r==='ref-network'))r='admin';
     if(!isAdmin()&&(r==='admin'||r==='bets'))r='play';
-    var mainRoute=(r==='add'||r==='withdraw'||r==='share')?'settings':r;
+    var mainRoute=(r==='add'||r==='withdraw'||r==='share'||r==='ref-network')?'settings':r;
     ['home','rewards','goldball','aviator','play','results','mine','admin','bets','settings','tx','pw'].forEach(function(k){$('v-'+k).classList.toggle('hide',k!==mainRoute)});
     $('v-add').classList.toggle('hide',r!=='add');
     $('v-withdraw').classList.toggle('hide',r!=='withdraw');
     if($('v-share'))$('v-share').classList.toggle('hide',r!=='share');
+    if($('v-ref-network'))$('v-ref-network').classList.toggle('hide',r!=='ref-network');
     clearPlayOnlyEffects();
-    var inSettingsSub=(r==='add'||r==='withdraw'||r==='share');
+    var inSettingsSub=(r==='add'||r==='withdraw'||r==='share'||r==='ref-network');
     ['settings-profile','settings-wallet-links','settings-other'].forEach(function(id){$(id).classList.toggle('hide',inSettingsSub)});
     document.querySelectorAll('#nav a').forEach(function(a){a.classList.toggle('on',a.dataset.r===r)});
     if(r==='rewards'){loadDailyRewards();}
@@ -1560,6 +1637,7 @@ img{ -webkit-user-drag:none; user-drag:none; }
     if(r==='bets')loadBets();
     if(r==='settings'){renderSettings();if(!isAdmin()&&window.Play2WinLoadReferrals)window.Play2WinLoadReferrals();}
     if(r==='share'){if(window.Play2WinLoadReferrals)window.Play2WinLoadReferrals();}
+    if(r==='ref-network'){if(window.Play2WinLoadReferralNetwork)window.Play2WinLoadReferralNetwork();}
     if(r==='add'){loadMyDeposits();}
     if(r==='withdraw'){loadMyWithdrawals();}
     if(r==='tx'){if(isAdmin())fillTxUsers().then(loadTx);else loadTx()}
@@ -1747,8 +1825,18 @@ img{ -webkit-user-drag:none; user-drag:none; }
 
   // ---- admin ----
   function loadUsers(){
-    api('admin_list_users',{p_token:S.token}).then(function(us){S.users=us;
-      $('users').innerHTML=us.length?us.map(function(u){var who=u.email||u.display_name||u.id;return '<tr><td>'+esc(who)+'</td><td>'+esc(u.phone||'–')+'</td><td>'+u.balance+'</td><td><button class="mini" data-add="'+esc(u.id)+'">Add</button> <button class="mini" data-sub="'+esc(u.id)+'">Deduct</button> <button class="mini" data-ph="'+esc(u.id)+'">Phone</button> <button class="mini" data-rp="'+esc(u.id)+'">Reset password</button> <button class="mini" data-del="'+esc(u.id)+'">Delete</button></td></tr>'}).join(''):'<tr><td colspan="4" class="empty">No users yet. Create one above.</td></tr>';
+    Promise.all([
+      api('admin_list_users',{p_token:S.token}),
+      api('admin_list_referral_access',{p_token:S.token}).catch(function(){return {}})
+    ]).then(function(res){
+      var us=res[0]||[], accessMap=res[1]||{};
+      S.users=us;
+      $('users').innerHTML=us.length?us.map(function(u){
+        var who=u.email||u.display_name||u.id;
+        var hasNet=!!accessMap[u.id];
+        var netBtn='<button class="mini" data-refnet="'+esc(u.id)+'" data-refnet-on="'+(hasNet?'1':'0')+'" style="'+(hasNet?'background:rgba(46,230,160,.16);color:var(--green);border-color:rgba(46,230,160,.45)':'')+'">'+(hasNet?'✓ Network Tab':'Give Network')+'</button>';
+        return '<tr><td>'+esc(who)+'</td><td>'+esc(u.phone||'–')+'</td><td>'+u.balance+'</td><td><button class="mini" data-add="'+esc(u.id)+'">Add</button> <button class="mini" data-sub="'+esc(u.id)+'">Deduct</button> <button class="mini" data-ph="'+esc(u.id)+'">Phone</button> '+netBtn+' <button class="mini" data-rp="'+esc(u.id)+'">Reset password</button> <button class="mini" data-del="'+esc(u.id)+'">Delete</button></td></tr>';
+      }).join(''):'<tr><td colspan="4" class="empty">No users yet. Create one above.</td></tr>';
     }).catch(function(e){toast(e.message)});
   }
   $('n-go').onclick=function(){
@@ -1764,9 +1852,17 @@ img{ -webkit-user-drag:none; user-drag:none; }
       .catch(function(x){e.textContent=x.message});
   };
   $('users').addEventListener('click',function(e){
-    var a=e.target.dataset.add,sb=e.target.dataset.sub,d=e.target.dataset.del,ph=e.target.dataset.ph,rp=e.target.dataset.rp;
+    var a=e.target.dataset.add,sb=e.target.dataset.sub,d=e.target.dataset.del,ph=e.target.dataset.ph,rp=e.target.dataset.rp,rn=e.target.dataset.refnet;
     if(a){var v=parseInt(prompt('Coins to add to '+a+':','100'),10);if(v>0)api('admin_add_coins',{p_token:S.token,p_id:a,p_amount:v}).then(function(){toast('Added '+v+' coins to '+a);loadUsers()}).catch(function(x){toast(x.message)})}
     if(ph){var p=prompt('New phone number for '+ph+':');if(p)api('admin_set_phone',{p_token:S.token,p_id:ph,p_phone:p.trim()}).then(function(){toast('Phone updated for '+ph);loadUsers()}).catch(function(x){toast(x.message)})}
+    if(rn){
+      var nextOn=e.target.dataset.refnetOn!=='1';
+      api('admin_set_referral_network_access',{p_token:S.token,p_user_id:rn,p_enabled:nextOn}).then(function(){
+        toast(nextOn?'Referral Network tab enabled for '+rn:'Referral Network tab disabled for '+rn);
+        loadUsers();
+        if(window.Play2WinLoadAdminReferrals)window.Play2WinLoadAdminReferrals();
+      }).catch(function(x){toast(x.message)});
+    }
     if(rp){var np=prompt('New password for '+rp+' (min 6 characters):');if(np)api('admin_set_password',{p_token:S.token,p_id:rp,p_new:np}).then(function(){toast('Password reset for '+rp+'. The user must log in again.')}).catch(function(x){toast(x.message)})}
     if(sb){var w=parseInt(prompt('Coins to deduct from '+sb+':','100'),10);if(w>0)api('admin_add_coins',{p_token:S.token,p_id:sb,p_amount:-w}).then(function(){toast('Deducted '+w+' coins from '+sb);loadUsers()}).catch(function(x){toast(x.message)})}
     if(d&&confirm('Delete user '+d+'? This cannot be undone.'))api('admin_delete_user',{p_token:S.token,p_id:d}).then(loadUsers).catch(function(x){toast(x.message)});
@@ -1780,7 +1876,7 @@ img{ -webkit-user-drag:none; user-drag:none; }
   };
   $('withdraw-submit').onclick=function(){
     var a=Number($('withdraw-amount').value),m=$('withdraw-msg');m.style.color='var(--red)';m.textContent='';
-    if(!Number.isSafeInteger(a)||a<100){m.textContent='Minimum withdrawal ₹100 hai.';return}
+    if(!Number.isSafeInteger(a)||a<300){m.textContent='Minimum withdrawal ₹300 hai.';return}
     if(a>S.balance){m.textContent='Wallet mein itne coins nahi hain.';return}
     api('create_withdrawal_request',{p_token:S.token,p_amount:a}).then(function(){m.style.color='var(--green)';m.textContent='Withdrawal request submitted. Coins are reserved until admin review.';return Promise.all([refresh(),loadMyWithdrawals()]);}).catch(function(e){m.textContent=e.message});
   };
@@ -1842,8 +1938,173 @@ img{ -webkit-user-drag:none; user-drag:none; }
       if(btn)setBetTab(btn.dataset.betsTab);
     });
   }
+  var currentNumberRound=null, currentNumberOverride=null, numberCtrlBusy=false;
+  var currentAviatorRoundId=null, currentAviatorPhase='', currentAviatorOverride=null, aviatorCtrlBusy=false;
+
+  (function initAdminNumGrid(){
+    var g=$('b-ctrl-nums');
+    if(!g)return;
+    for(var n=0;n<10;n++){
+      (function(num){
+        var cs=colorsOf(num),btn=document.createElement('button');
+        btn.type='button';
+        btn.className='admin-num-btn';
+        btn.textContent=num;
+        btn.dataset.adminNum=String(num);
+        btn.setAttribute('aria-label','Set winning number '+num);
+        btn.style.background=cs.length>1?'linear-gradient(135deg,'+COLORS[cs[0]]+' 50%,'+COLORS[cs[1]]+' 50%)':COLORS[cs[0]];
+        g.appendChild(btn);
+      })(n);
+    }
+  })();
+
+  function renderNumberCtrl(){
+    var badge=$('b-ctrl-badge'),status=$('b-ctrl-status'),clr=$('b-ctrl-clear');
+    if(!badge||!status)return;
+    var hasRound=!!currentNumberRound;
+    var hasOverride=currentNumberOverride!==null&&currentNumberOverride!==undefined;
+    badge.textContent=hasOverride?('Set: '+currentNumberOverride):'Random';
+    badge.className='bets-pill '+(hasOverride?'win':'live');
+    status.textContent=!hasRound
+      ?'Waiting for active round...'
+      :(hasOverride
+        ?('Round '+rl(currentNumberRound)+' me Number '+currentNumberOverride+' open hoga. Next round automatic random rahega.')
+        :('Round '+rl(currentNumberRound)+' ke liye number (0–9) select karein. Next round automatic random rahega.'));
+    document.querySelectorAll('#b-ctrl-nums [data-admin-num]').forEach(function(btn){
+      var val=Number(btn.dataset.adminNum);
+      btn.classList.toggle('is-set',hasOverride&&val===Number(currentNumberOverride));
+      btn.disabled=numberCtrlBusy||!hasRound;
+    });
+    if(clr)clr.disabled=numberCtrlBusy||!hasRound||!hasOverride;
+  }
+
+  function syncNumberOverrideForRound(roundId){
+    if(!roundId||!S.token||!isAdmin())return;
+    api('admin_get_number_override',{p_token:S.token,p_round_id:String(roundId)}).then(function(res){
+      if(String(currentNumberRound)!==String(roundId))return;
+      currentNumberOverride=(res&&res.forced_num!==null&&res.forced_num!==undefined)?Number(res.forced_num):null;
+      renderNumberCtrl();
+    }).catch(function(){});
+  }
+
+  function setNumberOverride(num){
+    if(numberCtrlBusy||!currentNumberRound)return;
+    var targetRound=String(currentNumberRound);
+    numberCtrlBusy=true;
+    renderNumberCtrl();
+    api('admin_set_number_result',{p_token:S.token,p_round_id:targetRound,p_num:num}).then(function(res){
+      if(String(currentNumberRound)===targetRound){
+        currentNumberOverride=(res&&res.forced_num!==null&&res.forced_num!==undefined)?Number(res.forced_num):null;
+      }
+      toast(num===null?('Round '+rl(targetRound)+' reset to Random'):('Round '+rl(targetRound)+' ke liye Number '+num+' set ho gaya'));
+    }).catch(function(e){
+      toast(e.message||'Run supabase_admin_controls.sql in Supabase first.');
+    }).finally(function(){
+      numberCtrlBusy=false;
+      renderNumberCtrl();
+    });
+  }
+
+  if($('b-ctrl-nums')){
+    $('b-ctrl-nums').addEventListener('click',function(e){
+      var btn=e.target.closest('[data-admin-num]');
+      if(!btn)return;
+      setNumberOverride(Number(btn.dataset.adminNum));
+    });
+  }
+  if($('b-ctrl-clear')){
+    $('b-ctrl-clear').addEventListener('click',function(){
+      setNumberOverride(null);
+    });
+  }
+
+  function renderAviatorCtrl(){
+    var badge=$('ab-ctrl-badge'),status=$('ab-ctrl-status'),inp=$('ab-ctrl-mult'),setBtn=$('ab-ctrl-set'),clrBtn=$('ab-ctrl-clear');
+    if(!badge||!status)return;
+    var isBetting=currentAviatorPhase==='BETTING'&&!!currentAviatorRoundId;
+    var hasOverride=currentAviatorOverride!==null&&currentAviatorOverride!==undefined;
+    badge.textContent=hasOverride?('Set: '+Number(currentAviatorOverride).toFixed(2)+'x'):'Auto';
+    badge.className='bets-pill '+(hasOverride?'win':'live');
+    status.textContent=!currentAviatorRoundId
+      ?'Loading active Aviator round...'
+      :(isBetting
+        ?(hasOverride
+          ?('Round #'+currentAviatorRoundId+' me plane '+Number(currentAviatorOverride).toFixed(2)+'x par crash hoga. Next round normal rules chalega.')
+          :('Round #'+currentAviatorRoundId+' betting open hai. Exact crash multiplier (1.00x–100.00x) set karein.'))
+        :('Round #'+currentAviatorRoundId+' takeoff ho chuka ('+currentAviatorPhase+'). Agle round ke BETTING phase me set karein.'));
+    if(inp){
+      inp.disabled=aviatorCtrlBusy||!isBetting;
+      if(hasOverride&&document.activeElement!==inp){
+        inp.value=Number(currentAviatorOverride).toFixed(2);
+      }
+    }
+    if(setBtn)setBtn.disabled=aviatorCtrlBusy||!isBetting;
+    if(clrBtn)clrBtn.disabled=aviatorCtrlBusy||!isBetting||!hasOverride;
+    document.querySelectorAll('#ab-ctrl-chips [data-av-preset]').forEach(function(btn){
+      var p=Number(btn.dataset.avPreset);
+      btn.classList.toggle('is-set',hasOverride&&Math.abs(Number(currentAviatorOverride)-p)<0.005);
+      btn.disabled=aviatorCtrlBusy||!isBetting;
+    });
+  }
+
+  function setAviatorCrashOverride(val){
+    if(aviatorCtrlBusy||!currentAviatorRoundId)return;
+    if(val!==null){
+      if(!Number.isFinite(val)||val<1||val>100){
+        toast('Multiplier 1.00x se 100.00x ke beech hona chahiye.');
+        return;
+      }
+      val=Math.round(val*100)/100;
+    }
+    var targetRoundId=currentAviatorRoundId;
+    aviatorCtrlBusy=true;
+    renderAviatorCtrl();
+    api('admin_set_aviator_crash',{p_token:S.token,p_round_id:Number(targetRoundId),p_crash_point:val}).then(function(res){
+      currentAviatorOverride=(res&&res.admin_crash_point!==null&&res.admin_crash_point!==undefined)?Number(res.admin_crash_point):null;
+      toast(val===null?('Aviator round #'+targetRoundId+' crash override cleared'):('Aviator round #'+targetRoundId+' set to '+val.toFixed(2)+'x'));
+      loadAviatorBets();
+    }).catch(function(e){
+      toast(e.message||'Could not update crash point.');
+      loadAviatorBets();
+    }).finally(function(){
+      aviatorCtrlBusy=false;
+      renderAviatorCtrl();
+    });
+  }
+
+  if($('ab-ctrl-set')){
+    $('ab-ctrl-set').addEventListener('click',function(){
+      var raw=Number($('ab-ctrl-mult')?$('ab-ctrl-mult').value:0);
+      setAviatorCrashOverride(raw);
+    });
+  }
+  if($('ab-ctrl-clear')){
+    $('ab-ctrl-clear').addEventListener('click',function(){
+      setAviatorCrashOverride(null);
+    });
+  }
+  if($('ab-ctrl-chips')){
+    $('ab-ctrl-chips').addEventListener('click',function(e){
+      var btn=e.target.closest('[data-av-preset]');
+      if(!btn)return;
+      var v=Number(btn.dataset.avPreset);
+      if($('ab-ctrl-mult'))$('ab-ctrl-mult').value=v.toFixed(2);
+      setAviatorCrashOverride(v);
+    });
+  }
+
   function loadNumberBets(){
     api('admin_bets',{p_token:S.token}).then(function(d){
+      var nextRound=(d&&d.round!==undefined&&d.round!==null)?String(d.round):null;
+      var roundChanged=nextRound!==currentNumberRound;
+      currentNumberRound=nextRound;
+      if(roundChanged){
+        currentNumberOverride=null;
+        renderNumberCtrl();
+        syncNumberOverrideForRound(nextRound);
+      }else{
+        syncNumberOverrideForRound(nextRound);
+      }
       $('b-round').textContent=rl(d.round);
       var agg={},total=0;OPTS.forEach(function(o){agg[o]={n:{},c:0}});
       d.current.forEach(function(b){var a=agg[b.target];if(!a)return;a.n[b.user_id]=1;a.c+=b.amount;total+=b.amount});
@@ -1881,6 +2142,10 @@ img{ -webkit-user-drag:none; user-drag:none; }
     api('admin_aviator_bets',{p_token:S.token}).then(function(d){
       $('ab-round').textContent=d&&d.round_id?'#'+d.round_id:'–';
       var phase=(d&&d.phase)?String(d.phase).toUpperCase():'–';
+      currentAviatorRoundId=d&&d.round_id?Number(d.round_id):null;
+      currentAviatorPhase=phase;
+      currentAviatorOverride=(d&&d.admin_crash_point!==null&&d.admin_crash_point!==undefined)?Number(d.admin_crash_point):null;
+      renderAviatorCtrl();
       var phEl=$('ab-phase');
       if(phEl){
         phEl.textContent=phase+(d&&d.crash_point&&phase==='CRASHED'?' @ '+Number(d.crash_point).toFixed(2)+'x':'');
@@ -2420,7 +2685,7 @@ img{ -webkit-user-drag:none; user-drag:none; }
     var banner=$('auth-ref-banner'),code=getPendingRef();
     if(!banner)return;
     if(code){
-      banner.textContent='🎁 Referral Code Applied: '+code+' — Log in karein aur dono ko 20 Bonus Coins milenge!';
+      banner.textContent='🎁 Referral Code Applied: '+code+' — Naye account ke login par aapko 20 Welcome Coins aur referrer ko +20 Coins milenge!';
       banner.classList.remove('hide');
     }else{
       banner.classList.add('hide');
@@ -2510,6 +2775,10 @@ img{ -webkit-user-drag:none; user-drag:none; }
     if($('ref-stat-shares'))$('ref-stat-shares').textContent=Number(info.total_shares||0);
     if($('ref-stat-refers'))$('ref-stat-refers').textContent=Number(info.total_referrals||0);
     if($('ref-stat-earned'))$('ref-stat-earned').textContent=Number(info.total_earned||0)+' 🪙';
+    var ss=bridge.getSession();
+    var canViewNet=!!(info&&info.can_view_network)&&ss&&ss.role!=='admin';
+    if($('m-ref-network'))$('m-ref-network').classList.toggle('hide',!canViewNet);
+    if(!canViewNet&&location.hash==='#/ref-network')location.hash='#/settings';
     var warn=$('ref-link-warn');
     if(warn){
       warn.textContent=resolveAppDownloadUrl(info)?'':'App auto-download (.apk) link abhi Admin dwara set nahi hua hai. Admin → Refer & Earn Analytics mein APK link save karein.';
@@ -2518,7 +2787,7 @@ img{ -webkit-user-drag:none; user-drag:none; }
     if(info.referral_rewarded){
       if(claimBox)claimBox.classList.add('hide');
       if(claimedBadge){
-        claimedBadge.textContent='✓ Referral bonus claimed'+(info.referred_code_used?' ('+info.referred_code_used+' · +20 Coins)':'');
+        claimedBadge.textContent='✓ Referral code applied'+(info.referred_code_used?' ('+info.referred_code_used+' · Referrer +20 Coins)':'');
         claimedBadge.classList.remove('hide');
       }
       clearPendingRef();
@@ -2548,16 +2817,49 @@ img{ -webkit-user-drag:none; user-drag:none; }
 
   function loadReferrals(){
     var ss=bridge.getSession();
-    if(!ss||!ss.token||ss.role==='admin')return Promise.resolve();
+    if(!ss||!ss.token||ss.role==='admin'){
+      if($('m-ref-network'))$('m-ref-network').classList.add('hide');
+      return Promise.resolve();
+    }
     return bridge.api('get_referral_info',{p_token:ss.token}).then(function(info){
       renderReferralInfo(info);
       return info;
     }).catch(function(e){
+      if($('m-ref-network'))$('m-ref-network').classList.add('hide');
       if($('ref-my-code'))$('ref-my-code').textContent='Setup pending';
       if($('ref-my-history'))$('ref-my-history').textContent=friendlyRefErr(e,'Referral system unavailable.');
     });
   }
   window.Play2WinLoadReferrals=loadReferrals;
+
+  function loadReferralNetwork(){
+    var ss=bridge.getSession();
+    if(!ss||!ss.token||ss.role==='admin')return Promise.resolve();
+    var errEl=$('refnet-err'), tbody=$('refnet-rows');
+    if(errEl)errEl.textContent='';
+    if(tbody)tbody.innerHTML='<tr><td colspan="3" class="empty">Loading...</td></tr>';
+    return bridge.api('get_my_referral_network_stats',{p_token:ss.token}).then(function(d){
+      if($('refnet-total-users'))$('refnet-total-users').textContent=Number(d&&d.total_users||0);
+      if($('refnet-total-added'))$('refnet-total-added').textContent='₹'+Number(d&&d.total_added||0).toLocaleString('en-IN');
+      if($('refnet-total-withdrawn'))$('refnet-total-withdrawn').textContent='₹'+Number(d&&d.total_withdrawn||0).toLocaleString('en-IN');
+      var users=Array.isArray(d&&d.users)?d.users:[];
+      if(tbody){
+        tbody.innerHTML=users.length?users.map(function(u){
+          var addAmt=Number(u.added_amount||0), addPend=Number(u.added_pending||0);
+          var wdrAmt=Number(u.withdrawn_amount||0), wdrPend=Number(u.withdrawn_pending||0);
+          var addHtml='<b style="color:var(--green)">₹'+addAmt.toLocaleString('en-IN')+'</b>'+(addPend>0?'<div style="font-size:.68rem;color:var(--mute)">Pending ₹'+addPend.toLocaleString('en-IN')+'</div>':'');
+          var wdrHtml='<b>₹'+wdrAmt.toLocaleString('en-IN')+'</b>'+(wdrPend>0?'<div style="font-size:.68rem;color:var(--mute)">Pending ₹'+wdrPend.toLocaleString('en-IN')+'</div>':'');
+          return '<tr><td><div><b>'+bridge.esc(u.user_label||u.user_id||'User')+'</b></div><div style="font-size:.68rem;color:var(--mute)">'+bridge.fmtTime(u.joined_at)+'</div></td><td>'+addHtml+'</td><td>'+wdrHtml+'</td></tr>';
+        }).join(''):'<tr><td colspan="3" class="empty">Aapki link se abhi tak koi user login nahi hua hai.</td></tr>';
+      }
+    }).catch(function(e){
+      var msg=friendlyRefErr(e,'Access denied: Admin permission required.');
+      if(errEl)errEl.textContent=msg;
+      if(tbody)tbody.innerHTML='<tr><td colspan="3" class="empty">'+bridge.esc(msg)+'</td></tr>';
+    });
+  }
+  window.Play2WinLoadReferralNetwork=loadReferralNetwork;
+  if($('refnet-refresh-btn'))$('refnet-refresh-btn').onclick=loadReferralNetwork;
 
   function claimCode(rawCode,silent){
     var ss=bridge.getSession();
@@ -2571,7 +2873,7 @@ img{ -webkit-user-drag:none; user-drag:none; }
     bridge.api('claim_referral_code',{p_token:ss.token,p_code:code}).then(function(res){
       clearPendingRef();
       if($('ref-input-code'))$('ref-input-code').value='';
-      bridge.toast('🎉 Mubarak ho! Dono ke wallet mein +'+(res.reward||20)+' Coins add ho gaye!');
+      bridge.toast('🎉 Referral code apply ho gaya! Referrer ko +'+(res.reward||20)+' Coins credit ho gaye!');
       return Promise.all([bridge.refresh(),loadReferrals()]);
     }).catch(function(e){
       if(!silent&&err)err.textContent=friendlyRefErr(e,'Referral code apply nahi ho saka.');
@@ -2583,7 +2885,10 @@ img{ -webkit-user-drag:none; user-drag:none; }
 
   function tryAutoClaimPendingRef(){
     var pending=getPendingRef();
-    if(!pending)return;
+    if(!pending){
+      loadReferrals();
+      return;
+    }
     loadReferrals().then(function(info){
       if(info&&!info.referral_rewarded&&info.referral_code!==pending){
         claimCode(pending,true);
@@ -2622,7 +2927,7 @@ img{ -webkit-user-drag:none; user-drag:none; }
         bridge.toast('App APK auto-download link abhi set nahi hai. Admin panel mein .apk link save karein.');
         return;
       }
-      var shareMsg='Play2Win Android App download karein (Auto-Download): '+appLink+'\n\nApp open karke Settings → Share App mein mera referral code '+code+' daalein — dono ko 20 Bonus Coins milenge!';
+      var shareMsg='Play2Win Android App download karein (Auto-Download): '+appLink+'\n\nNaye account par login karte hi aapko 20 Bonus Coins milenge! App open karke Settings → Share App mein mera referral code '+code+' apply karein.';
       if(window.Play2WinNative&&window.Play2WinNative.shareText){
         window.Play2WinNative.shareText('Play2Win App · Earn 20 Coins',shareMsg);
       }else if(navigator.share){
@@ -2653,20 +2958,41 @@ img{ -webkit-user-drag:none; user-drag:none; }
       var users=d.users||[];
       if($('admin-ref-users')){
         $('admin-ref-users').innerHTML=users.length?users.map(function(u){
-          return '<tr><td>'+bridge.esc(u.user_label||u.user_id)+'</td><td><b>'+bridge.esc(u.referral_code||'')+'</b></td><td>'+Number(u.total_shares||0)+'</td><td>'+Number(u.total_referrals||0)+'</td><td style="color:var(--green)"><b>'+Number(u.total_earned||0)+'</b></td></tr>';
-        }).join(''):'<tr><td colspan="5" class="empty">Abhi tak kisi user ne share nahi kiya hai.</td></tr>';
+          var hasNet=!!u.can_view_network;
+          var toggleBtn='<button type="button" class="mini" data-refnet-uid="'+bridge.esc(u.user_id)+'" data-refnet-next="'+(hasNet?'0':'1')+'" style="'+(hasNet?'background:rgba(46,230,160,.16);color:var(--green);border-color:rgba(46,230,160,.45)':'')+'">'+(hasNet?'✓ Allowed':'Grant Right')+'</button>';
+          return '<tr><td>'+bridge.esc(u.user_label||u.user_id)+'</td><td><b>'+bridge.esc(u.referral_code||'—')+'</b></td><td>'+Number(u.total_shares||0)+'</td><td>'+Number(u.total_referrals||0)+'</td><td style="color:var(--green)"><b>'+Number(u.total_earned||0)+'</b></td><td>'+toggleBtn+'</td></tr>';
+        }).join(''):'<tr><td colspan="6" class="empty">Abhi tak koi user nahi hai.</td></tr>';
       }
       var recent=d.recent||[];
       if($('admin-ref-recent')){
         $('admin-ref-recent').innerHTML=recent.length?recent.map(function(r){
-          return '<tr><td>'+bridge.fmtTime(r.created_at)+'</td><td>'+bridge.esc(r.referrer_label)+'</td><td>'+bridge.esc(r.referred_label)+'</td><td style="color:var(--green)">+'+Number(r.referrer_coins||20)+' / +'+Number(r.referred_coins||20)+'</td></tr>';
+          var bonusText='Referrer +'+Number(r.referrer_coins||20)+(Number(r.referred_coins||0)>0?' / User +'+Number(r.referred_coins):'');
+          return '<tr><td>'+bridge.fmtTime(r.created_at)+'</td><td>'+bridge.esc(r.referrer_label)+'</td><td>'+bridge.esc(r.referred_label)+'</td><td style="color:var(--green)">'+bonusText+'</td></tr>';
         }).join(''):'<tr><td colspan="4" class="empty">Abhi tak koi referral claim nahi hua hai.</td></tr>';
       }
     }).catch(function(e){
-      if($('admin-ref-users'))$('admin-ref-users').innerHTML='<tr><td colspan="5" class="empty">'+bridge.esc(friendlyRefErr(e,'Run supabase_refer_earn.sql in Supabase.'))+'</td></tr>';
+      if($('admin-ref-users'))$('admin-ref-users').innerHTML='<tr><td colspan="6" class="empty">'+bridge.esc(friendlyRefErr(e,'Run supabase_refer_earn.sql in Supabase.'))+'</td></tr>';
     });
   }
   window.Play2WinLoadAdminReferrals=loadAdminReferrals;
+  if($('admin-ref-users')){
+    $('admin-ref-users').addEventListener('click',function(e){
+      var btn=e.target.closest('[data-refnet-uid]');
+      if(!btn)return;
+      var ss=bridge.getSession();
+      if(!ss||!ss.token||ss.role!=='admin')return;
+      var uid=btn.getAttribute('data-refnet-uid');
+      var nextOn=btn.getAttribute('data-refnet-next')==='1';
+      btn.disabled=true;
+      bridge.api('admin_set_referral_network_access',{p_token:ss.token,p_user_id:uid,p_enabled:nextOn}).then(function(){
+        bridge.toast(nextOn?'Referral Network tab enabled for '+uid:'Referral Network tab disabled for '+uid);
+        loadAdminReferrals();
+      }).catch(function(err){
+        btn.disabled=false;
+        bridge.toast(friendlyRefErr(err,'Could not update access right.'));
+      });
+    });
+  }
 
   if($('admin-ref-save-url'))$('admin-ref-save-url').onclick=function(){
     var ss=bridge.getSession(),rawUrl=($('admin-ref-download-url')?$('admin-ref-download-url').value:'').trim(),msg=$('admin-ref-url-msg');

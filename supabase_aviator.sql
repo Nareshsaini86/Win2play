@@ -1,8 +1,9 @@
 -- Play2Win Aviator + Admin Multi-Game Live Bets (Supabase SQL Migration)
 -- Run this script once in your Supabase Dashboard -> SQL Editor.
--- Aviator Crash Rule:
---   * Any bet of 300 Coins or more (stake >= 300): crashes at 1.10x
---   * All other rounds (bets < 300 Coins or no bets): random crash (1.00x - 50.00x)
+-- Aviator Crash Rules (Randomized / Anti-Pattern):
+--   * Any bet >= 300 Coins: crashes fast at 1.00x - 1.10x
+--   * Bets placed (< 300 Coins): mostly crashes early (1.00x - 2.20x), low chance 5.00x - 10.00x (max 10.00x)
+--   * No coins bet (total_stake = 0): mixed unpredictable crashes, 10.00x - 25.00x ONLY possible here (~15% chance)
 -- Admin Live Bets RPCs:
 --   * admin_gold_bets(p_token): Gold Ball live/recent bets, user, amount, win/loss & payout
 --   * admin_aviator_bets(p_token): Aviator current round + recent bets, cashout & crash
@@ -15,10 +16,12 @@ create table if not exists public.aviator_global_rounds (
   crashes_at timestamptz not null,
   next_round_at timestamptz not null,
   crash_finalized boolean not null default false,
+  admin_crash_point numeric(10, 2),
   created_at timestamptz not null default clock_timestamp()
 );
 
 alter table public.aviator_global_rounds add column if not exists crash_finalized boolean not null default true;
+alter table public.aviator_global_rounds add column if not exists admin_crash_point numeric(10, 2);
 
 create table if not exists public.aviator_bets (
   id bigserial primary key,
@@ -196,9 +199,10 @@ end;
 $$;
 
 -- Synchronize & advance global Aviator rounds:
--- Finalizes crash_point right when 10s betting closes:
---   * Any bet >= 300 Coins -> crashes at 1.10x
---   * All other rounds -> random (1.00x .. 50.00x)
+-- Finalizes crash_point right when 10s betting closes (randomized per round to prevent pattern prediction):
+--   * Any bet >= 300 Coins -> crashes at 1.00x .. 1.10x
+--   * Bets placed (< 300 Coins) -> mostly early crash (1.00x..2.20x), rare 5.00x..10.00x
+--   * No coins bet -> mixed crashes, 10.00x..25.00x only possible with no bets
 create or replace function public._p2w_aviator_ensure_round(
   p_users_table text,
   p_balance_col text,
@@ -216,6 +220,7 @@ declare
   v_bet record;
   v_payout integer;
   v_r double precision;
+  v_total_stake bigint;
   v_max_stake integer;
   v_crash_point numeric(10, 2);
   v_fly_secs double precision;
@@ -233,21 +238,46 @@ begin
 
   -- Finalize crash_point as soon as betting closes for the active round
   if v_has_round and not v_round.crash_finalized and v_now >= v_round.betting_ends_at then
-    select coalesce(max(stake), 0)
-    into v_max_stake
+    select coalesce(sum(stake), 0), coalesce(max(stake), 0)
+    into v_total_stake, v_max_stake
     from public.aviator_bets
     where round_id = v_round.id;
 
-    if coalesce(v_max_stake, 0) >= 300 then
-      -- Any bet of 300 Coins or more: crash at 1.10x
-      v_crash_point := 1.10;
-    else
-      -- All other rounds (bets < 300 or no bets): random crash (1.00x .. 50.00x)
-      v_r := random();
-      if v_r < 0.04 then
+    v_r := random();
+
+    if v_round.admin_crash_point is not null then
+      -- Admin override set specifically for this round only
+      v_crash_point := least(100.00, greatest(1.00, round(v_round.admin_crash_point, 2)));
+    elsif coalesce(v_max_stake, 0) >= 300 then
+      -- Any bet >= 300 Coins: fast crash at 1.00x .. 1.10x
+      if v_r < 0.30 then
         v_crash_point := 1.00;
       else
-        v_crash_point := least(50.00, greatest(1.01, round((0.96 / greatest(0.0192, 1.0 - v_r))::numeric, 2)));
+        v_crash_point := least(1.10, greatest(1.01, round((1.01 + random() * 0.09)::numeric, 2)));
+      end if;
+    elsif coalesce(v_total_stake, 0) > 0 then
+      -- Coins bet (< 300): mostly crashes very early, rare chance of 5.00x - 10.00x (max 10.00x)
+      if v_r < 0.16 then
+        v_crash_point := 1.00;
+      elsif v_r < 0.62 then
+        v_crash_point := least(1.45, greatest(1.01, round((1.01 + random() * 0.44)::numeric, 2)));
+      elsif v_r < 0.84 then
+        v_crash_point := least(2.20, greatest(1.46, round((1.46 + random() * 0.74)::numeric, 2)));
+      elsif v_r < 0.94 then
+        v_crash_point := least(4.99, greatest(2.21, round((2.21 + random() * 2.78)::numeric, 2)));
+      else
+        v_crash_point := least(10.00, greatest(5.00, round((5.00 + random() * 5.00)::numeric, 2)));
+      end if;
+    else
+      -- No coins bet: unpredictable mix so pattern cannot be guessed; 10.00x - 25.00x only possible here
+      if v_r < 0.40 then
+        v_crash_point := least(1.99, greatest(1.00, round((1.00 + random() * 0.99)::numeric, 2)));
+      elsif v_r < 0.68 then
+        v_crash_point := least(4.99, greatest(2.00, round((2.00 + random() * 2.99)::numeric, 2)));
+      elsif v_r < 0.85 then
+        v_crash_point := least(9.99, greatest(5.00, round((5.00 + random() * 4.99)::numeric, 2)));
+      else
+        v_crash_point := least(25.00, greatest(10.00, round((10.00 + random() * 15.00)::numeric, 2)));
       end if;
     end if;
 
@@ -604,7 +634,7 @@ begin
   end if;
 
   v_elapsed := greatest(0.0, extract(epoch from (v_now - v_round.betting_ends_at)));
-  v_time_mult := least(50.00, round(exp(0.11 * least(v_elapsed + 0.25, 42.0))::numeric, 2));
+  v_time_mult := least(100.00, round(exp(0.11 * least(v_elapsed + 0.25, 45.0))::numeric, 2));
   if p_claim_mult is not null and p_claim_mult >= 1.01 then
     v_mult := least(round(p_claim_mult, 2), v_time_mult, v_round.crash_point);
   else
@@ -727,9 +757,67 @@ begin
     'round_id', v_round.id,
     'phase', v_phase,
     'crash_point', case when v_round.crash_finalized and v_phase in ('flying','crashed') then v_round.crash_point else null end,
+    'admin_crash_point', v_round.admin_crash_point,
     'total_staked', coalesce(v_total_staked, 0),
     'current', v_current,
     'recent', v_recent
+  );
+end;
+$$;
+
+-- Admin: set exact crash multiplier for one specific betting round only
+create or replace function public.admin_set_aviator_crash(
+  p_token text,
+  p_round_id bigint,
+  p_crash_point numeric default null
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_auth record;
+  v_round public.aviator_global_rounds;
+  v_val numeric(10, 2);
+begin
+  select * into v_auth from public._p2w_aviator_auth(p_token);
+  if v_auth.user_role <> 'admin' then
+    raise exception 'Admin access required.';
+  end if;
+
+  if p_crash_point is not null then
+    v_val := round(p_crash_point, 2);
+    if v_val < 1.00 or v_val > 100.00 then
+      raise exception 'Multiplier 1.00x se 100.00x ke beech hona chahiye.';
+    end if;
+  else
+    v_val := null;
+  end if;
+
+  perform public._p2w_aviator_ensure_round(v_auth.users_table, v_auth.balance_col, v_auth.coin_log_table);
+
+  select * into v_round from public.aviator_global_rounds where id = p_round_id;
+  if not found then
+    raise exception 'Round not found.';
+  end if;
+
+  if v_round.crash_finalized or clock_timestamp() >= v_round.betting_ends_at then
+    raise exception 'Is round ka takeoff ho chuka hai. Agle round ke betting phase me set karein.';
+  end if;
+
+  update public.aviator_global_rounds
+  set admin_crash_point = v_val
+  where id = p_round_id and crash_finalized = false
+  returning * into v_round;
+
+  if not found then
+    raise exception 'Is round ka takeoff ho chuka hai. Agle round ke betting phase me set karein.';
+  end if;
+
+  return jsonb_build_object(
+    'round_id', v_round.id,
+    'admin_crash_point', v_round.admin_crash_point
   );
 end;
 $$;
@@ -833,6 +921,7 @@ grant execute on function public.aviator_state(text) to anon, authenticated;
 grant execute on function public.aviator_place_bet(text, bigint, integer, numeric) to anon, authenticated;
 grant execute on function public.aviator_cashout(text, bigint, numeric) to anon, authenticated;
 grant execute on function public.admin_aviator_bets(text) to anon, authenticated;
+grant execute on function public.admin_set_aviator_crash(text, bigint, numeric) to anon, authenticated;
 grant execute on function public.admin_gold_bets(text) to anon, authenticated;
 
 notify pgrst, 'reload schema';

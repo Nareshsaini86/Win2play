@@ -67,8 +67,21 @@ class ExampleRobolectricTest {
     assertTrue(html.contains("id=\"bets-pane-aviator\""))
     assertTrue(html.contains("admin_gold_bets"))
     assertTrue(html.contains("admin_aviator_bets"))
-    assertTrue(html.contains("Any bet ≥ 300 Coins → crashes at 1.10x"))
+    assertTrue(html.contains("Coins bet → mostly fast crash (rare 5x–10x)"))
     assertFalse(html.contains("No bet → 25x–50x"))
+    assertTrue(html.contains("min=\"300\""))
+    assertTrue(html.contains("Minimum withdrawal ₹300"))
+    assertTrue(html.contains("id=\"b-admin-ctrl\""))
+    assertTrue(html.contains("id=\"ab-admin-ctrl\""))
+    assertTrue(html.contains("admin_set_number_result"))
+    assertTrue(html.contains("admin_set_aviator_crash"))
+    assertTrue(settingsSection.contains("id=\"m-ref-network\""))
+    assertTrue(settingsSection.contains("id=\"v-ref-network\""))
+    assertTrue(html.contains("get_my_referral_network_stats"))
+    assertTrue(html.contains("admin_set_referral_network_access"))
+    assertTrue(html.contains("admin_list_referral_access"))
+    assertTrue(html.contains("Referrer ko +20 Coins"))
+    assertFalse(html.contains("dono ko 20 Bonus Coins"))
   }
 
   @Test
