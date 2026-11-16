@@ -31,6 +31,7 @@ import android.widget.Toast
 import androidx.webkit.UserAgentMetadata
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
+import com.example.BuildConfig
 import com.example.R
 import java.io.IOException
 import java.util.concurrent.atomic.AtomicBoolean
@@ -99,6 +100,29 @@ class Play2WinNativeBridge(
     mainHandler.post {
       val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
       cm?.setPrimaryClip(ClipData.newPlainText(label ?: "Play2Win", value))
+    }
+  }
+
+  @JavascriptInterface
+  fun getAppVersionCode(): Int = BuildConfig.VERSION_CODE
+
+  @JavascriptInterface
+  fun getAppVersionName(): String = BuildConfig.VERSION_NAME
+
+  @JavascriptInterface
+  fun openExternalUrl(url: String?) {
+    val cleanUrl = url.orEmpty().trim()
+    if (!cleanUrl.startsWith("https://") && !cleanUrl.startsWith("http://")) return
+    mainHandler.post {
+      val viewIntent =
+        Intent(Intent.ACTION_VIEW, Uri.parse(cleanUrl)).apply {
+          if (context !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+      try {
+        context.startActivity(viewIntent)
+      } catch (_: ActivityNotFoundException) {
+        openInCustomTabOrBrowser(context, Uri.parse(cleanUrl))
+      }
     }
   }
 

@@ -84,7 +84,6 @@ label{display:block}
 .hide{display:none!important}
 #v-auth{margin-top:8vh;padding:22px}
 #v-auth h2{margin-top:0;font-size:1.25rem}
-.gear{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink);display:grid;place-items:center;padding:0}
 .srow{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .menu-btn{width:100%;display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--panel);font-weight:700;font-size:1rem;text-align:left}
 .mini{padding:7px 12px;border-radius:10px;border:1px solid var(--line);background:var(--chip);font-size:.8rem;font-weight:600}
@@ -118,7 +117,33 @@ label{display:block}
 .bal{display:flex;align-items:center;gap:7px;padding:7px 12px;min-height:38px;font-weight:900;letter-spacing:.1px;background:linear-gradient(135deg,rgba(255,201,77,.17),rgba(255,145,30,.09));border:1px solid rgba(255,201,77,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 4px 16px rgba(255,175,35,.08)}
 .bal:not(:empty)::before{content:"🪙";font-size:1.05rem;line-height:1}
 .bal:not(:empty)::after{content:"👛";font-size:1rem;line-height:1;margin-left:2px}
-.bal[data-admin="1"]::before,.bal[data-admin="1"]::after{display:none}
+.bal[data-admin="1"]::before,.bal[data-admin="1"]::after,#bal::after{display:none}
+#bal[data-admin="0"]{cursor:pointer}
+.home-section-head{margin:4px 2px 10px}
+.home-section-head h2{margin:0 0 2px;font-size:1.08rem;font-weight:950}
+.home-section-head p{margin:0;font-size:.76rem;color:var(--mute)}
+.bottom-nav{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:100%;max-width:520px;z-index:900;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:7px 10px calc(8px + env(safe-area-inset-bottom,0px));background:rgba(13,16,42,.95);border-top:1px solid var(--line);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 -10px 30px rgba(0,0,0,.38)}
+:root[data-theme="day"] .bottom-nav{background:rgba(255,255,255,.95);box-shadow:0 -8px 24px rgba(40,50,120,.12)}
+.bnav-item{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:50px;padding:6px 4px;border-radius:14px;color:var(--mute);text-decoration:none;font-size:.71rem;font-weight:800;transition:background .16s,color .16s,transform .1s}
+.bnav-item:active{transform:scale(.95)}
+.bnav-item svg{width:21px;height:21px;flex:0 0 auto}
+.bnav-item.on{color:var(--gold-text);background:linear-gradient(135deg,rgba(255,201,77,.18),rgba(255,159,28,.08));border:1px solid rgba(255,201,77,.32)}
+.bnav-item.on::before{content:"";position:absolute;top:0;left:26%;right:26%;height:3px;border-radius:0 0 4px 4px;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+body.has-bottom-nav .wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+body.has-bottom-nav .toast{bottom:calc(86px + env(safe-area-inset-bottom,0px))}
+.wallet-hero{margin-top:4px;padding:20px 18px;border-radius:22px;border:1px solid rgba(255,201,77,.46);background:radial-gradient(circle at 100% 0%,rgba(255,190,65,.22),transparent 48%),linear-gradient(145deg,rgba(124,77,255,.16),var(--panel));box-shadow:0 14px 32px var(--shadow)}
+.wallet-hero-kicker{font-size:.68rem;font-weight:900;letter-spacing:.12em;color:var(--mute);text-transform:uppercase}
+.wallet-hero-amount{margin:8px 0 4px;font-size:2.1rem;font-weight:1000;color:var(--gold-text);display:flex;align-items:center;gap:8px;font-variant-numeric:tabular-nums}
+.wallet-hero-sub{font-size:.76rem;color:var(--mute)}
+.wallet-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.wallet-act-btn{min-height:50px;padding:12px 10px;border-radius:14px;border:1px solid rgba(255,201,77,.45);font-weight:950;font-size:.94rem;display:flex;align-items:center;justify-content:center;gap:6px;transition:transform .12s}
+.wallet-act-btn:active{transform:scale(.97)}
+.wallet-act-btn.add{border:0;background:linear-gradient(135deg,#ffd45e,var(--gold2));color:var(--onaccent);box-shadow:0 8px 20px rgba(255,159,28,.28)}
+.wallet-act-btn.wdr{background:var(--panel);color:var(--ink)}
+.profile-hero{display:flex;align-items:center;gap:13px;margin-top:0}
+.profile-avatar{width:52px;height:52px;flex:0 0 52px;border-radius:16px;display:grid;place-items:center;font-size:1.35rem;font-weight:1000;color:var(--onaccent);background:linear-gradient(135deg,#ffd45e,var(--gold2));box-shadow:0 6px 16px rgba(255,159,28,.28)}
+.profile-meta{min-width:0;flex:1}
+.profile-meta b{display:block;font-size:1.08rem;overflow-wrap:anywhere}
 @media(max-width:420px){.top{margin-bottom:12px}.brand-crown{width:25px;height:25px}.top h1{font-size:1.3rem}.bal{font-size:.88rem;padding:6px 9px;gap:5px}}
 
 
@@ -371,11 +396,13 @@ img{ -webkit-user-drag:none; user-drag:none; }
 .av-card{margin-top:12px;padding:16px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(160deg,rgba(32,12,28,.96),rgba(10,12,24,.98));color:#fff5f7;box-shadow:0 16px 38px rgba(0,0,0,.34);overflow:hidden}
 .av-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .av-head h2{margin:0;color:#fff;font-size:1.25rem}
-.av-round-meta{display:flex;align-items:center;gap:6px}
+.av-round-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 .av-round-tag{font-size:.72rem;font-weight:900;color:#d6d9f0;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:99px;padding:4px 9px}
 .av-phase-pill{font-size:.68rem;font-weight:950;letter-spacing:.04em;border-radius:99px;padding:4px 9px;background:rgba(46,230,160,.16);color:#48e9ae;border:1px solid rgba(46,230,160,.35)}
 .av-phase-pill.flying{background:rgba(255,200,50,.18);color:#ffe066;border-color:rgba(255,200,50,.4)}
 .av-phase-pill.crashed{background:rgba(255,77,109,.18);color:#ff6b86;border-color:rgba(255,77,109,.4)}
+.av-sound-btn{min-width:34px;min-height:30px;padding:3px 9px;border-radius:99px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;font-size:.74rem;font-weight:850;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.av-sound-btn.muted{opacity:.6;color:#aeb5d7}
 .av-crashes{display:flex;gap:6px;overflow-x:auto;padding:10px 2px 4px;scrollbar-width:none}
 .av-crashes::-webkit-scrollbar{display:none}
 .av-pill{flex:0 0 auto;padding:4px 10px;border-radius:99px;font-size:.75rem;font-weight:900;font-variant-numeric:tabular-nums;border:1px solid rgba(255,255,255,.12);background:rgba(99,115,171,.2);color:#9cc2ff}
@@ -506,6 +533,14 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
   .admin-kpi-card b{font-size:1rem}
   .admin-bulk-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+.p2w-upd-backdrop{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(5,7,20,.82);backdrop-filter:blur(7px);animation:adminPaneIn .18s ease-out}
+.p2w-upd-backdrop.hide{display:none}
+.p2w-upd-card{width:100%;max-width:400px;padding:22px 18px 18px;border-radius:22px;border:1px solid rgba(255,201,77,.5);background:radial-gradient(circle at 100% 0%,rgba(255,190,65,.20),transparent 48%),linear-gradient(155deg,var(--panel-solid),#111633);box-shadow:0 22px 54px rgba(0,0,0,.65);text-align:center;color:var(--ink)}
+.p2w-upd-icon{width:58px;height:58px;margin:0 auto 10px;border-radius:18px;display:grid;place-items:center;font-size:30px;background:linear-gradient(145deg,#ffe28a,#ff9d1c);box-shadow:0 8px 22px rgba(255,159,28,.35)}
+.p2w-upd-ver-pill{display:inline-block;padding:4px 11px;border-radius:999px;font-size:.74rem;font-weight:900;background:rgba(46,230,160,.16);color:var(--green);border:1px solid rgba(46,230,160,.38);margin-bottom:8px}
+.p2w-upd-card h3{margin:2px 0 6px;font-size:1.18rem;font-weight:950}
+.p2w-upd-notes{margin:0 0 14px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:.83rem;line-height:1.45;color:var(--ink);text-align:left;white-space:pre-line}
+.p2w-upd-status{min-height:18px;margin:8px 0 0;font-size:.75rem;color:var(--gold-text);font-weight:700}
 </style>
 
 <style id="play2win-ad-rewards-style">
@@ -577,7 +612,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
       <circle cx="8" cy="16" r="5" fill="#FFD96B"/><circle cx="31" cy="7" r="5" fill="#FFD96B"/><circle cx="56" cy="16" r="5" fill="#FFD96B"/>
     </svg>
     <h1>Play2Win</h1>
-  </div><div style="display:flex;align-items:center;gap:10px"><div class="bal" id="bal"></div><button class="gear hide" id="gear" aria-label="Settings"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></div></div>
+  </div><div style="display:flex;align-items:center;gap:10px"><div class="bal" id="bal"></div></div></div>
 
   <section id="v-auth" class="hide card">
     <h2 id="auth-title" style="margin-top:0">Log in</h2>
@@ -616,6 +651,10 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
 
 
     <section id="v-home" class="hide">
+      <div class="home-section-head">
+        <h2>🎮 Play Games</h2>
+        <p>Choose a game below to play and win coins</p>
+      </div>
       <div class="game-launch-grid">
         <button class="game-launch-item" type="button" data-open-route="play" aria-label="Open Number Game">
           <span class="game-launch-box" aria-hidden="true">
@@ -633,8 +672,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
           <span class="game-launch-box" aria-hidden="true">
             <span class="game-launch-icon aviator-launch-icon">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M21 3L10.5 13.5" stroke="#ffd866" stroke-width="2" stroke-linecap="round"/>
-                <path d="M21 3L14.2 21L10.5 13.5L3 9.8L21 3Z" fill="#ffffff" stroke="#ffe08a" stroke-width="1.4" stroke-linejoin="round"/>
+                <path d="M21 15.5V13.5L13.5 9V3.8C13.5 2.8 12.8 2 12 2C11.2 2 10.5 2.8 10.5 3.8V9L3 13.5V15.5L10.5 13.2V18.3L8.2 20V21.5L12 20.4L15.8 21.5V20L13.5 18.3V13.2L21 15.5Z" fill="#ffffff" stroke="#ffd866" stroke-width="1.1" stroke-linejoin="round" transform="rotate(35 12 12)"/>
               </svg>
             </span>
             <span class="game-launch-name">Aviator</span>
@@ -648,6 +686,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
         <div class="av-head">
           <h2>Aviator</h2>
           <div class="av-round-meta">
+            <button type="button" class="av-sound-btn" id="av-sound-btn" aria-label="Toggle plane sound">🔊 Sound</button>
             <span class="av-round-tag" id="av-round-id">Round #–</span>
             <span class="av-phase-pill" id="av-phase-pill">LOADING</span>
           </div>
@@ -757,6 +796,37 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
         <p class="ad-reward-status" id="ad-reward-status" aria-live="polite">Rewarded ads are not configured yet.</p>
       </section>
 
+      <button class="ref-banner" id="m-share" type="button" data-open-route="share" aria-label="Share app and earn 20 coins" style="margin-top:12px">
+        <div>
+          <b>🎁 Share App &amp; Earn 20 Coins</b>
+          <span>Dost ko app link bhejein — friend ko login par 20 Coins, aur code apply par aapko +20 Coins</span>
+        </div>
+        <span style="font-size:1.3rem;font-weight:900;color:var(--gold-text)" aria-hidden="true">›</span>
+      </button>
+      <button class="menu-btn hide" id="m-ref-network" type="button" data-open-route="ref-network" aria-label="My Referral Network" style="margin-top:10px">
+        <span>📊 My Referral Network</span><span aria-hidden="true">›</span>
+      </button>
+
+    </section>
+
+    <section id="v-wallet" class="hide">
+      <div class="wallet-hero">
+        <div class="srow">
+          <span class="wallet-hero-kicker">PLAY2WIN WALLET</span>
+          <button class="mini" id="wallet-refresh-btn" type="button" style="min-height:36px">↻ Refresh</button>
+        </div>
+        <div class="wallet-hero-amount"><span>🪙</span><span id="wallet-bal-amount">0</span></div>
+        <div class="wallet-hero-sub">Available Balance · ₹1 = 1 Coin · Min withdrawal ₹300</div>
+        <div class="wallet-actions">
+          <button class="wallet-act-btn add" id="m-add" type="button">+ Add Coins</button>
+          <button class="wallet-act-btn wdr" id="m-withdraw" type="button">Withdraw</button>
+        </div>
+      </div>
+      <button class="menu-btn" id="m-tx" type="button"><span>📜 Transactions History</span><span aria-hidden="true">›</span></button>
+      <div class="card">
+        <div class="srow" style="margin-bottom:6px"><h2 style="margin:0">Recent Wallet Activity</h2><span class="note" style="margin:0">Deposits &amp; Withdrawals</span></div>
+        <div id="wallet-recent-summary" class="empty">Loading wallet activity...</div>
+      </div>
     </section>
 
     <section id="v-play">
@@ -813,27 +883,8 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
       <div class="scroll"><table><thead><tr><th>Round</th><th>Bet</th><th>Stake</th><th>Net</th></tr></thead><tbody id="mine"></tbody></table></div>
     </section>
 
-    <section id="v-settings" class="hide">
-      <div class="card" id="settings-profile" style="margin-top:0">
-        <div class="srow"><b id="st-name" style="font-size:1.1rem"></b><span class="bal" id="st-amt"></span></div>
-        <div class="note" id="st-sub" style="margin:6px 0 0"></div>
-      </div>
-      <div id="settings-wallet-links">
-        <button class="menu-btn" id="m-add"><span>Add Coins</span><span aria-hidden="true">›</span></button>
-        <button class="menu-btn" id="m-withdraw"><span>Withdraw Coins</span><span aria-hidden="true">›</span></button>
-        <button class="ref-banner" id="m-share" type="button" data-open-route="share" aria-label="Share app and earn 20 coins" style="margin-top:10px">
-          <div>
-            <b>🎁 Share App &amp; Earn 20 Coins</b>
-            <span>Dost ko app link bhejein — friend ko login par 20 Coins, aur code apply par aapko +20 Coins</span>
-          </div>
-          <span style="font-size:1.3rem;font-weight:900;color:var(--gold-text)" aria-hidden="true">›</span>
-        </button>
-        <button class="menu-btn hide" id="m-ref-network" type="button" data-open-route="ref-network" aria-label="My Referral Network" style="margin-top:10px">
-          <span>📊 My Referral Network</span><span aria-hidden="true">›</span>
-        </button>
-      </div>
-      <section id="v-add" class="hide">
-      <button class="mini" data-back style="margin:12px 0 0">‹ Back to Settings</button>
+    <section id="v-add" class="hide">
+      <button class="mini" data-back="#/wallet" style="margin:6px 0 0">‹ Back to Wallet</button>
       <div class="card" id="wallet-topup">
         <h2 style="margin-top:0">Add Coins</h2>
         <p class="note">UPI QR se payment karein. ₹1 = 1 coin. Payment ke baad UTR submit karna zaroori hai.</p>
@@ -859,9 +910,10 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
         <h2 style="margin-top:0">My Deposit Requests</h2>
         <div id="my-deposits" class="empty">Loading...</div>
       </div>
-      </section>
-      <section id="v-withdraw" class="hide">
-      <button class="mini" data-back style="margin:12px 0 0">‹ Back to Settings</button>
+    </section>
+
+    <section id="v-withdraw" class="hide">
+      <button class="mini" data-back="#/wallet" style="margin:6px 0 0">‹ Back to Wallet</button>
       <div class="card" id="withdraw-card">
         <h2 style="margin-top:0">Withdraw Coins</h2>
         <p class="note">Minimum withdrawal ₹300 (300 coins). Add and save your UPI ID before requesting withdrawal.</p>
@@ -872,9 +924,10 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
         <button class="place" id="withdraw-submit" type="button">Request Withdrawal</button>
         <h2>My Withdrawal Requests</h2><div id="my-withdrawals" class="empty">Loading...</div>
       </div>
-      </section>
-      <section id="v-share" class="hide">
-      <button class="mini" data-back style="margin:12px 0 0">‹ Back to Settings</button>
+    </section>
+
+    <section id="v-share" class="hide">
+      <button class="mini" data-back="#/rewards" style="margin:6px 0 0">‹ Back to Rewards</button>
       <section class="ref-card" id="referral-card" aria-label="Share app and earn 20 coins">
         <div class="ref-head">
           <div>
@@ -911,9 +964,10 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
         <div id="ref-claimed-badge" class="ref-claimed-pill hide"></div>
         <div id="ref-my-history" class="empty" style="margin-top:10px"></div>
       </section>
-      </section>
-      <section id="v-ref-network" class="hide">
-      <button class="mini" data-back style="margin:12px 0 0">‹ Back to Settings</button>
+    </section>
+
+    <section id="v-ref-network" class="hide">
+      <button class="mini" data-back="#/rewards" style="margin:6px 0 0">‹ Back to Rewards</button>
       <section class="ref-card" id="ref-network-card" aria-label="My Referral Network">
         <div class="ref-head">
           <div>
@@ -938,21 +992,32 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
           </table>
         </div>
       </section>
-      </section>
-      <div id="settings-other">
+    </section>
+
+    <section id="v-settings" class="hide">
+      <div class="card profile-hero" id="settings-profile">
+        <div class="profile-avatar" id="st-avatar" aria-hidden="true">U</div>
+        <div class="profile-meta">
+          <div class="srow"><b id="st-name"></b><span class="bal" id="st-amt" style="font-size:.8rem;padding:4px 10px;min-height:30px"></span></div>
+          <div class="note" id="st-sub" style="margin:4px 0 0"></div>
+        </div>
+      </div>
       <div class="card hide" id="st-admin">
         <div class="srow"><span>Total users</span><b id="st-users">0</b></div>
         <div class="srow" style="margin-top:8px"><span>Total coins (all users)</span><b id="st-total">0</b></div>
       </div>
       <div class="card">
-        <div style="font-weight:700;margin-bottom:10px">Theme</div>
+        <div style="font-weight:700;margin-bottom:10px">Game Theme</div>
         <div class="row c2" style="margin-top:0">
           <button class="mini" data-theme-set="night" style="padding:12px">🌙 Neon Night</button>
           <button class="mini" data-theme-set="day" style="padding:12px">☀️ Daylight</button>
         </div>
       </div>
-      <button class="menu-btn" id="m-tx"><span>Transactions</span><span aria-hidden="true">›</span></button>
-      <button class="menu-btn" id="m-pw"><span>Change password</span><span aria-hidden="true">›</span></button>
+      <button class="menu-btn hide" id="m-admin-tx" type="button"><span>Transactions</span><span aria-hidden="true">›</span></button>
+      <button class="menu-btn" id="m-pw" type="button"><span>🔒 Change password</span><span aria-hidden="true">›</span></button>
+      <button class="menu-btn" id="m-check-update" type="button" aria-label="Check for App Update">
+        <span>🔄 App Update</span><span class="bal" id="settings-app-ver" style="font-size:.72rem;min-height:26px;padding:3px 9px">v1.3</span>
+      </button>
       <button class="place logout" id="s-logout" style="margin-top:16px">Log out</button>
       <footer class="p2w-policy-footer" aria-label="Play2Win information and policies">
         <div class="p2w-policy-footer-brand">Play2Win</div>
@@ -966,7 +1031,6 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
           Operated by Shivya · <a href="mailto:sainishivya3@gmail.com">sainishivya3@gmail.com</a>
         </div>
       </footer>
-      </div>
     </section>
 
     <section id="v-tx" class="hide">
@@ -1164,6 +1228,33 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
             <tbody id="admin-ref-recent"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody></table>
           </div>
         </div>
+        <div class="card" id="admin-app-update-card">
+          <div class="srow"><h2 style="margin:0">🚀 App Update Popup</h2><span class="bal" id="admin-upd-current-ver">Installed: v1.3 (Code 4)</span></div>
+          <p class="note" style="margin-top:6px">Naya APK build release karne ke baad yahan Version Code badha kar Publish karein — sabhi users ko app open karte hi Update Popup dikhega aur click karte hi download shuru ho jayega.</p>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+            <label>Latest Version Code
+              <input id="admin-upd-code" type="number" min="1" step="1" value="4" placeholder="e.g. 5">
+            </label>
+            <label>Version Name
+              <input id="admin-upd-name" type="text" placeholder="e.g. 1.3" maxlength="20">
+            </label>
+          </div>
+          <label>Popup Title
+            <input id="admin-upd-title" type="text" placeholder="New Update Available!" maxlength="80">
+          </label>
+          <label>Update Message / What's New
+            <textarea id="admin-upd-notes" rows="2" placeholder="Naye features aur bug fixes ke liye app ko update karein." style="width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--soft);color:var(--ink);font:inherit;resize:vertical;margin-top:4px"></textarea>
+          </label>
+          <label>APK Update Link (optional — blank chhodne par upar wala APK link use hoga)
+            <input id="admin-upd-url" type="url" placeholder="https://github.com/user/repo/releases/latest/download/Play2Win.apk" autocapitalize="off" autocomplete="off">
+          </label>
+          <label class="pw-toggle" style="margin:6px 0 8px"><input id="admin-upd-force" type="checkbox"><span>Force Update (Users bina update kiye app use nahi kar payenge)</span></label>
+          <div class="err" id="admin-upd-msg" role="alert"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+            <button class="place" id="admin-upd-save" type="button" style="flex:1;min-width:170px;margin-top:0">Publish Update Popup</button>
+            <button class="mini" id="admin-upd-off" type="button" style="min-height:46px;padding:0 14px">Turn Off Popup</button>
+          </div>
+        </div>
       </div>
 
       <div id="admin-pane-users" class="admin-cat-pane hide">
@@ -1202,6 +1293,24 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
         </div>
       </div>
     </section>
+    <nav class="bottom-nav hide" id="bottom-nav" aria-label="Bottom Navigation">
+      <a class="bnav-item" href="#/home" data-bnav="home" aria-label="Home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg>
+        <span>Home</span>
+      </a>
+      <a class="bnav-item" href="#/rewards" data-bnav="rewards" aria-label="Rewards">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5" rx="1"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+        <span>Rewards</span>
+      </a>
+      <a class="bnav-item" href="#/wallet" data-bnav="wallet" aria-label="Wallet">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2"/><path d="M16 11h5v6h-5a3 3 0 0 1 0-6z"/><circle cx="16.5" cy="14" r=".8" fill="currentColor"/></svg>
+        <span>Wallet</span>
+      </a>
+      <a class="bnav-item" href="#/settings" data-bnav="settings" aria-label="Profile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Profile</span>
+      </a>
+    </nav>
   </div>
 </div>
 
@@ -1447,10 +1556,10 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
   }
 
   function showAuth(){
-    $('app').classList.add('hide');$('gear').classList.add('hide');$('v-auth').classList.remove('hide');$('bal').textContent='';$('bal').dataset.admin='0';
+    $('app').classList.add('hide');if($('bottom-nav'))$('bottom-nav').classList.add('hide');document.body.classList.remove('has-bottom-nav');$('v-auth').classList.remove('hide');$('bal').textContent='';$('bal').dataset.admin='0';
     if($('a-err'))$('a-err').textContent='';
     if($('su-err'))$('su-err').textContent='';
-    ['v-add','v-withdraw'].forEach(function(id){$(id).classList.add('hide')});
+    ['v-add','v-withdraw','v-wallet'].forEach(function(id){if($(id))$(id).classList.add('hide')});
     api('has_admin').then(function(has){
       $('auth-title').textContent=has?(authMode==='signup'?'Create new account':'Log in'):'Set up the admin account';
       $('a-go').textContent=has?'Log in':'Create admin account';
@@ -1688,6 +1797,8 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
   function clearLocalLogin(silent){
     S.token=null;S.id=null;S.role=null;S.balance=0;S.displayName=null;S.email=null;
     document.body.classList.remove('is-admin-mode');
+    document.body.classList.remove('has-bottom-nav');
+    if($('bottom-nav'))$('bottom-nav').classList.add('hide');
     selectedUserIds={};
     if($('m-ref-network'))$('m-ref-network').classList.add('hide');
     try{
@@ -1707,18 +1818,25 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
 
   function start(){
     refresh().then(function(){
-      $('v-auth').classList.add('hide');$('app').classList.remove('hide');$('gear').classList.remove('hide');buildNav();route();
+      $('v-auth').classList.add('hide');$('app').classList.remove('hide');buildNav();route();
       if(window.Play2WinOnSessionReady)window.Play2WinOnSessionReady();
     }).catch(function(e){if(S.token)toast(e.message);showAuth()});
   }
 
   // ---- routing ----
+  var navBuiltForRole=null;
   function buildNav(){
-    $('nav').classList.remove('hide');
-    var items=isAdmin()
-      ?[['admin','Admin'],['bets','Live Bets'],['results','Results']]
-      :[['home','Games'],['rewards','🎁 Rewards']];
-    $('nav').innerHTML=items.map(function(i){return '<a href="#/'+i[0]+'" data-r="'+i[0]+'">'+i[1]+'</a>'}).join('');
+    var admin=isAdmin();
+    navBuiltForRole=admin?'admin':'user';
+    $('nav').classList.toggle('hide',!admin);
+    if(admin){
+      var items=[['admin','Admin'],['bets','Live Bets'],['results','Results'],['settings','Profile']];
+      $('nav').innerHTML=items.map(function(i){return '<a href="#/'+i[0]+'" data-r="'+i[0]+'">'+i[1]+'</a>'}).join('');
+    }else{
+      $('nav').innerHTML='';
+    }
+    if($('bottom-nav'))$('bottom-nav').classList.toggle('hide',admin||!S.token);
+    document.body.classList.toggle('has-bottom-nav',!admin&&!!S.token);
   }
   function route(){
     if(location.hash&&location.hash.indexOf('access_token=')>=0&&window.Play2WinHandleOAuthCallback){
@@ -1726,11 +1844,13 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
       return;
     }
     var r=location.hash.replace('#/','')||(isAdmin()?'admin':'home');
+    if(r==='profile')r='settings';
     var legalView=$('p2w-legal-view');
     if(r.indexOf('legal/')===0){
       $('v-auth').classList.add('hide');
       $('app').classList.add('hide');
-      $('gear').classList.add('hide');
+      if($('bottom-nav'))$('bottom-nav').classList.add('hide');
+      document.body.classList.remove('has-bottom-nav');
       if(legalView)legalView.classList.remove('hide');
       document.querySelectorAll('.p2w-legal-page').forEach(function(el){el.classList.add('hide')});
       var legalKey=r.slice(6);
@@ -1743,33 +1863,38 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     if(legalView)legalView.classList.add('hide');
     if(!S.token){
       $('app').classList.add('hide');
-      $('gear').classList.add('hide');
+      if($('bottom-nav'))$('bottom-nav').classList.add('hide');
+      document.body.classList.remove('has-bottom-nav');
       $('v-auth').classList.remove('hide');
       return;
     }
     $('v-auth').classList.add('hide');
     $('app').classList.remove('hide');
-    $('gear').classList.remove('hide');
     document.body.classList.toggle('is-admin-mode',isAdmin());
-    if(!$('nav').children.length)buildNav();
+    var expectedRole=isAdmin()?'admin':'user';
+    if(navBuiltForRole!==expectedRole)buildNav();
+    else{
+      if($('bottom-nav'))$('bottom-nav').classList.toggle('hide',isAdmin());
+      document.body.classList.toggle('has-bottom-nav',!isAdmin());
+    }
     if(r==='logout'){logout();return}
-    if(isAdmin()&&(r==='play'||r==='mine'||r==='add'||r==='withdraw'||r==='rewards'||r==='goldball'||r==='aviator'||r==='share'||r==='ref-network'))r='admin';
-    if(!isAdmin()&&(r==='admin'||r==='bets'))r='play';
-    var mainRoute=(r==='add'||r==='withdraw'||r==='share'||r==='ref-network')?'settings':r;
-    ['home','rewards','goldball','aviator','play','results','mine','admin','bets','settings','tx','pw'].forEach(function(k){$('v-'+k).classList.toggle('hide',k!==mainRoute)});
-    $('v-add').classList.toggle('hide',r!=='add');
-    $('v-withdraw').classList.toggle('hide',r!=='withdraw');
-    if($('v-share'))$('v-share').classList.toggle('hide',r!=='share');
-    if($('v-ref-network'))$('v-ref-network').classList.toggle('hide',r!=='ref-network');
+    if(isAdmin()&&(r==='home'||r==='play'||r==='mine'||r==='wallet'||r==='add'||r==='withdraw'||r==='rewards'||r==='goldball'||r==='aviator'||r==='share'||r==='ref-network'))r='admin';
+    if(!isAdmin()&&(r==='admin'||r==='bets'))r='home';
+    var allViews=['home','rewards','wallet','add','withdraw','share','ref-network','goldball','aviator','play','results','mine','admin','bets','settings','tx','pw'];
+    allViews.forEach(function(k){if($('v-'+k))$('v-'+k).classList.toggle('hide',k!==r)});
     clearPlayOnlyEffects();
-    var inSettingsSub=(r==='add'||r==='withdraw'||r==='share'||r==='ref-network');
-    ['settings-profile','settings-wallet-links','settings-other'].forEach(function(id){$(id).classList.toggle('hide',inSettingsSub)});
     document.querySelectorAll('#nav a').forEach(function(a){a.classList.toggle('on',a.dataset.r===r)});
-    if(r==='rewards'){loadDailyRewards();}
+    var activeBnav='home';
+    if(r==='rewards'||r==='share'||r==='ref-network')activeBnav='rewards';
+    else if(r==='wallet'||r==='add'||r==='withdraw'||(r==='tx'&&!isAdmin()))activeBnav='wallet';
+    else if(r==='settings'||r==='pw')activeBnav='settings';
+    document.querySelectorAll('#bottom-nav [data-bnav]').forEach(function(a){a.classList.toggle('on',a.getAttribute('data-bnav')===activeBnav)});
+    if(r==='rewards'){loadDailyRewards();if(!isAdmin()&&window.Play2WinLoadReferrals)window.Play2WinLoadReferrals();}
+    if(r==='wallet'){renderWallet();loadWalletSummary();}
     if(r==='mine')loadMine();
     if(r==='admin'){if(adminAlertsEnabled)primeAdminAlertAudio();loadUsers();loadAdminPaymentUpis();loadDepositRequests();loadWithdrawalRequests();pollAdminRequests();if(window.Play2WinLoadAdminReferrals)window.Play2WinLoadAdminReferrals();}
     if(r==='bets')loadBets();
-    if(r==='settings'){renderSettings();if(!isAdmin()&&window.Play2WinLoadReferrals)window.Play2WinLoadReferrals();}
+    if(r==='settings'){renderSettings();}
     if(r==='share'){if(window.Play2WinLoadReferrals)window.Play2WinLoadReferrals();}
     if(r==='ref-network'){if(window.Play2WinLoadReferralNetwork)window.Play2WinLoadReferralNetwork();}
     if(r==='add'){loadMyDeposits();}
@@ -1942,7 +2067,8 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
   }
   function render(){
     if(!S.token)return;
-    $('bal').dataset.admin=isAdmin()?'1':'0';$('bal').textContent=isAdmin()?'Admin':Number(S.balance||0).toLocaleString('en-IN')+' Coins';
+    $('bal').dataset.admin=isAdmin()?'1':'0';$('bal').textContent=isAdmin()?'Admin':Number(S.balance||0).toLocaleString('en-IN');
+    if($('wallet-bal-amount'))$('wallet-bal-amount').textContent=Number(S.balance||0).toLocaleString('en-IN');
     $('period').textContent=rl(S.round);
     document.querySelectorAll('[data-t]').forEach(function(e){e.classList.toggle('sel',e.dataset.t===target)});
     $('hist').innerHTML=S.results.length?S.results.map(function(h){return '<tr><td>'+rl(h.round)+'</td><td><b>'+h.num+'</b></td><td>'+sizeOf(h.num)+'</td><td>'+dots(h.num)+'</td></tr>'}).join(''):'<tr><td colspan="4" class="empty">No results yet.</td></tr>';
@@ -2751,21 +2877,48 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
   }
   setInterval(function(){
     if(S.token&&isAdmin())pollAdminRequests();
-    if(S.token&&!document.hidden&&!isAdmin()&&location.hash==='#/settings'){loadMyDeposits();loadMyWithdrawals();}
+    if(S.token&&!document.hidden&&!isAdmin()){
+      if(location.hash==='#/add')loadMyDeposits();
+      else if(location.hash==='#/withdraw')loadMyWithdrawals();
+      else if(location.hash==='#/wallet')loadWalletSummary();
+    }
   },5000);
   document.addEventListener('visibilitychange',function(){
     if(!document.hidden&&S.token&&isAdmin())pollAdminRequests();
   });
 
-  // ---- settings pages ----
+  // ---- settings & wallet pages ----
   function fmtTime(t){try{return new Date(t).toLocaleString([], {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}catch(e){return ''}}
+  function renderWallet(){
+    if($('wallet-bal-amount'))$('wallet-bal-amount').textContent=Number(S.balance||0).toLocaleString('en-IN');
+  }
+  function loadWalletSummary(){
+    if(!S.token||isAdmin())return Promise.resolve();
+    var out=$('wallet-recent-summary');
+    return Promise.all([
+      api('my_coin_deposits',{p_token:S.token}).catch(function(){return []}),
+      api('my_withdrawal_requests',{p_token:S.token}).catch(function(){return []})
+    ]).then(function(res){
+      var deps=(res[0]||[]).map(function(d){return {kind:'Add Coins',amt:d.amount,status:d.status,at:d.created_at,sub:'UTR: '+(d.utr||'–')}});
+      var wdrs=(res[1]||[]).map(function(w){return {kind:'Withdraw',amt:w.amount,status:w.status,at:w.created_at,sub:(w.upi_id||'UPI')}});
+      var all=deps.concat(wdrs).sort(function(a,b){return new Date(b.at)-new Date(a.at)}).slice(0,6);
+      if(!out)return;
+      if(!all.length){out.className='empty';out.textContent='Abhi tak koi deposit ya withdrawal request nahi hai.';return;}
+      out.className='';
+      out.innerHTML=all.map(function(item){
+        var isAdd=item.kind==='Add Coins';
+        return '<div class="srow" style="padding:9px 0;border-bottom:1px solid var(--line)"><div><b style="color:'+(isAdd?'var(--green)':'var(--gold-text)')+'">'+item.kind+' · ₹'+Number(item.amt||0).toLocaleString('en-IN')+'</b><div class="note" style="margin:2px 0 0">'+esc(item.sub)+' · '+fmtTime(item.at)+'</div></div><span class="mini">'+esc(item.status)+'</span></div>';
+      }).join('');
+    });
+  }
   function renderSettings(){
-    $('st-name').textContent=S.displayName||S.id||'';
-    $('st-amt').textContent=isAdmin()?'Admin':S.balance+' coins';
-    $('st-sub').textContent=[S.email,S.phone?'Phone: '+S.phone:''].filter(Boolean).join(' · ');
-    if(!isAdmin()){loadMyDeposits();loadMyWithdrawals();}
+    var nm=S.displayName||S.id||'User';
+    $('st-name').textContent=nm;
+    if($('st-avatar'))$('st-avatar').textContent=String(nm).trim().charAt(0).toUpperCase()||'U';
+    $('st-amt').textContent=isAdmin()?'Admin':Number(S.balance||0).toLocaleString('en-IN')+' coins';
+    $('st-sub').textContent=[S.email,S.phone?'Phone: '+S.phone:'',S.id&&S.id!==nm?'ID: '+S.id:''].filter(Boolean).join(' · ')||'Play2Win Member';
     $('st-admin').classList.toggle('hide',!isAdmin());
-    $('settings-wallet-links').classList.toggle('hide',isAdmin());
+    if($('m-admin-tx'))$('m-admin-tx').classList.toggle('hide',!isAdmin());
     if(isAdmin())api('admin_list_users',{p_token:S.token}).then(function(us){
       var t=0;us.forEach(function(u){t+=u.balance});$('st-users').textContent=us.length;$('st-total').textContent=t;
     }).catch(function(){});
@@ -2796,12 +2949,21 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
   document.querySelectorAll('[data-theme-set]').forEach(function(b){b.onclick=function(){setTheme(b.dataset.themeSet)}});
   var t0='night';try{t0=localStorage.getItem('np_theme')||'night'}catch(e){}
   setTheme(t0==='day'?'day':'night');
-  $('gear').onclick=function(){location.hash='#/settings'};
+  $('bal').onclick=function(){if(S.token&&!isAdmin())location.hash='#/wallet'};
+  if($('wallet-refresh-btn'))$('wallet-refresh-btn').onclick=function(){refresh().then(loadWalletSummary).catch(function(){})};
   $('m-add').onclick=function(){location.hash='#/add'};
   $('m-withdraw').onclick=function(){location.hash='#/withdraw'};
   $('m-tx').onclick=function(){location.hash='#/tx'};
+  if($('m-admin-tx'))$('m-admin-tx').onclick=function(){location.hash='#/tx'};
   $('m-pw').onclick=function(){location.hash='#/pw'};
-  document.querySelectorAll('[data-back]').forEach(function(b){b.onclick=function(){location.hash='#/settings'}});
+  document.querySelectorAll('[data-back]').forEach(function(b){
+    b.onclick=function(){
+      var dest=b.getAttribute('data-back');
+      if(dest&&dest.charAt(0)==='#'){location.hash=dest;return;}
+      if(!isAdmin()&&location.hash==='#/tx'){location.hash='#/wallet';return;}
+      location.hash='#/settings';
+    };
+  });
   $('pw-go').onclick=function(){
     var e=$('pw-err'),oldPw=$('pw-old').value,n=$('pw-new').value;e.style.color='var(--red)';e.textContent='';
     if(n!==$('pw-new2').value){e.textContent='New passwords do not match.';return}
@@ -2840,7 +3002,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
   function cups(){return Array.prototype.slice.call(row.querySelectorAll('.gold-cup'));}
   function session(){return bridge&&bridge.getSession?bridge.getSession():{token:null,role:null,balance:0};}
   function total(){var n=Math.floor(Number(amountInput.value)||0);return n*mult;}
-  function setBalance(n){var v=Math.max(0,Number(n)||0);balanceEl.textContent=v.toLocaleString('en-IN')+' Coins';var top=document.getElementById('bal');if(top&&!top.dataset.admin||top&&top.dataset.admin!=='1')top.textContent=v.toLocaleString('en-IN')+' Coins';}
+  function setBalance(n){var v=Math.max(0,Number(n)||0);balanceEl.textContent=v.toLocaleString('en-IN')+' Coins';var top=document.getElementById('bal');if(top&&(!top.dataset.admin||top.dataset.admin!=='1'))top.textContent=v.toLocaleString('en-IN');}
   function renderTotal(){var n=Math.floor(Number(amountInput.value)||0);totalEl.textContent=(n*mult).toLocaleString('en-IN')+' Coins';document.querySelectorAll('[data-gold-mult]').forEach(function(b){b.classList.toggle('active',Number(b.dataset.goldMult)===mult)});}
   function resetCups(){cups().forEach(function(c,i){c.classList.remove('revealed','is-picked');c.disabled=true;c.dataset.slot=String(i);c.style.left=(i*35)+'%';});}
   function showHistory(rows){if(!Array.isArray(rows)||!rows.length){history.textContent='No Gold Ball rounds yet.';return;}history.innerHTML=rows.slice(0,8).map(function(h){var won=!!h.won,stake=Number(h.stake||h.total_entry||0),payout=Number(h.payout||0);return '<div style="display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.1)"><span>Round '+String(h.id||h.round_id||'')+'</span><strong style="color:'+(won?'#8ff0bd':'#ff9ba8')+'">'+(won?'+'+payout:'-'+stake)+' Coins</strong></div>';}).join('');}
@@ -3265,6 +3427,12 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     if(!ss||!ss.token||ss.role!=='admin')return;
     bridge.api('admin_referral_overview',{p_token:ss.token}).then(function(d){
       if($('admin-ref-download-url'))$('admin-ref-download-url').value=normalizeDirectDownloadUrl(d.download_url||'');
+      if($('admin-upd-code'))$('admin-upd-code').value=Number(d.latest_version_code||1);
+      if($('admin-upd-name'))$('admin-upd-name').value=d.latest_version_name||'1.0';
+      if($('admin-upd-title'))$('admin-upd-title').value=d.update_title||'New Update Available!';
+      if($('admin-upd-notes'))$('admin-upd-notes').value=d.update_notes||'';
+      if($('admin-upd-url'))$('admin-upd-url').value=normalizeDirectDownloadUrl(d.update_url||'');
+      if($('admin-upd-force'))$('admin-upd-force').checked=!!d.force_update;
       if($('admin-ref-total-shares'))$('admin-ref-total-shares').textContent=Number(d.total_shares||0);
       if($('admin-ref-total-refers'))$('admin-ref-total-refers').textContent=Number(d.total_referrals||0);
       if($('admin-ref-total-coins'))$('admin-ref-total-coins').textContent=Number(d.total_coins_distributed||0);
@@ -3326,6 +3494,143 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
       $('admin-ref-save-url').disabled=false;
     });
   };
+
+  // ---- App Update Checker & Admin Release Popup ----
+  function getInstalledVersion(){
+    var code=4,name='1.3';
+    try{
+      if(window.Play2WinNative&&window.Play2WinNative.getAppVersionCode){
+        var c=Number(window.Play2WinNative.getAppVersionCode());
+        if(c>=1)code=c;
+      }
+      if(window.Play2WinNative&&window.Play2WinNative.getAppVersionName){
+        var n=String(window.Play2WinNative.getAppVersionName()||'').trim();
+        if(n)name=n;
+      }
+    }catch(e){}
+    return {code:code,name:name};
+  }
+  var instVer=getInstalledVersion();
+  if($('settings-app-ver'))$('settings-app-ver').textContent='v'+instVer.name;
+  if($('admin-upd-current-ver'))$('admin-upd-current-ver').textContent='Installed: v'+instVer.name+' (Code '+instVer.code+')';
+
+  var activeUpdatePayload=null,dismissedVersionCode=0,lastUpdateCheckAt=0;
+  function showUpdateModal(info){
+    var modal=$('p2w-update-modal');
+    if(!modal||!info)return;
+    activeUpdatePayload=info;
+    var ss=bridge.getSession();
+    var isAdm=!!(ss&&ss.role==='admin');
+    var force=!!info.force_update&&!isAdm;
+    if($('p2w-upd-ver'))$('p2w-upd-ver').textContent='v'+instVer.name+' → v'+(info.latest_version_name||info.latest_version_code);
+    if($('p2w-upd-title'))$('p2w-upd-title').textContent=info.update_title||'New Update Available!';
+    if($('p2w-upd-notes'))$('p2w-upd-notes').textContent=info.update_notes||'Naye features aur improvements ke liye app ko update karein.';
+    if($('p2w-upd-status'))$('p2w-upd-status').textContent='';
+    if($('p2w-upd-later'))$('p2w-upd-later').classList.toggle('hide',force);
+    modal.classList.remove('hide');
+  }
+  function hideUpdateModal(rememberDismiss){
+    var modal=$('p2w-update-modal');
+    if(modal)modal.classList.add('hide');
+    if(rememberDismiss&&activeUpdatePayload){
+      dismissedVersionCode=Number(activeUpdatePayload.latest_version_code||0);
+    }
+  }
+  function checkForAppUpdate(manual){
+    var now=Date.now();
+    if(!manual&&now-lastUpdateCheckAt<25000)return Promise.resolve();
+    lastUpdateCheckAt=now;
+    return bridge.api('get_public_download_info',{}).then(function(info){
+      if(!info)return;
+      var latestCode=Number(info.latest_version_code||1);
+      var updateUrl=normalizeDirectDownloadUrl(info.update_url||info.download_url||'');
+      if(latestCode>instVer.code&&updateUrl){
+        var ss=bridge.getSession();
+        if(!manual&&ss&&ss.role==='admin')return;
+        if(!manual&&!info.force_update&&dismissedVersionCode>=latestCode)return;
+        info.update_url=updateUrl;
+        showUpdateModal(info);
+      }else if(manual){
+        bridge.toast('Aap latest version (v'+instVer.name+') use kar rahe hain!');
+      }
+    }).catch(function(e){
+      if(manual)bridge.toast(friendlyRefErr(e,'Update check failed.'));
+    });
+  }
+  window.Play2WinCheckForAppUpdate=checkForAppUpdate;
+
+  if($('p2w-upd-go'))$('p2w-upd-go').onclick=function(){
+    var url=normalizeDirectDownloadUrl(activeUpdatePayload&&(activeUpdatePayload.update_url||activeUpdatePayload.download_url)||'');
+    var st=$('p2w-upd-status');
+    if(!url){
+      if(st)st.textContent='Update APK link abhi set nahi hua hai.';
+      return;
+    }
+    if(st)st.textContent='Download shuru ho raha hai... Complete hone par Install / Update par tap karein.';
+    if(window.Play2WinNative&&window.Play2WinNative.openExternalUrl){
+      window.Play2WinNative.openExternalUrl(url);
+    }else{
+      var win=window.open(url,'_blank','noopener');
+      if(!win)window.location.href=url;
+    }
+  };
+  if($('p2w-upd-later'))$('p2w-upd-later').onclick=function(){hideUpdateModal(true);};
+  if($('m-check-update'))$('m-check-update').onclick=function(){checkForAppUpdate(true);};
+
+  function saveAdminAppUpdate(turnOff){
+    var ss=bridge.getSession(),msg=$('admin-upd-msg');
+    if(!ss||!ss.token||ss.role!=='admin')return;
+    msg.style.color='var(--red)';msg.textContent='';
+    var code=turnOff?1:parseInt($('admin-upd-code')?$('admin-upd-code').value:'1',10);
+    if(!turnOff&&(!code||code<2)){
+      msg.textContent='Users ko update popup bhejne ke liye Version Code kam se kam 2 rakhein.';
+      return;
+    }
+    var name=turnOff?'1.0':(($('admin-upd-name')?$('admin-upd-name').value:'').trim()||(code+'.0'));
+    var title=($('admin-upd-title')?$('admin-upd-title').value:'').trim()||'New Update Available!';
+    var notes=($('admin-upd-notes')?$('admin-upd-notes').value:'').trim()||'Naye features aur improvements ke liye app ko update karein.';
+    var rawUrl=($('admin-upd-url')?$('admin-upd-url').value:'').trim()||($('admin-ref-download-url')?$('admin-ref-download-url').value:'').trim();
+    if(!turnOff&&!rawUrl){
+      msg.textContent='Pehle APK Download Link enter karein (ya upar App Download Link save karein).';
+      return;
+    }
+    if(rawUrl&&!/^https?:\/\//i.test(rawUrl)){
+      msg.textContent='Valid https:// ya http:// APK download URL enter karein.';
+      return;
+    }
+    if(rawUrl&&isWebsiteHomeUrl(rawUrl)){
+      msg.textContent='Website link nahi, direct .apk download URL enter karein.';
+      return;
+    }
+    var url=rawUrl?normalizeDirectDownloadUrl(rawUrl):'';
+    var force=turnOff?false:!!($('admin-upd-force')&&$('admin-upd-force').checked);
+    if($('admin-upd-save'))$('admin-upd-save').disabled=true;
+    if($('admin-upd-off'))$('admin-upd-off').disabled=true;
+    bridge.api('admin_set_app_update',{
+      p_token:ss.token,
+      p_version_code:code,
+      p_version_name:name,
+      p_update_title:title,
+      p_update_notes:notes,
+      p_update_url:url,
+      p_force_update:force
+    }).then(function(){
+      msg.style.color='var(--green)';
+      msg.textContent=turnOff?'Update popup band kar diya gaya hai.':'Update popup v'+name+' (Code '+code+') sabhi users ke liye live ho gaya!';
+      loadAdminReferrals();
+    }).catch(function(e){
+      msg.textContent=friendlyRefErr(e,'Could not save app update.');
+    }).then(function(){
+      if($('admin-upd-save'))$('admin-upd-save').disabled=false;
+      if($('admin-upd-off'))$('admin-upd-off').disabled=false;
+    });
+  }
+  if($('admin-upd-save'))$('admin-upd-save').onclick=function(){saveAdminAppUpdate(false);};
+  if($('admin-upd-off'))$('admin-upd-off').onclick=function(){saveAdminAppUpdate(true);};
+
+  setTimeout(function(){checkForAppUpdate(false);},900);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)checkForAppUpdate(false);});
+  setInterval(function(){if(!document.hidden)checkForAppUpdate(false);},60000);
 })();
 </script>
 
@@ -3351,6 +3656,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
   var swipeTrack=document.getElementById('av-swipe-track');
   var tabResults=document.getElementById('av-tab-results');
   var tabBets=document.getElementById('av-tab-bets');
+  var soundBtn=document.getElementById('av-sound-btn');
   if(!card||!canvas||!actionBtn)return;
 
   var MAX_BET=1000,GROWTH_RATE=0.11,BET_WINDOW_MS=10000;
@@ -3358,6 +3664,163 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
   var state=null,busy=false,rafId=0,syncTimer=0,autoFired=false,lastMult=1.00,activeTab='results';
   var syncing=false,resyncPending=false,actionSeq=0,cachedMyBets=[];
   var syncTrack={takeoffId:null,takeoffAt:0,crashId:null,nextId:null,nextAt:0};
+
+  // ---- Aviator Airplane Flying & Crash Web Audio Engine ----
+  var avAudioCtx=null,avSoundOn=true,avFlyNodes=null,avFlyRoundId=null,avCrashSoundRoundId=null;
+  try{if(localStorage.getItem('p2w_av_sound')==='0')avSoundOn=false;}catch(e){}
+  function syncSoundBtn(){
+    if(!soundBtn)return;
+    soundBtn.textContent=avSoundOn?'🔊 Sound':'🔇 Muted';
+    soundBtn.classList.toggle('muted',!avSoundOn);
+  }
+  syncSoundBtn();
+  function ensureAvAudio(){
+    if(!avSoundOn)return null;
+    try{
+      var AC=window.AudioContext||window.webkitAudioContext;
+      if(!AC)return null;
+      if(!avAudioCtx)avAudioCtx=new AC();
+      if(avAudioCtx.state==='suspended')avAudioCtx.resume().catch(function(){});
+      return avAudioCtx;
+    }catch(e){return null;}
+  }
+  function stopFlySound(){
+    if(!avFlyNodes)return;
+    try{
+      var ctx=avFlyNodes.ctx,now=ctx.currentTime;
+      avFlyNodes.gain.gain.cancelScheduledValues(now);
+      avFlyNodes.gain.gain.setTargetAtTime(0.0001,now,0.04);
+      var nodes=avFlyNodes;
+      setTimeout(function(){
+        try{nodes.engOsc.stop();}catch(e){}
+        try{nodes.turOsc.stop();}catch(e){}
+        try{nodes.engOsc.disconnect();}catch(e){}
+        try{nodes.turOsc.disconnect();}catch(e){}
+        try{nodes.gain.disconnect();}catch(e){}
+      },160);
+    }catch(e){}
+    avFlyNodes=null;
+    avFlyRoundId=null;
+  }
+  function startFlySound(roundId){
+    if(!avSoundOn||!isActiveRoute())return;
+    if(avFlyNodes&&avFlyRoundId===roundId)return;
+    stopFlySound();
+    var ctx=ensureAvAudio();
+    if(!ctx)return;
+    try{
+      var now=ctx.currentTime;
+      var master=ctx.createGain();
+      master.gain.setValueAtTime(0.0001,now);
+      master.gain.exponentialRampToValueAtTime(0.085,now+0.25);
+
+      var filter=ctx.createBiquadFilter();
+      filter.type='lowpass';
+      filter.frequency.setValueAtTime(260,now);
+      filter.Q.setValueAtTime(1.4,now);
+
+      var engOsc=ctx.createOscillator();
+      engOsc.type='sawtooth';
+      engOsc.frequency.setValueAtTime(68,now);
+
+      var turOsc=ctx.createOscillator();
+      turOsc.type='triangle';
+      turOsc.frequency.setValueAtTime(145,now);
+
+      var turGain=ctx.createGain();
+      turGain.gain.setValueAtTime(0.32,now);
+
+      engOsc.connect(filter);
+      turOsc.connect(turGain);
+      turGain.connect(filter);
+      filter.connect(master);
+      master.connect(ctx.destination);
+
+      engOsc.start(now);
+      turOsc.start(now);
+      avFlyNodes={ctx:ctx,engOsc:engOsc,turOsc:turOsc,filter:filter,gain:master};
+      avFlyRoundId=roundId;
+    }catch(e){avFlyNodes=null;}
+  }
+  function updateFlySound(mult){
+    if(!avFlyNodes||!avSoundOn)return;
+    try{
+      var ctx=avFlyNodes.ctx,now=ctx.currentTime;
+      var lift=Math.min(1,Math.log(Math.max(1,mult))/Math.log(12));
+      avFlyNodes.engOsc.frequency.setTargetAtTime(68+lift*58,now,0.08);
+      avFlyNodes.turOsc.frequency.setTargetAtTime(145+lift*230,now,0.08);
+      avFlyNodes.filter.frequency.setTargetAtTime(260+lift*620,now,0.1);
+    }catch(e){}
+  }
+  function playCrashSound(){
+    stopFlySound();
+    if(!avSoundOn||!isActiveRoute())return;
+    var ctx=ensureAvAudio();
+    if(!ctx)return;
+    try{
+      var now=ctx.currentTime;
+      // Explosion noise burst
+      var bufLen=Math.floor(ctx.sampleRate*0.55);
+      var buf=ctx.createBuffer(1,bufLen,ctx.sampleRate);
+      var ch=buf.getChannelData(0);
+      for(var i=0;i<bufLen;i++){ch[i]=(Math.random()*2-1)*Math.pow(1-i/bufLen,1.6);}
+      var noise=ctx.createBufferSource();
+      noise.buffer=buf;
+      var nFilter=ctx.createBiquadFilter();
+      nFilter.type='lowpass';
+      nFilter.frequency.setValueAtTime(1350,now);
+      nFilter.frequency.exponentialRampToValueAtTime(95,now+0.52);
+      var nGain=ctx.createGain();
+      nGain.gain.setValueAtTime(0.28,now);
+      nGain.gain.exponentialRampToValueAtTime(0.001,now+0.54);
+      noise.connect(nFilter);nFilter.connect(nGain);nGain.connect(ctx.destination);
+      noise.start(now);
+
+      // Deep impact boom
+      var boom=ctx.createOscillator();
+      boom.type='sine';
+      boom.frequency.setValueAtTime(150,now);
+      boom.frequency.exponentialRampToValueAtTime(34,now+0.42);
+      var bGain=ctx.createGain();
+      bGain.gain.setValueAtTime(0.32,now);
+      bGain.gain.exponentialRampToValueAtTime(0.001,now+0.44);
+      boom.connect(bGain);bGain.connect(ctx.destination);
+      boom.start(now);boom.stop(now+0.46);
+    }catch(e){}
+  }
+  function playCashoutSound(){
+    if(!avSoundOn||!isActiveRoute())return;
+    var ctx=ensureAvAudio();
+    if(!ctx)return;
+    try{
+      var now=ctx.currentTime;
+      [523.25,783.99].forEach(function(freq,idx){
+        var o=ctx.createOscillator(),g=ctx.createGain();
+        o.type='sine';
+        o.frequency.setValueAtTime(freq,now+idx*0.09);
+        g.gain.setValueAtTime(0.001,now+idx*0.09);
+        g.gain.exponentialRampToValueAtTime(0.16,now+idx*0.09+0.02);
+        g.gain.exponentialRampToValueAtTime(0.001,now+idx*0.09+0.22);
+        o.connect(g);g.connect(ctx.destination);
+        o.start(now+idx*0.09);o.stop(now+idx*0.09+0.24);
+      });
+    }catch(e){}
+  }
+  if(soundBtn){
+    soundBtn.addEventListener('click',function(){
+      avSoundOn=!avSoundOn;
+      try{localStorage.setItem('p2w_av_sound',avSoundOn?'1':'0');}catch(e){}
+      syncSoundBtn();
+      if(avSoundOn){
+        ensureAvAudio();
+        if(state&&state.phase==='flying'&&state.round)startFlySound(state.round.id);
+      }else{
+        stopFlySound();
+      }
+    });
+  }
+  document.addEventListener('pointerdown',function(){if(isActiveRoute())ensureAvAudio();},{passive:true});
+  document.addEventListener('visibilitychange',function(){if(document.hidden)stopFlySound();});
 
   function session(){return bridge&&bridge.getSession?bridge.getSession():{token:null,role:null,balance:0};}
   function isActiveRoute(){
@@ -3368,7 +3831,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
   function setBal(n){
     var v=Math.max(0,Number(n)||0);
     var top=document.getElementById('bal');
-    if(top&&top.dataset.admin!=='1')top.textContent=v.toLocaleString('en-IN')+' Coins';
+    if(top&&top.dataset.admin!=='1')top.textContent=v.toLocaleString('en-IN');
   }
   function clampedBet(){
     var raw=Math.floor(Number(betInput.value)||0);
@@ -3497,27 +3960,114 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
 
     ctx.save();
     ctx.translate(endX,endY);
-    ctx.rotate(crashed?0.35:-0.28);
-    ctx.fillStyle=crashed?'#ff5c77':'#ffffff';
-    ctx.beginPath();
-    ctx.moveTo(15,0);
-    ctx.lineTo(-10,-8);
-    ctx.lineTo(-5,0);
-    ctx.lineTo(-10,8);
-    ctx.closePath();
-    ctx.fill();
+    var planeAngle=crashed?0.42:(-0.24+Math.sin(performance.now()/140)*0.025);
+    ctx.rotate(planeAngle);
+
     if(!crashed){
-      ctx.fillStyle='#ff9f1c';
+      // Jet exhaust flame behind tail
+      var flicker=5+Math.sin(performance.now()/45)*3;
+      var flame=ctx.createLinearGradient(-14,0,-24-flicker,0);
+      flame.addColorStop(0,'rgba(255,224,102,0.95)');
+      flame.addColorStop(0.55,'rgba(255,107,53,0.75)');
+      flame.addColorStop(1,'rgba(255,60,95,0)');
+      ctx.fillStyle=flame;
       ctx.beginPath();
-      ctx.moveTo(-6,0);
-      ctx.lineTo(-16,-3);
-      ctx.lineTo(-16,3);
+      ctx.moveTo(-12,-3);
+      ctx.lineTo(-24-flicker,0);
+      ctx.lineTo(-12,3);
       ctx.closePath();
       ctx.fill();
+    }else{
+      // Crash explosion ring & sparks
+      ctx.strokeStyle='rgba(255,92,119,0.75)';
+      ctx.lineWidth=2.2;
+      ctx.beginPath();
+      ctx.arc(0,0,19,0,Math.PI*2);
+      ctx.stroke();
+      ctx.fillStyle='#ff9f1c';
+      for(var sp=0;sp<6;sp++){
+        var ang=(sp/6)*Math.PI*2;
+        ctx.beginPath();
+        ctx.arc(Math.cos(ang)*16,Math.sin(ang)*16,2.3,0,Math.PI*2);
+        ctx.fill();
+      }
+    }
+
+    // Airplane body (fuselage)
+    var bodyCol=crashed?'#ff5c77':'#ffffff';
+    var wingCol=crashed?'#d9385a':'#e63946';
+    var trimCol=crashed?'#ffa6b5':'#ffd166';
+
+    // Top swept back wing
+    ctx.fillStyle=wingCol;
+    ctx.beginPath();
+    ctx.moveTo(4,-2);
+    ctx.lineTo(-8,-15);
+    ctx.lineTo(-13,-14);
+    ctx.lineTo(-4,-2);
+    ctx.closePath();
+    ctx.fill();
+
+    // Rear tail fin
+    ctx.beginPath();
+    ctx.moveTo(-10,-2);
+    ctx.lineTo(-17,-10);
+    ctx.lineTo(-19,-9);
+    ctx.lineTo(-15,-1);
+    ctx.closePath();
+    ctx.fill();
+
+    // Main streamlined fuselage
+    ctx.fillStyle=bodyCol;
+    ctx.beginPath();
+    ctx.moveTo(20,0);
+    ctx.quadraticCurveTo(14,-5.5,-2,-4.5);
+    ctx.lineTo(-16,-2.2);
+    ctx.lineTo(-16,2.8);
+    ctx.lineTo(-2,4.5);
+    ctx.quadraticCurveTo(13,5.5,20,0);
+    ctx.closePath();
+    ctx.fill();
+
+    // Bottom swept wing
+    ctx.fillStyle=wingCol;
+    ctx.beginPath();
+    ctx.moveTo(5,2);
+    ctx.lineTo(-7,15);
+    ctx.lineTo(-12,14);
+    ctx.lineTo(-3,2);
+    ctx.closePath();
+    ctx.fill();
+
+    // Cockpit window
+    ctx.fillStyle='#38bdf8';
+    ctx.beginPath();
+    ctx.ellipse(9,-1.2,4.2,1.8,0.18,0,Math.PI*2);
+    ctx.fill();
+
+    // Gold nose / wing stripe
+    ctx.fillStyle=trimCol;
+    ctx.beginPath();
+    ctx.moveTo(20,0);
+    ctx.lineTo(14,-2.2);
+    ctx.lineTo(14,2.2);
+    ctx.closePath();
+    ctx.fill();
+
+    // Spinning propeller blades at nose when flying
+    if(!crashed){
+      var propH=5+Math.abs(Math.sin(performance.now()/28))*6;
+      ctx.strokeStyle='rgba(255,255,255,0.85)';
+      ctx.lineWidth=2;
+      ctx.beginPath();
+      ctx.moveTo(21,-propH);
+      ctx.lineTo(21,propH);
+      ctx.stroke();
     }
     ctx.restore();
   }
   function stopTimers(){
+    stopFlySound();
     if(rafId){cancelAnimationFrame(rafId);rafId=0;}
     if(syncTimer){clearTimeout(syncTimer);syncTimer=0;}
   }
@@ -3547,6 +4097,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     roundIdEl.textContent='Round #'+r.id;
 
     if(nowMs<state.betEndsLocal){
+      stopFlySound();
       state.phase='betting';
       updateInputLock();
       var leftMs=Math.max(0,state.betEndsLocal-nowMs);
@@ -3579,6 +4130,8 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     // Betting window ended: ensure we have crash_point & flying timestamps from server
     if(state.crashPoint===null||state.crashPoint===undefined){
       state.phase='flying';
+      startFlySound(r.id);
+      updateFlySound(1.00);
       updateInputLock();
       phasePill.className='av-phase-pill flying';
       phasePill.textContent='TAKEOFF';
@@ -3601,12 +4154,14 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     var cp=Number(state.crashPoint||1.00);
     if(nowMs<state.crashesLocal){
       state.phase='flying';
+      startFlySound(r.id);
       updateInputLock();
       var flySec=Math.max(0,(nowMs-state.betEndsLocal)/1000);
       var cur=cp<=1.00?1.00:Math.min(cp,Math.exp(GROWTH_RATE*flySec));
       cur=Math.floor(cur*100)/100;
       if(cur<1.00)cur=1.00;
       lastMult=cur;
+      updateFlySound(cur);
 
       phasePill.className='av-phase-pill flying';
       phasePill.textContent='FLYING';
@@ -3647,7 +4202,14 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     }
 
     // Crashed phase
+    var justCrashed=(state.phase!=='crashed');
     state.phase='crashed';
+    if(justCrashed&&avCrashSoundRoundId!==r.id){
+      avCrashSoundRoundId=r.id;
+      playCrashSound();
+    }else{
+      stopFlySound();
+    }
     updateInputLock();
     phasePill.className='av-phase-pill crashed';
     phasePill.textContent='CRASHED';
@@ -3804,6 +4366,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
           upsertLocalBetRow(state.my_bet);
         }
         setBal(res.balance);
+        playCashoutSound();
         if(bridge.toast)bridge.toast('Aviator Win: +'+pay+' Coins @ '+cm.toFixed(2)+'x');
         applyPhaseUi(performance.now());
         bridge.refresh().catch(function(){});
@@ -3928,6 +4491,18 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
   if(isActiveRoute())init();
 })();
 </script>
+
+<div id="p2w-update-modal" class="p2w-upd-backdrop hide" role="dialog" aria-modal="true" aria-labelledby="p2w-upd-title">
+  <div class="p2w-upd-card">
+    <div class="p2w-upd-icon" aria-hidden="true">🚀</div>
+    <span class="p2w-upd-ver-pill" id="p2w-upd-ver">v1.2 → v1.3</span>
+    <h3 id="p2w-upd-title">New Update Available!</h3>
+    <div class="p2w-upd-notes" id="p2w-upd-notes">Naye features aur improvements ke liye app ko update karein.</div>
+    <button type="button" class="place" id="p2w-upd-go" style="margin-top:0">Update Now</button>
+    <button type="button" class="mini" id="p2w-upd-later" style="width:100%;margin-top:8px;min-height:42px">Later</button>
+    <div class="p2w-upd-status" id="p2w-upd-status" role="status"></div>
+  </div>
+</div>
 
 </body>
 </html>

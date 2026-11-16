@@ -13,6 +13,12 @@ create table if not exists public.referral_settings (
   coin_log_table text,
   deposits_table text,
   withdrawals_table text,
+  latest_version_code integer not null default 1,
+  latest_version_name text not null default '1.0',
+  update_title text not null default 'New Update Available!',
+  update_notes text not null default 'Naye features aur improvements ke liye app ko update karein.',
+  force_update boolean not null default false,
+  update_url text not null default '',
   updated_at timestamptz not null default now()
 );
 
@@ -22,6 +28,12 @@ alter table public.referral_settings add column if not exists sessions_table tex
 alter table public.referral_settings add column if not exists coin_log_table text;
 alter table public.referral_settings add column if not exists deposits_table text;
 alter table public.referral_settings add column if not exists withdrawals_table text;
+alter table public.referral_settings add column if not exists latest_version_code integer not null default 1;
+alter table public.referral_settings add column if not exists latest_version_name text not null default '1.0';
+alter table public.referral_settings add column if not exists update_title text not null default 'New Update Available!';
+alter table public.referral_settings add column if not exists update_notes text not null default 'Naye features aur improvements ke liye app ko update karein.';
+alter table public.referral_settings add column if not exists force_update boolean not null default false;
+alter table public.referral_settings add column if not exists update_url text not null default '';
 
 insert into public.referral_settings (id, download_url, reward_coins)
 values (1, '', 20)
@@ -271,7 +283,7 @@ begin
 end;
 $$;
 
--- 4. Public download info (for landing / referral links before login)
+-- 4. Public download & app update info (checked on app startup and referral landing)
 create or replace function public.get_public_download_info()
 returns jsonb
 language plpgsql
@@ -284,7 +296,13 @@ begin
   select * into v_cfg from public.referral_settings where id = 1;
   return jsonb_build_object(
     'download_url', coalesce(v_cfg.download_url, ''),
-    'reward_coins', coalesce(v_cfg.reward_coins, 20)
+    'reward_coins', coalesce(v_cfg.reward_coins, 20),
+    'latest_version_code', coalesce(v_cfg.latest_version_code, 1),
+    'latest_version_name', coalesce(nullif(trim(v_cfg.latest_version_name), ''), '1.0'),
+    'update_title', coalesce(nullif(trim(v_cfg.update_title), ''), 'New Update Available!'),
+    'update_notes', coalesce(nullif(trim(v_cfg.update_notes), ''), 'Naye features aur improvements ke liye app ko update karein.'),
+    'force_update', coalesce(v_cfg.force_update, false),
+    'update_url', coalesce(nullif(trim(v_cfg.update_url), ''), nullif(trim(v_cfg.download_url), ''), '')
   );
 end;
 $$;
@@ -538,6 +556,12 @@ begin
   return jsonb_build_object(
     'download_url', coalesce(v_cfg.download_url, ''),
     'reward_coins', coalesce(v_cfg.reward_coins, 20),
+    'latest_version_code', coalesce(v_cfg.latest_version_code, 1),
+    'latest_version_name', coalesce(nullif(trim(v_cfg.latest_version_name), ''), '1.0'),
+    'update_title', coalesce(nullif(trim(v_cfg.update_title), ''), 'New Update Available!'),
+    'update_notes', coalesce(nullif(trim(v_cfg.update_notes), ''), 'Naye features aur improvements ke liye app ko update karein.'),
+    'force_update', coalesce(v_cfg.force_update, false),
+    'update_url', coalesce(v_cfg.update_url, ''),
     'total_shares', v_total_shares,
     'total_referrals', v_total_refs,
     'total_coins_distributed', coalesce(v_total_coins, 0),
@@ -575,6 +599,79 @@ begin
         updated_at = now();
 
   return jsonb_build_object('download_url', v_url);
+end;
+$$;
+
+-- 9b. Admin: publish or turn off App Update Popup for all users
+create or replace function public.admin_set_app_update(
+  p_token text,
+  p_version_code integer,
+  p_version_name text,
+  p_update_title text,
+  p_update_notes text,
+  p_update_url text,
+  p_force_update boolean
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_auth record;
+  v_code integer;
+  v_name text;
+  v_title text;
+  v_notes text;
+  v_url text;
+  v_force boolean;
+begin
+  select * into v_auth from public._p2w_auth_user(p_token);
+  if v_auth.user_role <> 'admin' then
+    raise exception 'Admin access required.';
+  end if;
+
+  v_code := coalesce(p_version_code, 1);
+  if v_code < 1 then
+    raise exception 'Version code kam se kam 1 hona chahiye.';
+  end if;
+
+  v_name := coalesce(nullif(trim(p_version_name), ''), v_code::text || '.0');
+  v_title := coalesce(nullif(trim(p_update_title), ''), 'New Update Available!');
+  v_notes := coalesce(nullif(trim(p_update_notes), ''), 'Naye features aur improvements ke liye app ko update karein.');
+  v_url := trim(coalesce(p_update_url, ''));
+  if v_url <> '' and v_url !~ '^https?://' then
+    raise exception 'Valid https:// or http:// update URL enter karein.';
+  end if;
+  v_force := coalesce(p_force_update, false);
+
+  insert into public.referral_settings (
+    id, download_url, reward_coins, latest_version_code, latest_version_name,
+    update_title, update_notes, update_url, force_update, updated_at
+  )
+  values (
+    1, v_url, 20, v_code, v_name,
+    v_title, v_notes, v_url, v_force, now()
+  )
+  on conflict (id) do update
+    set latest_version_code = excluded.latest_version_code,
+        latest_version_name = excluded.latest_version_name,
+        update_title = excluded.update_title,
+        update_notes = excluded.update_notes,
+        update_url = excluded.update_url,
+        force_update = excluded.force_update,
+        download_url = case when coalesce(trim(public.referral_settings.download_url), '') = '' and v_url <> '' then v_url else public.referral_settings.download_url end,
+        updated_at = now();
+
+  return jsonb_build_object(
+    'ok', true,
+    'latest_version_code', v_code,
+    'latest_version_name', v_name,
+    'update_title', v_title,
+    'update_notes', v_notes,
+    'update_url', v_url,
+    'force_update', v_force
+  );
 end;
 $$;
 
@@ -797,6 +894,7 @@ grant execute on function public.record_referral_share(text) to anon, authentica
 grant execute on function public.claim_referral_code(text, text) to anon, authenticated;
 grant execute on function public.admin_referral_overview(text) to anon, authenticated;
 grant execute on function public.admin_set_download_url(text, text) to anon, authenticated;
+grant execute on function public.admin_set_app_update(text, integer, text, text, text, text, boolean) to anon, authenticated;
 grant execute on function public.admin_list_referral_access(text) to anon, authenticated;
 grant execute on function public.admin_set_referral_network_access(text, text, boolean) to anon, authenticated;
 grant execute on function public.get_my_referral_network_stats(text) to anon, authenticated;
