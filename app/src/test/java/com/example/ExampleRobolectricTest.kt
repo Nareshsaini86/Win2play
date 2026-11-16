@@ -82,6 +82,21 @@ class ExampleRobolectricTest {
     assertTrue(html.contains("admin_list_referral_access"))
     assertTrue(html.contains("Referrer ko +20 Coins"))
     assertFalse(html.contains("dono ko 20 Bonus Coins"))
+    assertTrue(html.contains("id=\"admin-cat-tabs\""))
+    assertTrue(html.contains("id=\"admin-pane-payments\""))
+    assertTrue(html.contains("id=\"admin-pane-referrals\""))
+    assertTrue(html.contains("id=\"admin-pane-users\""))
+    assertTrue(html.contains("id=\"admin-user-search\""))
+    assertTrue(html.contains("id=\"admin-users-bulk-bar\""))
+    assertTrue(html.contains("id=\"admin-users-select-all\""))
+    assertTrue(html.contains("id=\"admin-users-select-all-top\""))
+    assertTrue(html.contains("class=\"admin-user-cb\""))
+    assertTrue(html.contains("id=\"admin-bulk-add\""))
+    assertTrue(html.contains("id=\"admin-bulk-deduct\""))
+    assertTrue(html.contains("id=\"admin-bulk-network-on\""))
+    assertTrue(html.contains("id=\"admin-bulk-reset-pw\""))
+    assertTrue(html.contains("id=\"admin-bulk-delete\""))
+    assertFalse(html.contains("admin-user-actions"))
   }
 
   @Test

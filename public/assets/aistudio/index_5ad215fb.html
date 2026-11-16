@@ -447,6 +447,67 @@ img{ -webkit-user-drag:none; user-drag:none; }
 .admin-ctrl-chips button:disabled{opacity:.5;cursor:not-allowed}
 </style>
 
+<style id="admin-hub-style">
+body.is-admin-mode .wrap{max-width:780px}
+.admin-hub-hero{margin:0 0 12px;padding:16px;border-radius:20px;border:1px solid rgba(255,201,77,.32);background:radial-gradient(circle at 100% 0%,rgba(255,190,65,.18),transparent 48%),linear-gradient(145deg,rgba(124,77,255,.16),var(--panel));box-shadow:0 12px 28px var(--shadow)}
+.admin-hub-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.admin-hub-title{margin:0;font-size:1.15rem;font-weight:950;letter-spacing:-.01em}
+.admin-hub-sub{margin:2px 0 0;font-size:.76rem;color:var(--mute)}
+.admin-alert-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.admin-alert-bar .note{margin:0;flex:1;min-width:170px}
+.admin-kpi-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.admin-kpi-card{padding:11px 8px;border-radius:14px;border:1px solid var(--line);background:var(--panel);text-align:center;cursor:pointer;transition:transform .12s,border-color .15s,box-shadow .15s}
+.admin-kpi-card:active{transform:scale(.97)}
+.admin-kpi-card.is-active{border-color:rgba(255,201,77,.55);box-shadow:0 6px 18px var(--shadow)}
+.admin-kpi-card small{display:block;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--mute)}
+.admin-kpi-card b{display:block;margin-top:3px;font-size:1.15rem;font-weight:950;color:var(--gold-text);font-variant-numeric:tabular-nums}
+.admin-cat-tabs{position:sticky;top:6px;z-index:4;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:6px;border-radius:16px;background:var(--panel-solid);border:1px solid var(--line);margin-bottom:12px;box-shadow:0 10px 26px var(--shadow)}
+.admin-cat-tab{min-height:54px;border:1px solid transparent;border-radius:12px;background:transparent;color:var(--mute);padding:7px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-weight:850;font-size:.78rem;cursor:pointer;transition:background .15s,color .15s,transform .1s,box-shadow .15s}
+.admin-cat-tab:active{transform:scale(.97)}
+.admin-cat-tab.on{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--onaccent);box-shadow:0 6px 16px rgba(255,159,28,.28)}
+.admin-cat-icon{font-size:1.12rem;line-height:1}
+.admin-cat-label{display:inline-flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap;line-height:1.1}
+.admin-cat-badge{display:inline-block;padding:1px 6px;border-radius:999px;font-size:.66rem;font-weight:900;background:rgba(255,201,77,.18);color:var(--gold-text);font-variant-numeric:tabular-nums}
+.admin-cat-badge.alert{background:rgba(255,93,115,.22);color:var(--red)}
+.admin-cat-tab.on .admin-cat-badge{background:rgba(0,0,0,.18);color:inherit}
+.admin-cat-pane{animation:adminPaneIn .18s ease-out}
+.admin-cat-pane>.card:first-child{margin-top:0}
+@keyframes adminPaneIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.admin-pay-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+.admin-pay-grid .card{margin-top:0}
+.admin-user-search-wrap{display:flex;gap:8px;align-items:center;margin:8px 0 10px}
+.admin-user-search-wrap input{margin:0;flex:1;min-width:0}
+.admin-bulk-bar{margin:0 0 10px;padding:10px;border-radius:14px;border:1px solid var(--line);background:var(--soft);transition:border-color .15s,background .15s}
+.admin-bulk-bar.has-sel{border-color:rgba(255,201,77,.55);background:linear-gradient(145deg,rgba(255,201,77,.10),var(--soft))}
+.admin-bulk-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.admin-bulk-sel-info{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.admin-bulk-all-toggle{display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:4px 10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-size:.78rem;font-weight:850;cursor:pointer;margin:0}
+.admin-bulk-all-toggle input{width:17px;height:17px;accent-color:var(--gold);margin:0;cursor:pointer}
+.admin-bulk-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;transition:opacity .15s}
+.admin-bulk-bar:not(.has-sel) .admin-bulk-actions{opacity:.68}
+.admin-bulk-actions .mini{min-height:40px;padding:7px 6px;font-weight:850;font-size:.76rem;border-radius:10px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.admin-bulk-actions .bulk-add{background:rgba(46,230,160,.14);color:var(--green);border-color:rgba(46,230,160,.38)}
+.admin-bulk-actions .bulk-sub{background:rgba(255,201,77,.14);color:var(--gold-text);border-color:rgba(255,201,77,.4)}
+.admin-bulk-actions .bulk-net{background:rgba(53,240,168,.14);color:var(--green);border-color:rgba(53,240,168,.38)}
+.admin-bulk-actions .bulk-net-off{background:var(--panel);color:var(--mute)}
+.admin-bulk-actions .bulk-pw{background:rgba(124,77,255,.16);color:var(--ink);border-color:rgba(124,77,255,.42)}
+.admin-bulk-actions .bulk-del{background:rgba(255,93,115,.14);color:var(--red);border-color:rgba(255,93,115,.42)}
+.admin-chk-cell{width:44px;padding:4px !important;text-align:center}
+.admin-chk-label{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;margin:0;cursor:pointer;border-radius:10px}
+.admin-chk-label input{width:18px;height:18px;accent-color:var(--gold);margin:0;cursor:pointer}
+tr.is-selected td{background:rgba(255,201,77,.09)}
+.admin-net-badge{display:inline-block;margin-top:3px;padding:1px 7px;border-radius:999px;font-size:.66rem;font-weight:850;background:rgba(46,230,160,.15);color:var(--green);border:1px solid rgba(46,230,160,.35)}
+@media(min-width:720px){
+  .admin-pay-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .admin-bulk-actions{grid-template-columns:repeat(6,minmax(0,1fr))}
+}
+@media(max-width:380px){
+  .admin-cat-tab{font-size:.72rem;padding:6px 4px;min-height:50px}
+  .admin-kpi-card b{font-size:1rem}
+  .admin-bulk-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+</style>
+
 <style id="play2win-ad-rewards-style">
 .ad-reward-card{margin:14px 0 8px;padding:16px 14px 14px;border-radius:20px;border:1px solid rgba(255,190,65,.42);background:radial-gradient(circle at 100% 0%,rgba(255,184,55,.16),transparent 42%),linear-gradient(145deg,var(--panel),rgba(255,255,255,.025));box-shadow:0 12px 28px var(--shadow),inset 0 1px 0 rgba(255,255,255,.10)}
 .ad-reward-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
@@ -998,77 +1059,147 @@ img{ -webkit-user-drag:none; user-drag:none; }
     </section>
 
     <section id="v-admin" class="hide">
-      <div class="card" id="admin-alert-card" style="margin-top:0">
-        <div class="srow"><h2 style="margin:0">Request Alerts</h2><span class="bal" id="admin-alert-status">Sound off</span></div>
-        <p class="note">Admin login hote hi sound alerts automatically start honge. New Add Coins aur Withdrawal request par ring aur browser notification milega.</p>
-        <button class="mini hide" id="admin-alert-enable" type="button">Enable Sound Alerts</button>
-        <button class="mini" id="admin-alert-disable" type="button" style="width:100%;margin-top:8px">Mute Sound</button>
-        <div class="note" id="admin-alert-message" role="status" style="margin-top:8px">Automatic alerts are ready while the admin dashboard is open.</div>
-      </div>
-      <div class="card" style="margin-top:0">
-        <h2 style="margin-top:0">Create user</h2>
-        <input id="n-id" placeholder="User ID" autocomplete="off">
-        <input id="n-phone" placeholder="Phone number (e.g. 9876543210)" inputmode="tel" autocomplete="off">
-        <input id="n-pw" placeholder="Password (min 6 characters)" autocomplete="off">
-        <div class="err" id="n-err"></div>
-        <button class="place" id="n-go" style="margin-top:4px">Create user</button>
-      </div>
-      <div class="card" id="admin-payment-upi-card">
-        <div class="srow"><h2 style="margin-top:0">Payment UPI Management</h2><span class="bal">Admin</span></div>
-        <p class="note">Yahan UPI ID add karein. Active UPI ID se users ke Add Coins QR generate honge. Payment bank/UPI statement se verify karna zaroori hai.</p>
-        <label>UPI ID (VPA)<input id="admin-upi-id" type="text" placeholder="yourname@upi" autocapitalize="off" autocomplete="off"></label>
-        <label>Payee / Business Name<input id="admin-upi-name" type="text" placeholder="Play2Win" maxlength="60"></label>
-        <div class="err" id="admin-upi-error" role="alert"></div>
-        <button class="place" id="admin-upi-add" type="button">Add UPI ID</button>
-        <div style="font-weight:700;margin:16px 0 8px">Saved UPI IDs</div>
-        <div class="scroll" style="max-height:35vh;max-height:35dvh">
-          <table><thead><tr><th>UPI ID</th><th>Name</th><th>Status</th><th>Actions</th></tr></thead>
-          <tbody id="admin-upi-list"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody></table>
+      <div class="admin-hub-hero" id="admin-alert-card">
+        <div class="admin-hub-top">
+          <div>
+            <h2 class="admin-hub-title">Admin Control Center</h2>
+            <p class="admin-hub-sub">Payments, Referrals aur Users ko category-wise manage karein</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="bal" id="admin-alert-status" style="font-size:.78rem;min-height:32px;padding:5px 10px">Sound off</span>
+            <button class="mini hide" id="admin-alert-enable" type="button">Enable</button>
+            <button class="mini" id="admin-alert-disable" type="button" style="min-height:36px">Mute Sound</button>
+          </div>
         </div>
-        <div id="admin-upi-qr-wrap" class="hide" style="margin-top:14px;text-align:center">
-          <b id="admin-upi-qr-title"></b>
-          <div id="admin-upi-qr" style="display:flex;justify-content:center;background:#fff;padding:14px;border-radius:14px;margin:10px auto;width:max-content"></div>
-          <button class="mini" id="admin-upi-qr-close" type="button">Close QR</button>
+        <div class="admin-alert-bar">
+          <div class="note" id="admin-alert-message" role="status">Automatic alerts are ready while the admin dashboard is open.</div>
         </div>
       </div>
-      <div class="card" id="admin-deposits-card">
-        <div class="srow"><h2 style="margin-top:0">UPI Deposit Requests</h2><span class="bal" id="deposit-pending-count">0 Pending</span></div>
-        <p class="note">UTR aur bank statement verify karne ke baad hi Approve karein.</p>
-        <div class="scroll" style="max-height:45vh;max-height:45dvh"><table><thead><tr><th>Time</th><th>User</th><th>Amount</th><th>UTR</th><th>Status / Action</th></tr></thead><tbody id="deposit-requests"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody></table></div>
+
+      <div class="admin-kpi-grid" aria-label="Admin quick overview">
+        <button type="button" class="admin-kpi-card is-active" data-admin-cat-jump="payments" id="admin-kpi-card-payments">
+          <small>Pending Pay</small>
+          <b id="admin-kpi-pending">0</b>
+        </button>
+        <button type="button" class="admin-kpi-card" data-admin-cat-jump="referrals" id="admin-kpi-card-referrals">
+          <small>Referrals</small>
+          <b id="admin-kpi-refs" style="color:var(--green)">0</b>
+        </button>
+        <button type="button" class="admin-kpi-card" data-admin-cat-jump="users" id="admin-kpi-card-users">
+          <small>Total Users</small>
+          <b id="admin-kpi-users">0</b>
+        </button>
       </div>
-      <div class="card" id="admin-withdrawals-card">
-        <div class="srow"><h2 style="margin-top:0">Withdrawal Requests</h2><span class="bal" id="withdraw-pending-count">0 Pending</span></div>
-        <p class="note">UPI payout manually complete karne ke baad Mark Paid karein. Reject karne par coins user ko refund honge.</p>
-        <div class="scroll" style="max-height:45vh;max-height:45dvh"><table><thead><tr><th>Time</th><th>User</th><th>UPI ID</th><th>Amount</th><th>Status / Action</th></tr></thead><tbody id="withdraw-requests"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody></table></div>
+
+      <div class="admin-cat-tabs" id="admin-cat-tabs" role="tablist" aria-label="Admin categories">
+        <button type="button" class="admin-cat-tab on" id="admin-cat-tab-payments" data-admin-cat="payments" role="tab" aria-selected="true">
+          <span class="admin-cat-icon" aria-hidden="true">💳</span>
+          <span class="admin-cat-label"><span>Payments</span><span class="admin-cat-badge" id="admin-cat-pay-badge">0</span></span>
+        </button>
+        <button type="button" class="admin-cat-tab" id="admin-cat-tab-referrals" data-admin-cat="referrals" role="tab" aria-selected="false">
+          <span class="admin-cat-icon" aria-hidden="true">🎁</span>
+          <span class="admin-cat-label"><span>Referrals</span><span class="admin-cat-badge" id="admin-cat-ref-badge">0</span></span>
+        </button>
+        <button type="button" class="admin-cat-tab" id="admin-cat-tab-users" data-admin-cat="users" role="tab" aria-selected="false">
+          <span class="admin-cat-icon" aria-hidden="true">👥</span>
+          <span class="admin-cat-label"><span>Users</span><span class="admin-cat-badge" id="admin-cat-users-badge">0</span></span>
+        </button>
       </div>
-      <div class="card" id="admin-referrals-card">
-        <div class="srow"><h2 style="margin-top:0">Refer &amp; Earn Analytics</h2><span class="bal" id="admin-ref-badge">20 Coins / Referrer</span></div>
-        <p class="note">Yahan direct App / APK auto-download link (.apk file, GitHub Release, ya Google Drive file link) set karein. Website link set na karein.</p>
-        <label>App / APK Auto-Download Link
-          <input id="admin-ref-download-url" type="url" placeholder="https://github.com/user/repo/releases/latest/download/Play2Win.apk" autocapitalize="off" autocomplete="off">
-        </label>
-        <div class="err" id="admin-ref-url-msg" role="alert"></div>
-        <button class="place" id="admin-ref-save-url" type="button" style="margin-top:4px">Save App Download Link</button>
-        <div class="ref-stats-grid" style="margin-top:14px">
-          <div class="ref-stat"><span>Total Shares</span><b id="admin-ref-total-shares">0</b></div>
-          <div class="ref-stat"><span>Total Installs</span><b id="admin-ref-total-refers">0</b></div>
-          <div class="ref-stat"><span>Coins Earned</span><b id="admin-ref-total-coins">0</b></div>
+
+      <div id="admin-pane-payments" class="admin-cat-pane">
+        <div class="admin-pay-grid">
+          <div class="card" id="admin-deposits-card">
+            <div class="srow"><h2 style="margin-top:0">UPI Deposit Requests</h2><span class="bal" id="deposit-pending-count">0 Pending</span></div>
+            <p class="note">UTR aur bank statement verify karne ke baad hi Approve karein.</p>
+            <div class="scroll" style="max-height:42vh;max-height:42dvh"><table><thead><tr><th>Time</th><th>User</th><th>Amount</th><th>UTR</th><th>Status / Action</th></tr></thead><tbody id="deposit-requests"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody></table></div>
+          </div>
+          <div class="card" id="admin-withdrawals-card">
+            <div class="srow"><h2 style="margin-top:0">Withdrawal Requests</h2><span class="bal" id="withdraw-pending-count">0 Pending</span></div>
+            <p class="note">UPI payout manually complete karne ke baad Mark Paid karein. Reject karne par coins user ko refund honge.</p>
+            <div class="scroll" style="max-height:42vh;max-height:42dvh"><table><thead><tr><th>Time</th><th>User</th><th>UPI ID</th><th>Amount</th><th>Status / Action</th></tr></thead><tbody id="withdraw-requests"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody></table></div>
+          </div>
         </div>
-        <div style="font-weight:700;margin:12px 0 8px">Users, Referrals &amp; Network Tab Right</div>
-        <div class="scroll" style="max-height:38vh;max-height:38dvh">
-          <table><thead><tr><th>User</th><th>Code</th><th>Shares</th><th>Installs</th><th>Earned</th><th>Network Tab</th></tr></thead>
-          <tbody id="admin-ref-users"><tr><td colspan="6" class="empty">Loading...</td></tr></tbody></table>
-        </div>
-        <div style="font-weight:700;margin:14px 0 8px">Recent Referrals</div>
-        <div class="scroll" style="max-height:35vh;max-height:35dvh">
-          <table><thead><tr><th>Time</th><th>Referrer</th><th>New User</th><th>Bonus</th></tr></thead>
-          <tbody id="admin-ref-recent"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody></table>
+        <div class="card" id="admin-payment-upi-card">
+          <div class="srow"><h2 style="margin-top:0">Payment UPI Management</h2><span class="bal">Admin</span></div>
+          <p class="note">Yahan UPI ID add karein. Active UPI ID se users ke Add Coins QR generate honge. Payment bank/UPI statement se verify karna zaroori hai.</p>
+          <label>UPI ID (VPA)<input id="admin-upi-id" type="text" placeholder="yourname@upi" autocapitalize="off" autocomplete="off"></label>
+          <label>Payee / Business Name<input id="admin-upi-name" type="text" placeholder="Play2Win" maxlength="60"></label>
+          <div class="err" id="admin-upi-error" role="alert"></div>
+          <button class="place" id="admin-upi-add" type="button">Add UPI ID</button>
+          <div style="font-weight:700;margin:16px 0 8px">Saved UPI IDs</div>
+          <div class="scroll" style="max-height:35vh;max-height:35dvh">
+            <table><thead><tr><th>UPI ID</th><th>Name</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="admin-upi-list"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody></table>
+          </div>
+          <div id="admin-upi-qr-wrap" class="hide" style="margin-top:14px;text-align:center">
+            <b id="admin-upi-qr-title"></b>
+            <div id="admin-upi-qr" style="display:flex;justify-content:center;background:#fff;padding:14px;border-radius:14px;margin:10px auto;width:max-content"></div>
+            <button class="mini" id="admin-upi-qr-close" type="button">Close QR</button>
+          </div>
         </div>
       </div>
-      <div class="card">
-        <h2 style="margin-top:0">Users</h2>
-        <div class="scroll" style="max-height:50vh;max-height:50dvh"><table><thead><tr><th>User ID</th><th>Phone</th><th>Coins</th><th>Actions</th></tr></thead><tbody id="users"></tbody></table></div>
-        <p class="note" style="margin-top:8px">Accounts, passwords and coins are stored securely in the cloud database.</p>
+
+      <div id="admin-pane-referrals" class="admin-cat-pane hide">
+        <div class="card" id="admin-referrals-card">
+          <div class="srow"><h2 style="margin-top:0">Refer &amp; Earn Analytics</h2><span class="bal" id="admin-ref-badge">20 Coins / Referrer</span></div>
+          <p class="note">Yahan direct App / APK auto-download link (.apk file, GitHub Release, ya Google Drive file link) set karein. Website link set na karein.</p>
+          <label>App / APK Auto-Download Link
+            <input id="admin-ref-download-url" type="url" placeholder="https://github.com/user/repo/releases/latest/download/Play2Win.apk" autocapitalize="off" autocomplete="off">
+          </label>
+          <div class="err" id="admin-ref-url-msg" role="alert"></div>
+          <button class="place" id="admin-ref-save-url" type="button" style="margin-top:4px">Save App Download Link</button>
+          <div class="ref-stats-grid" style="margin-top:14px">
+            <div class="ref-stat"><span>Total Shares</span><b id="admin-ref-total-shares">0</b></div>
+            <div class="ref-stat"><span>Total Installs</span><b id="admin-ref-total-refers">0</b></div>
+            <div class="ref-stat"><span>Coins Earned</span><b id="admin-ref-total-coins">0</b></div>
+          </div>
+          <div style="font-weight:700;margin:12px 0 8px">Users, Referrals &amp; Network Tab Right</div>
+          <div class="scroll" style="max-height:38vh;max-height:38dvh">
+            <table><thead><tr><th>User</th><th>Code</th><th>Shares</th><th>Installs</th><th>Earned</th><th>Network Tab</th></tr></thead>
+            <tbody id="admin-ref-users"><tr><td colspan="6" class="empty">Loading...</td></tr></tbody></table>
+          </div>
+          <div style="font-weight:700;margin:14px 0 8px">Recent Referrals</div>
+          <div class="scroll" style="max-height:35vh;max-height:35dvh">
+            <table><thead><tr><th>Time</th><th>Referrer</th><th>New User</th><th>Bonus</th></tr></thead>
+            <tbody id="admin-ref-recent"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <div id="admin-pane-users" class="admin-cat-pane hide">
+        <div class="card" id="admin-create-user-card" style="margin-top:0">
+          <h2 style="margin-top:0">Create User</h2>
+          <input id="n-id" placeholder="User ID" autocomplete="off">
+          <input id="n-phone" placeholder="Phone number (e.g. 9876543210)" inputmode="tel" autocomplete="off">
+          <input id="n-pw" placeholder="Password (min 6 characters)" autocomplete="off">
+          <div class="err" id="n-err"></div>
+          <button class="place" id="n-go" style="margin-top:4px">Create user</button>
+        </div>
+        <div class="card" id="admin-users-card">
+          <div class="srow"><h2 style="margin:0">Users Management</h2><span class="bal" id="admin-users-count">0 Users</span></div>
+          <div class="admin-user-search-wrap">
+            <input id="admin-user-search" type="search" placeholder="Search user by ID, email or phone..." autocomplete="off" aria-label="Search users">
+          </div>
+          <div class="admin-bulk-bar" id="admin-users-bulk-bar">
+            <div class="admin-bulk-top">
+              <div class="admin-bulk-sel-info">
+                <label class="admin-bulk-all-toggle"><input type="checkbox" id="admin-users-select-all-top" aria-label="Select all users"><span>Select All</span></label>
+                <span class="bal" id="admin-bulk-count" style="font-size:.74rem;padding:4px 9px;min-height:26px">0 Selected</span>
+              </div>
+              <button type="button" class="mini hide" id="admin-bulk-clear">Clear</button>
+            </div>
+            <div class="admin-bulk-actions" id="admin-bulk-actions">
+              <button type="button" class="mini bulk-add" id="admin-bulk-add">+ ₹ Add</button>
+              <button type="button" class="mini bulk-sub" id="admin-bulk-deduct">- ₹ Deduct</button>
+              <button type="button" class="mini bulk-net" id="admin-bulk-network-on">Give Network</button>
+              <button type="button" class="mini bulk-net-off" id="admin-bulk-network-off">Off Network</button>
+              <button type="button" class="mini bulk-pw" id="admin-bulk-reset-pw">Reset PW</button>
+              <button type="button" class="mini bulk-del" id="admin-bulk-delete">Delete</button>
+            </div>
+          </div>
+          <div class="scroll" style="max-height:52vh;max-height:52dvh"><table><thead><tr><th class="admin-chk-cell"><label class="admin-chk-label" title="Select all visible users"><input type="checkbox" id="admin-users-select-all" aria-label="Select all visible users"></label></th><th>User ID</th><th>Phone</th><th>Coins</th></tr></thead><tbody id="users"></tbody></table></div>
+          <p class="note" style="margin-top:8px">Single, multiple ya All users select karke upar ke buttons se ek sath ₹ Add/Deduct, Give Network, Reset PW ya Delete kar sakte hain.</p>
+        </div>
       </div>
     </section>
   </div>
@@ -1556,6 +1687,8 @@ img{ -webkit-user-drag:none; user-drag:none; }
   var loggingOut=false;
   function clearLocalLogin(silent){
     S.token=null;S.id=null;S.role=null;S.balance=0;S.displayName=null;S.email=null;
+    document.body.classList.remove('is-admin-mode');
+    selectedUserIds={};
     if($('m-ref-network'))$('m-ref-network').classList.add('hide');
     try{
       ['np_token','np_id','np_display_name','np_email'].forEach(function(k){localStorage.removeItem(k)});
@@ -1617,6 +1750,7 @@ img{ -webkit-user-drag:none; user-drag:none; }
     $('v-auth').classList.add('hide');
     $('app').classList.remove('hide');
     $('gear').classList.remove('hide');
+    document.body.classList.toggle('is-admin-mode',isAdmin());
     if(!$('nav').children.length)buildNav();
     if(r==='logout'){logout();return}
     if(isAdmin()&&(r==='play'||r==='mine'||r==='add'||r==='withdraw'||r==='rewards'||r==='goldball'||r==='aviator'||r==='share'||r==='ref-network'))r='admin';
@@ -1824,19 +1958,202 @@ img{ -webkit-user-drag:none; user-drag:none; }
   }
 
   // ---- admin ----
+  var activeAdminCat='payments', adminPendingDepCount=0, adminPendingWdrCount=0, adminAccessMap={}, selectedUserIds={}, adminBulkBusy=false;
+  function syncAdminPaymentBadges(){
+    var totalPend=adminPendingDepCount+adminPendingWdrCount;
+    if($('admin-kpi-pending')){
+      $('admin-kpi-pending').textContent=totalPend;
+      $('admin-kpi-pending').style.color=totalPend>0?'var(--red)':'var(--green)';
+    }
+    if($('admin-cat-pay-badge')){
+      $('admin-cat-pay-badge').textContent=totalPend;
+      $('admin-cat-pay-badge').classList.toggle('alert',totalPend>0);
+    }
+  }
+  function setAdminCat(cat){
+    if(cat!=='referrals'&&cat!=='users')cat='payments';
+    activeAdminCat=cat;
+    ['payments','referrals','users'].forEach(function(k){
+      var tab=$('admin-cat-tab-'+k),pane=$('admin-pane-'+k),kpi=$('admin-kpi-card-'+k);
+      if(tab){tab.classList.toggle('on',k===cat);tab.setAttribute('aria-selected',k===cat?'true':'false');}
+      if(pane)pane.classList.toggle('hide',k!==cat);
+      if(kpi)kpi.classList.toggle('is-active',k===cat);
+    });
+  }
+  if($('admin-cat-tabs')){
+    $('admin-cat-tabs').addEventListener('click',function(e){
+      var btn=e.target.closest('[data-admin-cat]');
+      if(btn)setAdminCat(btn.dataset.adminCat);
+    });
+  }
+  document.addEventListener('click',function(e){
+    var j=e.target.closest('[data-admin-cat-jump]');
+    if(j&&isAdmin())setAdminCat(j.getAttribute('data-admin-cat-jump'));
+  });
+
+  function getFilteredUsers(){
+    var us=S.users||[];
+    var q=($('admin-user-search')?$('admin-user-search').value:'').trim().toLowerCase();
+    return q?us.filter(function(u){
+      var hay=[u.id,u.email,u.display_name,u.phone].filter(Boolean).join(' ').toLowerCase();
+      return hay.indexOf(q)>=0;
+    }):us;
+  }
+  function getSelectedUserIds(){
+    return Object.keys(selectedUserIds).filter(function(id){return !!selectedUserIds[id];});
+  }
+  function syncUserSelectionUI(){
+    var allSel=getSelectedUserIds();
+    var vis=getFilteredUsers();
+    var visSel=0;
+    vis.forEach(function(u){if(selectedUserIds[u.id])visSel++;});
+    if($('admin-users-bulk-bar'))$('admin-users-bulk-bar').classList.toggle('has-sel',allSel.length>0);
+    if($('admin-bulk-count')&&!adminBulkBusy)$('admin-bulk-count').textContent=allSel.length+' Selected';
+    if($('admin-bulk-clear'))$('admin-bulk-clear').classList.toggle('hide',allSel.length===0);
+    var allChecked=vis.length>0&&visSel===vis.length;
+    var someChecked=visSel>0&&visSel<vis.length;
+    ['admin-users-select-all','admin-users-select-all-top'].forEach(function(cid){
+      var el=$(cid);
+      if(el){el.checked=allChecked;el.indeterminate=someChecked;}
+    });
+    if($('users')){
+      $('users').querySelectorAll('tr').forEach(function(tr){
+        var cb=tr.querySelector('.admin-user-cb');
+        if(!cb)return;
+        var on=!!selectedUserIds[cb.dataset.uid];
+        cb.checked=on;
+        tr.classList.toggle('is-selected',on);
+      });
+    }
+  }
+  function renderUsersTable(){
+    var us=S.users||[];
+    var q=($('admin-user-search')?$('admin-user-search').value:'').trim().toLowerCase();
+    var filtered=getFilteredUsers();
+    if($('admin-users-count'))$('admin-users-count').textContent=us.length+' Users';
+    if($('admin-kpi-users'))$('admin-kpi-users').textContent=us.length;
+    if($('admin-cat-users-badge'))$('admin-cat-users-badge').textContent=us.length;
+    $('users').innerHTML=filtered.length?filtered.map(function(u){
+      var who=u.email||u.display_name||u.id;
+      var hasNet=!!adminAccessMap[u.id];
+      var isSel=!!selectedUserIds[u.id];
+      return '<tr class="'+(isSel?'is-selected':'')+'"><td class="admin-chk-cell"><label class="admin-chk-label"><input type="checkbox" class="admin-user-cb" data-uid="'+esc(u.id)+'"'+(isSel?' checked':'')+' aria-label="Select '+esc(who)+'"></label></td><td><div>'+esc(who)+'</div>'+(hasNet?'<span class="admin-net-badge">✓ Network</span>':'')+'</td><td>'+esc(u.phone||'–')+'</td><td><b>'+u.balance+'</b></td></tr>';
+    }).join(''):'<tr><td colspan="4" class="empty">'+(q?'Koi matching user nahi mila.':'No users yet. Create one above.')+'</td></tr>';
+    syncUserSelectionUI();
+  }
+  if($('admin-user-search'))$('admin-user-search').addEventListener('input',renderUsersTable);
+  function toggleSelectAllVisible(checked){
+    getFilteredUsers().forEach(function(u){
+      if(checked)selectedUserIds[u.id]=true;
+      else delete selectedUserIds[u.id];
+    });
+    syncUserSelectionUI();
+  }
+  ['admin-users-select-all','admin-users-select-all-top'].forEach(function(cid){
+    if($(cid))$(cid).addEventListener('change',function(){toggleSelectAllVisible(this.checked);});
+  });
+  if($('admin-bulk-clear'))$('admin-bulk-clear').addEventListener('click',function(){
+    selectedUserIds={};
+    syncUserSelectionUI();
+  });
+  function setBulkBusy(busy,statusText){
+    adminBulkBusy=busy;
+    if($('admin-bulk-actions')){
+      $('admin-bulk-actions').querySelectorAll('button').forEach(function(b){b.disabled=busy;});
+    }
+    if($('admin-bulk-count')){
+      $('admin-bulk-count').textContent=busy&&statusText?statusText:(getSelectedUserIds().length+' Selected');
+    }
+  }
+  function runBulkUserAction(label,workerFn,opts){
+    if(adminBulkBusy)return;
+    var ids=getSelectedUserIds();
+    if(!ids.length){toast('Pehle kam se kam 1 user select karein.');return;}
+    var ok=0,fail=0,lastErr='',idx=0,BATCH=5;
+    setBulkBusy(true,label+' 0/'+ids.length+'...');
+    function nextBatch(){
+      if(idx>=ids.length){
+        if(opts&&opts.clearAfter){
+          ids.forEach(function(id){delete selectedUserIds[id];});
+        }
+        setBulkBusy(false);
+        loadUsers();
+        if(opts&&opts.reloadRefs&&window.Play2WinLoadAdminReferrals)window.Play2WinLoadAdminReferrals();
+        var msg=label+': '+ok+'/'+ids.length+' users updated.';
+        if(fail>0)msg+=' Failed: '+fail+(lastErr?' ('+lastErr+')':'');
+        toast(msg);
+        return;
+      }
+      var slice=ids.slice(idx,idx+BATCH);
+      idx+=slice.length;
+      Promise.all(slice.map(function(uid){
+        return Promise.resolve().then(function(){return workerFn(uid);}).then(function(){ok++;}).catch(function(err){
+          fail++;
+          if(!lastErr&&err&&err.message)lastErr=err.message;
+        });
+      })).then(function(){
+        if($('admin-bulk-count'))$('admin-bulk-count').textContent=label+' '+Math.min(idx,ids.length)+'/'+ids.length+'...';
+        nextBatch();
+      });
+    }
+    nextBatch();
+  }
+  if($('admin-bulk-add'))$('admin-bulk-add').onclick=function(){
+    var ids=getSelectedUserIds();
+    if(!ids.length){toast('Pehle kam se kam 1 user select karein.');return;}
+    var raw=prompt('Coins / ₹ to ADD to '+ids.length+' selected user(s):','100');
+    if(raw===null)return;
+    var v=parseInt(raw,10);
+    if(!v||v<=0){toast('Valid positive amount enter karein.');return;}
+    runBulkUserAction('Added ₹'+v,function(uid){return api('admin_add_coins',{p_token:S.token,p_id:uid,p_amount:v});});
+  };
+  if($('admin-bulk-deduct'))$('admin-bulk-deduct').onclick=function(){
+    var ids=getSelectedUserIds();
+    if(!ids.length){toast('Pehle kam se kam 1 user select karein.');return;}
+    var raw=prompt('Coins / ₹ to DEDUCT from '+ids.length+' selected user(s):','100');
+    if(raw===null)return;
+    var w=parseInt(raw,10);
+    if(!w||w<=0){toast('Valid positive amount enter karein.');return;}
+    runBulkUserAction('Deducted ₹'+w,function(uid){return api('admin_add_coins',{p_token:S.token,p_id:uid,p_amount:-w});});
+  };
+  if($('admin-bulk-network-on'))$('admin-bulk-network-on').onclick=function(){
+    var ids=getSelectedUserIds();
+    if(!ids.length){toast('Pehle kam se kam 1 user select karein.');return;}
+    if(!confirm('Give Referral Network Tab access to '+ids.length+' selected user(s)?'))return;
+    runBulkUserAction('Network enabled',function(uid){return api('admin_set_referral_network_access',{p_token:S.token,p_user_id:uid,p_enabled:true});},{reloadRefs:true});
+  };
+  if($('admin-bulk-network-off'))$('admin-bulk-network-off').onclick=function(){
+    var ids=getSelectedUserIds();
+    if(!ids.length){toast('Pehle kam se kam 1 user select karein.');return;}
+    if(!confirm('Remove Referral Network Tab access from '+ids.length+' selected user(s)?'))return;
+    runBulkUserAction('Network disabled',function(uid){return api('admin_set_referral_network_access',{p_token:S.token,p_user_id:uid,p_enabled:false});},{reloadRefs:true});
+  };
+  if($('admin-bulk-reset-pw'))$('admin-bulk-reset-pw').onclick=function(){
+    var ids=getSelectedUserIds();
+    if(!ids.length){toast('Pehle kam se kam 1 user select karein.');return;}
+    var np=prompt('New password for '+ids.length+' selected user(s) (min 6 characters):');
+    if(np===null)return;
+    if(np.length<6){toast('Password kam se kam 6 characters ka hona chahiye.');return;}
+    runBulkUserAction('Password reset',function(uid){return api('admin_set_password',{p_token:S.token,p_id:uid,p_new:np});});
+  };
+  if($('admin-bulk-delete'))$('admin-bulk-delete').onclick=function(){
+    var ids=getSelectedUserIds();
+    if(!ids.length){toast('Pehle kam se kam 1 user select karein.');return;}
+    if(!confirm('Delete '+ids.length+' selected user(s)? This cannot be undone.'))return;
+    runBulkUserAction('Deleted',function(uid){return api('admin_delete_user',{p_token:S.token,p_id:uid});},{clearAfter:true});
+  };
+
   function loadUsers(){
     Promise.all([
       api('admin_list_users',{p_token:S.token}),
       api('admin_list_referral_access',{p_token:S.token}).catch(function(){return {}})
     ]).then(function(res){
-      var us=res[0]||[], accessMap=res[1]||{};
-      S.users=us;
-      $('users').innerHTML=us.length?us.map(function(u){
-        var who=u.email||u.display_name||u.id;
-        var hasNet=!!accessMap[u.id];
-        var netBtn='<button class="mini" data-refnet="'+esc(u.id)+'" data-refnet-on="'+(hasNet?'1':'0')+'" style="'+(hasNet?'background:rgba(46,230,160,.16);color:var(--green);border-color:rgba(46,230,160,.45)':'')+'">'+(hasNet?'✓ Network Tab':'Give Network')+'</button>';
-        return '<tr><td>'+esc(who)+'</td><td>'+esc(u.phone||'–')+'</td><td>'+u.balance+'</td><td><button class="mini" data-add="'+esc(u.id)+'">Add</button> <button class="mini" data-sub="'+esc(u.id)+'">Deduct</button> <button class="mini" data-ph="'+esc(u.id)+'">Phone</button> '+netBtn+' <button class="mini" data-rp="'+esc(u.id)+'">Reset password</button> <button class="mini" data-del="'+esc(u.id)+'">Delete</button></td></tr>';
-      }).join(''):'<tr><td colspan="4" class="empty">No users yet. Create one above.</td></tr>';
+      S.users=res[0]||[];
+      adminAccessMap=res[1]||{};
+      var validMap={};
+      S.users.forEach(function(u){validMap[u.id]=true;});
+      Object.keys(selectedUserIds).forEach(function(id){if(!validMap[id])delete selectedUserIds[id];});
+      renderUsersTable();
     }).catch(function(e){toast(e.message)});
   }
   $('n-go').onclick=function(){
@@ -1851,21 +2168,13 @@ img{ -webkit-user-drag:none; user-drag:none; }
       .then(function(){$('n-id').value='';$('n-pw').value='';$('n-phone').value='';toast('User created: '+id+' (20 starting coins)');loadUsers()})
       .catch(function(x){e.textContent=x.message});
   };
-  $('users').addEventListener('click',function(e){
-    var a=e.target.dataset.add,sb=e.target.dataset.sub,d=e.target.dataset.del,ph=e.target.dataset.ph,rp=e.target.dataset.rp,rn=e.target.dataset.refnet;
-    if(a){var v=parseInt(prompt('Coins to add to '+a+':','100'),10);if(v>0)api('admin_add_coins',{p_token:S.token,p_id:a,p_amount:v}).then(function(){toast('Added '+v+' coins to '+a);loadUsers()}).catch(function(x){toast(x.message)})}
-    if(ph){var p=prompt('New phone number for '+ph+':');if(p)api('admin_set_phone',{p_token:S.token,p_id:ph,p_phone:p.trim()}).then(function(){toast('Phone updated for '+ph);loadUsers()}).catch(function(x){toast(x.message)})}
-    if(rn){
-      var nextOn=e.target.dataset.refnetOn!=='1';
-      api('admin_set_referral_network_access',{p_token:S.token,p_user_id:rn,p_enabled:nextOn}).then(function(){
-        toast(nextOn?'Referral Network tab enabled for '+rn:'Referral Network tab disabled for '+rn);
-        loadUsers();
-        if(window.Play2WinLoadAdminReferrals)window.Play2WinLoadAdminReferrals();
-      }).catch(function(x){toast(x.message)});
+  $('users').addEventListener('change',function(e){
+    if(e.target&&e.target.classList&&e.target.classList.contains('admin-user-cb')){
+      var uid=e.target.dataset.uid;
+      if(e.target.checked)selectedUserIds[uid]=true;
+      else delete selectedUserIds[uid];
+      syncUserSelectionUI();
     }
-    if(rp){var np=prompt('New password for '+rp+' (min 6 characters):');if(np)api('admin_set_password',{p_token:S.token,p_id:rp,p_new:np}).then(function(){toast('Password reset for '+rp+'. The user must log in again.')}).catch(function(x){toast(x.message)})}
-    if(sb){var w=parseInt(prompt('Coins to deduct from '+sb+':','100'),10);if(w>0)api('admin_add_coins',{p_token:S.token,p_id:sb,p_amount:-w}).then(function(){toast('Deducted '+w+' coins from '+sb);loadUsers()}).catch(function(x){toast(x.message)})}
-    if(d&&confirm('Delete user '+d+'? This cannot be undone.'))api('admin_delete_user',{p_token:S.token,p_id:d}).then(loadUsers).catch(function(x){toast(x.message)});
   });
 
   // ---- UPI withdrawal requests (manual payout; no payout provider connected) ----
@@ -1891,7 +2200,9 @@ img{ -webkit-user-drag:none; user-drag:none; }
   function loadWithdrawalRequests(){
     if(!S.token||!isAdmin())return Promise.resolve();
     return api('admin_list_withdrawal_requests',{p_token:S.token}).then(function(rows){
-      $('withdraw-pending-count').textContent=rows.filter(function(w){return w.status==='pending'}).length+' Pending';
+      adminPendingWdrCount=rows.filter(function(w){return w.status==='pending'}).length;
+      $('withdraw-pending-count').textContent=adminPendingWdrCount+' Pending';
+      syncAdminPaymentBadges();
       $('withdraw-requests').innerHTML=rows.length?rows.map(function(w){var actions=w.status==='pending'?'<button class="mini" data-wpaid="'+w.id+'">Mark Paid</button> <button class="mini" data-wreject="'+w.id+'">Reject</button>':'<span class="mini">'+esc(w.status)+'</span>';return '<tr><td>'+fmtTime(w.created_at)+'</td><td>'+esc(w.email||w.display_name||w.user_id)+'</td><td>'+esc(w.upi_id)+'</td><td>₹'+w.amount+'</td><td>'+actions+'</td></tr>'}).join(''):'<tr><td colspan="5" class="empty">No withdrawal requests.</td></tr>';
     }).catch(function(e){$('withdraw-requests').innerHTML='<tr><td colspan="5" class="empty">'+esc(e.message)+'</td></tr>'});
   }
@@ -2284,7 +2595,9 @@ img{ -webkit-user-drag:none; user-drag:none; }
     if(!S.token||!isAdmin())return Promise.resolve();
     return api('admin_list_coin_deposits',{p_token:S.token}).then(function(rows){
       var pending=rows.filter(function(d){return d.status==='pending'}).length;
+      adminPendingDepCount=pending;
       $('deposit-pending-count').textContent=pending+' Pending';
+      syncAdminPaymentBadges();
       $('deposit-requests').innerHTML=rows.length?rows.map(function(d){
         var action=d.status==='pending'?'<button class="mini" data-deposit-approve="'+d.id+'">Approve</button> <button class="mini" data-deposit-reject="'+d.id+'">Reject</button>':'<span class="mini">'+esc(d.status)+'</span>';
         return '<tr><td>'+fmtTime(d.created_at)+'</td><td>'+esc(d.email||d.display_name||d.user_id)+'</td><td>₹'+d.amount+'</td><td>'+esc(d.utr)+'</td><td>'+action+'</td></tr>';
@@ -2955,6 +3268,8 @@ img{ -webkit-user-drag:none; user-drag:none; }
       if($('admin-ref-total-shares'))$('admin-ref-total-shares').textContent=Number(d.total_shares||0);
       if($('admin-ref-total-refers'))$('admin-ref-total-refers').textContent=Number(d.total_referrals||0);
       if($('admin-ref-total-coins'))$('admin-ref-total-coins').textContent=Number(d.total_coins_distributed||0);
+      if($('admin-kpi-refs'))$('admin-kpi-refs').textContent=Number(d.total_referrals||0);
+      if($('admin-cat-ref-badge'))$('admin-cat-ref-badge').textContent=Number(d.total_referrals||0);
       var users=d.users||[];
       if($('admin-ref-users')){
         $('admin-ref-users').innerHTML=users.length?users.map(function(u){
