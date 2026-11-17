@@ -337,9 +337,9 @@ body.has-bottom-nav .toast{bottom:calc(86px + env(safe-area-inset-bottom,0px))}
   box-shadow:0 0 0 3px rgba(255,236,145,.2),0 0 15px 5px rgba(255,207,48,.75),0 5px 8px rgba(104,54,0,.35);
 }
 #v-home .game-launch-grid{
-  display:grid!important;grid-template-columns:repeat(3,minmax(0,112px))!important;
-  justify-content:center!important;align-items:start!important;
-  gap:16px!important;padding:10px 2px 18px!important;
+  display:flex!important;flex-wrap:wrap!important;
+  justify-content:center!important;align-items:flex-start!important;
+  gap:14px!important;padding:10px 2px 18px!important;
 }
 #v-home .coming-soon-row-head{
   display:flex;align-items:center;gap:10px;margin:4px 4px 8px;
@@ -400,12 +400,12 @@ body.has-bottom-nav .toast{bottom:calc(86px + env(safe-area-inset-bottom,0px))}
   width:46px;height:46px;display:block;filter:drop-shadow(0 3px 5px rgba(0,0,0,.32));
 }
 @media(max-width:420px){
-  #v-home .game-launch-grid{grid-template-columns:repeat(3,minmax(0,98px))!important;gap:10px!important}
+  #v-home .game-launch-grid{gap:10px!important}
   #v-home .game-launch-item{width:98px!important;max-width:98px!important}
   #v-home .game-launch-box{width:94px!important;height:106px!important;min-height:106px!important}
 }
 @media(max-width:340px){
-  #v-home .game-launch-grid{grid-template-columns:repeat(3,minmax(0,88px))!important;gap:8px!important}
+  #v-home .game-launch-grid{gap:8px!important}
   #v-home .game-launch-item{width:88px!important;max-width:88px!important}
   #v-home .game-launch-box{width:86px!important;height:98px!important;min-height:98px!important}
 }
@@ -500,8 +500,121 @@ img{ -webkit-user-drag:none; user-drag:none; }
 .av-table th{background:rgba(12,14,28,.96);color:#c2c8e6;font-size:.7rem;position:sticky;top:0}
 </style>
 
+<style id="ludo-game-style">
+.ludo-shell{margin-top:12px;padding:15px 14px;border:1px solid var(--line);border-radius:22px;background:radial-gradient(circle at 85% 0%,rgba(31,209,139,.14),transparent 42%),linear-gradient(160deg,var(--panel-solid),#0b1128);color:var(--ink);box-shadow:0 16px 38px rgba(0,0,0,.32);overflow:hidden}
+:root[data-theme="day"] .ludo-shell{background:radial-gradient(circle at 85% 0%,rgba(16,185,129,.12),transparent 42%),var(--panel-solid)}
+.ludo-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.ludo-title-wrap{display:flex;align-items:center;gap:8px}
+.ludo-title-wrap h2{margin:0;font-size:1.22rem;font-weight:950}
+.ludo-sub-badge{font-size:.66rem;font-weight:900;padding:3px 8px;border-radius:999px;background:rgba(46,230,160,.16);color:var(--green);border:1px solid rgba(46,230,160,.36)}
+.ludo-top-btns{display:flex;align-items:center;gap:6px}
+.ludo-main-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:5px;border-radius:14px;background:var(--soft);border:1px solid var(--line);margin-bottom:14px}
+.ludo-main-tab{border:0;border-radius:10px;background:transparent;color:var(--mute);padding:10px 6px;font-weight:850;font-size:.82rem;cursor:pointer;min-height:42px;transition:background .15s,color .15s}
+.ludo-main-tab.on{background:linear-gradient(135deg,#35f0a8,#0f9d6a);color:#042416;box-shadow:0 4px 12px rgba(15,157,106,.28)}
+.ludo-sec-label{font-size:.76rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin:0 0 8px}
+.ludo-mode-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:14px}
+.ludo-mode-btn{padding:11px 6px;border-radius:14px;border:1px solid var(--line);background:var(--soft);color:var(--ink);cursor:pointer;text-align:center;min-height:58px;transition:transform .12s,border-color .15s,background .15s}
+.ludo-mode-btn b{display:block;font-size:.92rem;font-weight:950}
+.ludo-mode-btn small{display:block;margin-top:2px;font-size:.68rem;color:var(--mute);font-weight:750}
+.ludo-mode-btn.on{background:linear-gradient(135deg,rgba(255,201,77,.22),rgba(255,159,28,.1));border-color:var(--gold);box-shadow:0 6px 16px rgba(255,159,28,.16)}
+.ludo-mode-btn.on b{color:var(--gold-text)}
+.ludo-bet-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:14px}
+.ludo-bet-tab{padding:10px 4px;border-radius:14px;border:1px solid var(--line);background:var(--soft);color:var(--ink);cursor:pointer;text-align:center;min-height:60px;transition:transform .12s,border-color .15s,background .15s}
+.ludo-bet-tab:active,.ludo-mode-btn:active{transform:scale(.96)}
+.ludo-bet-tab b{display:block;font-size:.95rem;font-weight:1000;color:var(--ink)}
+.ludo-bet-tab small{display:block;margin-top:3px;font-size:.66rem;font-weight:850;color:var(--green)}
+.ludo-bet-tab.on{background:linear-gradient(135deg,#ffd45e,#ff9812);border-color:transparent;box-shadow:0 6px 16px rgba(255,159,28,.3)}
+.ludo-bet-tab.on b{color:#271700}
+.ludo-bet-tab.on small{color:#3c2200}
+.ludo-prize-card{padding:12px 13px;border-radius:16px;border:1px solid rgba(46,230,160,.34);background:linear-gradient(135deg,rgba(46,230,160,.11),rgba(255,201,77,.07));margin-bottom:12px}
+.ludo-prize-row{display:flex;justify-content:space-between;align-items:center;font-size:.82rem;padding:3px 0}
+.ludo-prize-row.main{padding-top:7px;margin-top:5px;border-top:1px dashed rgba(255,255,255,.18);font-size:.96rem;font-weight:950}
+.ludo-prize-row.main strong{color:var(--green);font-size:1.08rem}
+.ludo-start-btn{width:100%;padding:15px 14px;border:0;border-radius:15px;background:linear-gradient(135deg,#35f0a8,#0f9d6a);color:#042416;font-weight:1000;font-size:1rem;letter-spacing:.02em;box-shadow:0 8px 22px rgba(15,157,106,.34);cursor:pointer;min-height:52px}
+.ludo-start-btn:disabled{opacity:.55;cursor:not-allowed}
+.ludo-search-box{padding:18px 14px;border-radius:18px;border:1px solid rgba(255,201,77,.38);background:radial-gradient(circle at 50% 20%,rgba(46,230,160,.15),transparent 58%),var(--soft);text-align:center}
+.ludo-radar{width:76px;height:76px;margin:0 auto 10px;border-radius:50%;display:grid;place-items:center;position:relative;background:linear-gradient(135deg,rgba(46,230,160,.25),rgba(255,201,77,.18));border:2px solid var(--green);font-size:1.55rem;font-weight:1000;color:var(--green)}
+.ludo-radar::after{content:"";position:absolute;inset:-8px;border-radius:50%;border:2px solid rgba(46,230,160,.45);animation:ludoPulseRing 1.2s ease-out infinite}
+@keyframes ludoPulseRing{0%{transform:scale(.92);opacity:.85}100%{transform:scale(1.28);opacity:0}}
+.ludo-seats-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:14px 0}
+.ludo-seat-card{padding:10px;border-radius:13px;border:1px solid var(--line);background:var(--panel);display:flex;align-items:center;gap:8px;text-align:left}
+.ludo-seat-card.filled{border-color:rgba(46,230,160,.45);background:rgba(46,230,160,.08)}
+.ludo-seat-dot{width:14px;height:14px;border-radius:50%;flex:0 0 14px;border:2px solid #fff}
+.ludo-game-hdr{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.ludo-pool-pill{padding:5px 10px;border-radius:999px;background:rgba(46,230,160,.16);border:1px solid rgba(46,230,160,.36);color:var(--green);font-size:.75rem;font-weight:900}
+.ludo-players-bar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:6px 0}
+.ludo-pcard{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px 9px;border-radius:12px;border:1px solid var(--line);background:var(--soft);opacity:.78;transition:transform .16s,border-color .16s,box-shadow .16s,opacity .16s}
+.ludo-pcard.active{opacity:1;border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,201,77,.35);transform:translateY(-1px)}
+.ludo-pcard.off{opacity:.25;visibility:hidden}
+.ludo-pcard.eliminated{opacity:.42;border-color:rgba(255,93,115,.4);background:rgba(255,93,115,.08)}
+.ludo-pinfo{display:flex;align-items:center;gap:7px;min-width:0;flex:1}
+.ludo-pavatar{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:950;font-size:.78rem;color:#fff;flex:0 0 28px;border:2px solid rgba(255,255,255,.8)}
+.ludo-pmeta{min-width:0;display:flex;flex-direction:column;gap:2px}
+.ludo-pname{font-size:.78rem;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ludo-hearts{display:flex;align-items:center;gap:3px;line-height:1}
+.ludo-heart{width:13px;height:13px;display:inline-block;transition:transform .2s,opacity .2s}
+.ludo-heart.on{color:#ff4d6d;filter:drop-shadow(0 1px 3px rgba(255,77,109,.45))}
+.ludo-heart.lost{color:rgba(255,255,255,.22);transform:scale(.82)}
+:root[data-theme="day"] .ludo-heart.lost{color:rgba(15,23,42,.22)}
+.ludo-out-badge{font-size:.6rem;font-weight:950;padding:1px 5px;border-radius:999px;background:rgba(255,93,115,.22);color:var(--red);border:1px solid rgba(255,93,115,.45);margin-left:3px}
+.ludo-phome-dots{display:flex;gap:3px;flex:0 0 auto}
+.ludo-phome-dots i{width:7px;height:7px;border-radius:50%;border:1px solid rgba(255,255,255,.5);background:transparent}
+.ludo-phome-dots i.done{background:var(--gold);border-color:#fff}
+.ludo-board-wrap{position:relative;width:100%;max-width:410px;aspect-ratio:1/1;margin:8px auto;border-radius:14px;overflow:hidden;border:3px solid rgba(255,224,130,.85);background:#f8fafc;box-shadow:0 12px 30px rgba(0,0,0,.45);touch-action:manipulation}
+.ludo-board-svg{width:100%;height:100%;display:block}
+.ludo-tokens-layer{position:absolute;inset:0;pointer-events:none}
+.ludo-tok{position:absolute;width:6.2%;height:6.2%;transform:translate(-50%,-50%);border-radius:50%;border:2.5px solid #fff;box-shadow:0 3px 6px rgba(0,0,0,.5),inset 0 2px 3px rgba(255,255,255,.55);transition:left .11s ease,top .11s ease,transform .15s ease;pointer-events:none;z-index:3;display:grid;place-items:center}
+.ludo-tok::after{content:"";width:42%;height:42%;border-radius:50%;background:rgba(255,255,255,.72)}
+.ludo-tok.red{background:radial-gradient(circle at 35% 30%,#ff8fa3,#e11d48)}
+.ludo-tok.green{background:radial-gradient(circle at 35% 30%,#6ee7b7,#059669)}
+.ludo-tok.yellow{background:radial-gradient(circle at 35% 30%,#fde047,#d97706)}
+.ludo-tok.blue{background:radial-gradient(circle at 35% 30%,#93c5fd,#2563eb)}
+.ludo-tok.movable{pointer-events:auto;cursor:pointer;z-index:8;box-shadow:0 0 0 3px #fff,0 0 12px 3px #ffd43b,0 4px 10px rgba(0,0,0,.6);animation:ludoTokPulse .7s ease-in-out infinite alternate}
+@keyframes ludoTokPulse{from{transform:translate(-50%,-50%) scale(1.06)}to{transform:translate(-50%,-50%) scale(1.26)}}
+.ludo-controls{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;padding:10px 12px;border-radius:16px;border:1px solid var(--line);background:var(--soft);perspective:420px}
+.ludo-turn-meta{flex:1;min-width:0}
+.ludo-turn-head{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ludo-turn-meta b{display:block;font-size:.9rem;font-weight:950}
+.ludo-turn-meta small{display:block;margin-top:2px;font-size:.74rem;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ludo-timer-pill{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:999px;font-size:.72rem;font-weight:950;background:rgba(46,230,160,.16);color:var(--green);border:1px solid rgba(46,230,160,.36);font-variant-numeric:tabular-nums}
+.ludo-timer-pill.warn{background:rgba(255,201,77,.2);color:var(--gold-text);border-color:rgba(255,201,77,.5)}
+.ludo-timer-pill.crit{background:rgba(255,93,115,.22);color:var(--red);border-color:rgba(255,93,115,.55);animation:ludoTimerPulse .55s ease-in-out infinite alternate}
+@keyframes ludoTimerPulse{from{transform:scale(1)}to{transform:scale(1.08)}}
+.ludo-dice-btn{width:64px;height:64px;flex:0 0 64px;border-radius:16px;border:2.5px solid #ffd866;background:linear-gradient(145deg,#ffffff 0%,#e2e8f0 70%,#cbd5e1 100%);color:#0f172a;box-shadow:0 8px 18px rgba(0,0,0,.38),inset 0 2px 2px #fff,inset 0 -4px 6px rgba(15,23,42,.18);display:grid;place-items:center;cursor:pointer;padding:8px;transition:transform .15s,box-shadow .15s;transform-style:preserve-3d}
+.ludo-dice-btn.ready{box-shadow:0 0 0 3px rgba(46,230,160,.55),0 8px 22px rgba(46,230,160,.36),inset 0 2px 2px #fff;animation:ludoDiceReady 1.05s ease-in-out infinite alternate}
+@keyframes ludoDiceReady{from{transform:scale(1)}to{transform:scale(1.06)}}
+.ludo-dice-btn:disabled{opacity:.6;cursor:not-allowed;animation:none}
+.ludo-dice-btn:active:not(:disabled){transform:scale(.92)}
+.ludo-dice-btn.rolling{opacity:1;border-color:#ff9f1c;box-shadow:0 12px 26px rgba(255,159,28,.48),inset 0 2px 3px #fff;animation:ludoDiceTumble .48s cubic-bezier(.36,.07,.19,.97) infinite}
+@keyframes ludoDiceTumble{
+  0%{transform:translateY(0) rotate(0deg) scale(1)}
+  25%{transform:translateY(-9px) rotate(95deg) scale(1.14)}
+  50%{transform:translateY(-3px) rotate(190deg) scale(1.06)}
+  75%{transform:translateY(-8px) rotate(280deg) scale(1.13)}
+  100%{transform:translateY(0) rotate(360deg) scale(1)}
+}
+.ludo-dice-btn.landed{animation:ludoDiceLand .28s cubic-bezier(.2,1.4,.4,1)}
+@keyframes ludoDiceLand{0%{transform:scale(1.22)}60%{transform:scale(.94)}100%{transform:scale(1)}}
+.ludo-dice-face{width:100%;height:100%;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);place-items:center;border-radius:10px;background:rgba(255,255,255,.55);padding:3px}
+.ludo-pip{width:8px;height:8px;border-radius:50%;background:#1e293b;box-shadow:inset 0 1px 1px rgba(255,255,255,.35)}
+.ludo-pip.six{background:#dc2626}
+.ludo-pip.off{opacity:0}
+.ludo-overlay{position:fixed;inset:0;z-index:9998;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(5,7,20,.84);backdrop-filter:blur(7px)}
+.ludo-overlay.hide{display:none}
+.ludo-res-card{width:100%;max-width:390px;padding:22px 18px;border-radius:22px;border:1px solid rgba(255,201,77,.5);background:linear-gradient(160deg,var(--panel-solid),#111633);text-align:center;color:var(--ink);box-shadow:0 22px 54px rgba(0,0,0,.65)}
+.ludo-res-icon{font-size:2.8rem;line-height:1;margin-bottom:8px}
+.ludo-res-card h3{margin:0 0 6px;font-size:1.3rem;font-weight:1000}
+.ludo-admin-filter{margin:10px 0;padding:11px 12px;border-radius:14px;border:1px solid var(--line);background:var(--panel)}
+.ludo-admin-date-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin-top:6px}
+.ludo-admin-date-row label{font-size:.7rem;font-weight:800;color:var(--mute);display:block;margin:0}
+.ludo-admin-date-row input{margin:4px 0 0;padding:8px 8px;min-height:40px;font-size:.82rem}
+.ludo-admin-presets{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.ludo-admin-presets button{min-height:34px;padding:4px 10px;border-radius:9px;border:1px solid var(--line);background:var(--soft);color:var(--ink);font-size:.74rem;font-weight:800;cursor:pointer}
+@media(max-width:360px){.ludo-bet-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}.ludo-admin-date-row{grid-template-columns:1fr 1fr}}
+</style>
+
 <style id="admin-game-bets-tabs-style">
-.bets-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:5px;border-radius:14px;background:var(--panel);border:1px solid var(--line);margin-bottom:12px}
+.bets-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:5px;border-radius:14px;background:var(--panel);border:1px solid var(--line);margin-bottom:12px}
 .bets-tab{border:0;border-radius:10px;background:transparent;color:var(--mute);padding:10px 4px;font-weight:850;font-size:.8rem;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bets-tab.on{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--onaccent);box-shadow:0 4px 12px rgba(255,159,28,.25)}
 .bets-summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
@@ -760,13 +873,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
             <span class="game-launch-name">Aviator</span>
           </span>
         </button>
-      </div>
-      <div class="coming-soon-row-head" id="coming-soon-row-head">
-        <span class="coming-soon-badge">⏳ Coming Soon</span>
-        <span class="coming-soon-line" aria-hidden="true"></span>
-      </div>
-      <div class="game-launch-grid coming-soon-grid" aria-label="Coming Soon Games">
-        <button class="game-launch-item is-coming-soon" type="button" data-coming-soon="Ludo" aria-label="Ludo - Coming Soon">
+        <button class="game-launch-item" type="button" data-open-route="ludo" aria-label="Open Ludo Game">
           <span class="game-launch-box" aria-hidden="true">
             <span class="game-launch-icon ludo-launch-icon">
               <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
@@ -785,6 +892,12 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
             <span class="game-launch-name">Ludo</span>
           </span>
         </button>
+      </div>
+      <div class="coming-soon-row-head" id="coming-soon-row-head">
+        <span class="coming-soon-badge">⏳ Coming Soon</span>
+        <span class="coming-soon-line" aria-hidden="true"></span>
+      </div>
+      <div class="game-launch-grid coming-soon-grid" aria-label="Coming Soon Games">
         <button class="game-launch-item is-coming-soon" type="button" data-coming-soon="3 Patti" aria-label="3 Patti - Coming Soon">
           <span class="game-launch-box" aria-hidden="true">
             <span class="game-launch-icon teenpatti-launch-icon">
@@ -889,6 +1002,149 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
                 </table>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="v-ludo" class="hide">
+      <div class="ludo-shell" id="ludo-shell">
+        <div class="ludo-top">
+          <div class="ludo-title-wrap">
+            <h2>🎲 Ludo</h2>
+            <span class="ludo-sub-badge">LIVE TABLES</span>
+          </div>
+          <div class="ludo-top-btns">
+            <button type="button" class="av-sound-btn" id="ludo-sound-btn" aria-label="Toggle Ludo sound">🔊 Sound</button>
+            <button type="button" class="mini" data-open-route="home" id="ludo-back-home">← Games</button>
+          </div>
+        </div>
+
+        <div class="ludo-main-tabs" id="ludo-main-tabs" role="tablist" aria-label="Ludo sections">
+          <button type="button" class="ludo-main-tab on" id="ludo-tab-lobby" data-ludo-tab="lobby" role="tab" aria-selected="true">🎮 Play Ludo</button>
+          <button type="button" class="ludo-main-tab" id="ludo-tab-history" data-ludo-tab="history" role="tab" aria-selected="false">📜 My Matches</button>
+          <button type="button" class="ludo-main-tab" id="ludo-tab-rules" data-ludo-tab="rules" role="tab" aria-selected="false">📖 Rules</button>
+        </div>
+
+        <div id="ludo-pane-lobby">
+          <div id="ludo-setup-view">
+            <div class="ludo-sec-label">1. Players Choose Karein</div>
+            <div class="ludo-mode-tabs" id="ludo-mode-tabs" role="tablist" aria-label="Player count">
+              <button type="button" class="ludo-mode-btn on" data-ludo-players="2"><b>2 Players</b><small>1 vs 1 Battle</small></button>
+              <button type="button" class="ludo-mode-btn" data-ludo-players="3"><b>3 Players</b><small>3-Way Match</small></button>
+              <button type="button" class="ludo-mode-btn" data-ludo-players="4"><b>4 Players</b><small>Classic 4-Way</small></button>
+            </div>
+
+            <div class="ludo-sec-label">2. Coin Bet Tab Choose Karein</div>
+            <div class="ludo-bet-tabs" id="ludo-bet-tabs" role="tablist" aria-label="Coin bet options">
+              <button type="button" class="ludo-bet-tab" data-ludo-bet="5"><b>5 🪙</b><small data-ludo-win="5">Win 8 🪙</small></button>
+              <button type="button" class="ludo-bet-tab on" data-ludo-bet="10"><b>10 🪙</b><small data-ludo-win="10">Win 17 🪙</small></button>
+              <button type="button" class="ludo-bet-tab" data-ludo-bet="25"><b>25 🪙</b><small data-ludo-win="25">Win 42 🪙</small></button>
+              <button type="button" class="ludo-bet-tab" data-ludo-bet="50"><b>50 🪙</b><small data-ludo-win="50">Win 85 🪙</small></button>
+              <button type="button" class="ludo-bet-tab" data-ludo-bet="100"><b>100 🪙</b><small data-ludo-win="100">Win 170 🪙</small></button>
+              <button type="button" class="ludo-bet-tab" data-ludo-bet="200"><b>200 🪙</b><small data-ludo-win="200">Win 340 🪙</small></button>
+              <button type="button" class="ludo-bet-tab" data-ludo-bet="500"><b>500 🪙</b><small data-ludo-win="500">Win 850 🪙</small></button>
+            </div>
+
+            <div class="ludo-prize-card" id="ludo-prize-card">
+              <div class="ludo-prize-row"><span>Entry Bet</span><b id="ludo-sum-bet">10 Coins</b></div>
+              <div class="ludo-prize-row"><span>Total Pool (<span id="ludo-sum-pcount">2</span> Players)</span><b id="ludo-sum-pool">20 Coins</b></div>
+              <div class="ludo-prize-row"><span>Platform Fee (15%)</span><b id="ludo-sum-cut" style="color:var(--mute)">-3 Coins</b></div>
+              <div class="ludo-prize-row main"><span>🏆 Winner Prize (85%)</span><strong id="ludo-sum-win">17 Coins</strong></div>
+            </div>
+
+            <div class="err" id="ludo-lobby-err" role="alert"></div>
+            <button type="button" class="ludo-start-btn" id="ludo-start-btn">PLAY LUDO · 10 COINS</button>
+          </div>
+
+          <div id="ludo-search-stage" class="ludo-search-box hide">
+            <div class="ludo-radar" id="ludo-search-timer">10</div>
+            <h3 style="margin:0 0 4px;font-size:1.08rem;font-weight:950">Finding Opponents...</h3>
+            <p class="note" id="ludo-search-sub" style="margin:0">Live players search ho rahe hain (10s). Agar koi opponent available nahi hoga toh table turant start ho jayegi.</p>
+            <div class="ludo-seats-grid" id="ludo-search-seats"></div>
+            <button type="button" class="mini" id="ludo-cancel-search" style="min-height:44px;padding:0 18px">Cancel &amp; Refund</button>
+          </div>
+
+          <div id="ludo-board-stage" class="hide">
+            <div class="ludo-game-hdr">
+              <span class="ludo-pool-pill" id="ludo-match-prize-pill">🏆 Win 17 🪙 · Pool 20 🪙 (15% cut)</span>
+              <button type="button" class="mini" id="ludo-exit-btn" style="min-height:36px;color:var(--red);border-color:rgba(255,93,115,.4)">Exit</button>
+            </div>
+            <div class="ludo-players-bar" id="ludo-players-top">
+              <div class="ludo-pcard off" id="ludo-card-red"></div>
+              <div class="ludo-pcard off" id="ludo-card-green"></div>
+            </div>
+            <div class="ludo-board-wrap" id="ludo-board-wrap">
+              <svg id="ludo-board-svg" class="ludo-board-svg" viewBox="0 0 150 150" aria-label="Ludo board"></svg>
+              <div class="ludo-tokens-layer" id="ludo-tokens-layer"></div>
+            </div>
+            <div class="ludo-players-bar" id="ludo-players-bottom">
+              <div class="ludo-pcard off" id="ludo-card-blue"></div>
+              <div class="ludo-pcard off" id="ludo-card-yellow"></div>
+            </div>
+            <div class="ludo-controls">
+              <div class="ludo-turn-meta">
+                <div class="ludo-turn-head">
+                  <b id="ludo-turn-text">Your Turn</b>
+                  <span class="ludo-timer-pill" id="ludo-turn-timer" aria-live="polite">⏱ 30s</span>
+                </div>
+                <small id="ludo-log-line">Tap the dice to roll!</small>
+              </div>
+              <button type="button" class="ludo-dice-btn" id="ludo-dice-btn" aria-label="Roll Ludo Dice">
+                <div class="ludo-dice-face" id="ludo-dice-face"></div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="ludo-pane-history" class="hide">
+          <div class="scroll" style="max-height:52vh;max-height:52dvh">
+            <table>
+              <thead><tr><th>Match</th><th>Mode</th><th>Bet</th><th>Pool</th><th>Result</th></tr></thead>
+              <tbody id="ludo-history-body"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="ludo-pane-rules" class="hide">
+          <div class="card" style="margin:0;background:var(--soft)">
+            <h3 style="margin-top:0">🎲 Ludo Game Rules &amp; Payout</h3>
+            <ul style="margin:0;padding-left:18px;line-height:1.65;font-size:.86rem">
+              <li><b>Player Modes:</b> 2 Players (1v1), 3 Players ya 4 Players table chunein.</li>
+              <li><b>Bet Tables:</b> 5, 10, 25, 50, 100, 200 ya 500 Coins me se koi bhi table join karein.</li>
+              <li><b>10s Matchmaking:</b> Pehle 10 seconds real opponents search hote hain; agar koi opponent join nahi karta toh table random-named player ke saath start hoti hai.</li>
+              <li><b>Winning Prize:</b> Sabhi players ka total pool add hota hai aur winner ko <b>15% cut</b> ke baad <b>85% Prize</b> turant wallet me milta hai.</li>
+              <li><b>30s Turn Timer &amp; 3 Lives (❤️❤️❤️):</b> Apni turn me <b>30 seconds</b> ke andar dice roll karein. Time miss karne par <b>1 Heart life</b> kam hoti hai; 3 lives khatam hone par player game se <b>OUT</b> ho jata hai.</li>
+              <li><b>Bonus Turn &amp; Safe Rules:</b> 6 aane, goti cut karne, ya goti Home pahunchane par bonus turn milta hai. Lagatar 3 baar 6 kabhi nahi aata. ★ Stars aur start squares safe hain.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div id="ludo-result-overlay" class="ludo-overlay hide" role="dialog" aria-modal="true" aria-labelledby="ludo-res-title">
+        <div class="ludo-res-card">
+          <div class="ludo-res-icon" id="ludo-res-icon">🏆</div>
+          <h3 id="ludo-res-title">Match Complete</h3>
+          <p class="note" id="ludo-res-sub" style="margin:0 0 12px"></p>
+          <div class="ludo-prize-card" style="text-align:left">
+            <div class="ludo-prize-row"><span>Total Pool</span><b id="ludo-res-pool">0 Coins</b></div>
+            <div class="ludo-prize-row"><span>Platform Fee (15%)</span><b id="ludo-res-cut">0 Coins</b></div>
+            <div class="ludo-prize-row main"><span>Winner Payout</span><strong id="ludo-res-prize">0 Coins</strong></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+            <button type="button" class="mini" id="ludo-res-hist" style="min-height:46px">My Matches</button>
+            <button type="button" class="ludo-start-btn" id="ludo-res-again" style="min-height:46px;padding:10px">Play Again</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="ludo-exit-overlay" class="ludo-overlay hide" role="dialog" aria-modal="true" aria-labelledby="ludo-exit-title">
+        <div class="ludo-res-card">
+          <h3 id="ludo-exit-title">Exit Active Match?</h3>
+          <p class="note" style="margin:6px 0 14px">Match beech me chhodne par aap haar jayenge aur entry bet wapas nahi milegi.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <button type="button" class="mini" id="ludo-exit-stay" style="min-height:46px">Keep Playing</button>
+            <button type="button" class="p2w-wdr-rej-btn" id="ludo-exit-confirm">Leave Match</button>
           </div>
         </div>
       </div>
@@ -1207,6 +1463,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
         <button type="button" class="bets-tab on" id="bets-tab-number" data-bets-tab="number" role="tab" aria-selected="true">Number Game</button>
         <button type="button" class="bets-tab" id="bets-tab-gold" data-bets-tab="gold" role="tab" aria-selected="false">Gold Ball</button>
         <button type="button" class="bets-tab" id="bets-tab-aviator" data-bets-tab="aviator" role="tab" aria-selected="false">Aviator</button>
+        <button type="button" class="bets-tab" id="bets-tab-ludo" data-bets-tab="ludo" role="tab" aria-selected="false">Ludo</button>
       </div>
 
       <div id="bets-pane-number">
@@ -1269,6 +1526,33 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
         <div class="scroll" style="max-height:32vh;max-height:32dvh"><table><thead><tr><th>User</th><th>Bet</th><th>Auto</th><th>Cash Out</th><th>Status</th></tr></thead><tbody id="ab-cur"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody></table></div>
         <h2>Recent Aviator bets</h2>
         <div class="scroll" style="max-height:38vh;max-height:38dvh"><table><thead><tr><th>Round</th><th>User</th><th>Bet</th><th>Cash Out</th><th>Crash</th><th>Net</th></tr></thead><tbody id="ab-rec"><tr><td colspan="6" class="empty">Loading...</td></tr></tbody></table></div>
+      </div>
+
+      <div id="bets-pane-ludo" class="hide">
+        <div class="timer"><div><small>Game</small><b>Ludo Tables</b></div><div style="text-align:right"><small>Total Ludo Pool</small><div class="clock" id="lb-pool" style="font-size:1.5rem">0</div></div></div>
+        <div class="ludo-admin-filter" id="lb-date-filter">
+          <div style="font-size:.78rem;font-weight:900">📅 Platform Fees Date Range Filter (15% Cut)</div>
+          <div class="ludo-admin-date-row">
+            <label>From Date<input type="date" id="lb-from-date"></label>
+            <label>To Date<input type="date" id="lb-to-date"></label>
+            <button type="button" class="mini" id="lb-filter-go" style="min-height:40px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--onaccent);font-weight:950">Apply</button>
+          </div>
+          <div class="ludo-admin-presets">
+            <button type="button" data-lb-preset="today">Today</button>
+            <button type="button" data-lb-preset="7d">Last 7 Days</button>
+            <button type="button" data-lb-preset="30d">Last 30 Days</button>
+            <button type="button" data-lb-preset="all">All Time</button>
+          </div>
+        </div>
+        <div class="bets-summary-grid" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+          <div class="bets-stat"><small>15% Platform Fees</small><b id="lb-cut" style="color:var(--green)">0</b></div>
+          <div class="bets-stat"><small>Winner Payouts (85%)</small><b id="lb-payout">0</b></div>
+          <div class="bets-stat"><small>Settled Matches</small><b id="lb-matches">0</b></div>
+        </div>
+        <h2>Date-wise Platform Fees (15%)</h2>
+        <div class="scroll" style="max-height:28vh;max-height:28dvh"><table><thead><tr><th>Date</th><th>Matches</th><th>Pool</th><th>15% Fee</th></tr></thead><tbody id="lb-daily-rows"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody></table></div>
+        <h2>Recent Ludo Matches</h2>
+        <div class="scroll" style="max-height:42vh;max-height:42dvh"><table><thead><tr><th>Match</th><th>Table</th><th>Pool</th><th>Winner</th><th>Fee (15%)</th></tr></thead><tbody id="lb-rows"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody></table></div>
       </div>
     </section>
 
@@ -1673,6 +1957,14 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     esc:esc,
     fmtTime:fmtTime
   };
+  window.Play2WinLudoBridge={
+    api:api,
+    getSession:function(){return {token:S.token,id:S.id,role:S.role,balance:S.balance,name:S.displayName||S.email||S.id}},
+    refresh:refresh,
+    toast:toast,
+    esc:esc,
+    fmtTime:fmtTime
+  };
   function isAdmin(){return S.role==='admin'}
   function colorsOf(n){if(n===0)return['red','violet'];if(n===5)return['green','violet'];return n%2?['green']:['red']}
   function sizeOf(n){return n>=5?'Big':'Small'}
@@ -2070,9 +2362,9 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
       document.body.classList.toggle('has-bottom-nav',!isAdmin());
     }
     if(r==='logout'){logout();return}
-    if(isAdmin()&&(r==='home'||r==='play'||r==='mine'||r==='wallet'||r==='add'||r==='withdraw'||r==='rewards'||r==='goldball'||r==='aviator'||r==='share'||r==='ref-network'))r='admin';
+    if(isAdmin()&&(r==='home'||r==='play'||r==='mine'||r==='wallet'||r==='add'||r==='withdraw'||r==='rewards'||r==='goldball'||r==='aviator'||r==='ludo'||r==='share'||r==='ref-network'))r='admin';
     if(!isAdmin()&&(r==='admin'||r==='bets'))r='home';
-    var allViews=['home','rewards','wallet','add','withdraw','share','ref-network','goldball','aviator','play','results','mine','admin','bets','settings','tx','pw'];
+    var allViews=['home','rewards','wallet','add','withdraw','share','ref-network','goldball','aviator','ludo','play','results','mine','admin','bets','settings','tx','pw'];
     allViews.forEach(function(k){if($('v-'+k))$('v-'+k).classList.toggle('hide',k!==r)});
     clearPlayOnlyEffects();
     document.querySelectorAll('#nav a').forEach(function(a){a.classList.toggle('on',a.dataset.r===r)});
@@ -2094,6 +2386,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     if(r==='tx'){if(isAdmin())fillTxUsers().then(loadTx);else loadTx()}
     if(r==='pw'){['pw-old','pw-new','pw-new2'].forEach(function(i){$(i).value=''});$('pw-err').textContent=''}
     if(window.Play2WinAviatorOnRoute)window.Play2WinAviatorOnRoute(r==='aviator');
+    if(window.Play2WinLudoOnRoute)window.Play2WinLudoOnRoute(r==='ludo');
     render();
   }
   window.addEventListener('hashchange',route);
@@ -2698,9 +2991,9 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
   var OPTS=['num:0','num:1','num:2','num:3','num:4','num:5','num:6','num:7','num:8','num:9','color:green','color:violet','color:red','size:big','size:small'];
   var activeBetTab='number';
   function setBetTab(tab){
-    if(tab!=='gold'&&tab!=='aviator')tab='number';
+    if(tab!=='gold'&&tab!=='aviator'&&tab!=='ludo')tab='number';
     activeBetTab=tab;
-    ['number','gold','aviator'].forEach(function(k){
+    ['number','gold','aviator','ludo'].forEach(function(k){
       var btn=$('bets-tab-'+k),pane=$('bets-pane-'+k);
       if(btn){btn.classList.toggle('on',k===tab);btn.setAttribute('aria-selected',k===tab?'true':'false');}
       if(pane)pane.classList.toggle('hide',k!==tab);
@@ -2945,10 +3238,53 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
       $('ab-cur').innerHTML='<tr><td colspan="5" class="empty">'+esc(e.message||'Run supabase_aviator.sql in Supabase first.')+'</td></tr>';
     });
   }
+  function fmtIsoDate(d){
+    var y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
+    return y+'-'+m+'-'+day;
+  }
+  if($('lb-filter-go'))$('lb-filter-go').onclick=function(){loadLudoBets()};
+  document.querySelectorAll('[data-lb-preset]').forEach(function(btn){
+    btn.onclick=function(){
+      var p=btn.dataset.lbPreset;
+      var now=new Date(),from='',to=fmtIsoDate(now);
+      if(p==='today'){from=to;}
+      else if(p==='7d'){var d7=new Date(now.getTime()-6*86400000);from=fmtIsoDate(d7);}
+      else if(p==='30d'){var d30=new Date(now.getTime()-29*86400000);from=fmtIsoDate(d30);}
+      else{from='';to='';}
+      if($('lb-from-date'))$('lb-from-date').value=from;
+      if($('lb-to-date'))$('lb-to-date').value=to;
+      loadLudoBets();
+    };
+  });
+  function loadLudoBets(){
+    var fVal=($('lb-from-date')&&$('lb-from-date').value)||null;
+    var tVal=($('lb-to-date')&&$('lb-to-date').value)||null;
+    api('admin_ludo_bets',{p_token:S.token,p_from_date:fVal,p_to_date:tVal}).then(function(d){
+      $('lb-pool').textContent=Number(d&&d.total_pool||0).toLocaleString('en-IN');
+      $('lb-cut').textContent=Number(d&&d.total_cut||0).toLocaleString('en-IN');
+      $('lb-payout').textContent=Number(d&&d.total_payout||0).toLocaleString('en-IN');
+      if($('lb-matches'))$('lb-matches').textContent=Number(d&&d.total_matches||0).toLocaleString('en-IN');
+      var daily=Array.isArray(d&&d.daily_fees)?d.daily_fees:[];
+      if($('lb-daily-rows')){
+        $('lb-daily-rows').innerHTML=daily.length?daily.map(function(dr){
+          return '<tr><td>'+esc(String(dr.fee_date||''))+'</td><td>'+Number(dr.matches_count||0)+'</td><td>'+Number(dr.total_pool||0)+'</td><td style="color:var(--green);font-weight:900">+'+Number(dr.total_fee||0)+' 🪙</td></tr>';
+        }).join(''):'<tr><td colspan="4" class="empty">Is date range me koi settled Ludo fee nahi hai.</td></tr>';
+      }
+      var rows=Array.isArray(d&&d.rows)?d.rows:[];
+      $('lb-rows').innerHTML=rows.length?rows.map(function(r){
+        var st=String(r.status||'');
+        var stHtml=st==='completed'?'<span class="bets-pill win">'+esc(r.winner_name||'Won')+'</span>':st==='playing'?'<span class="bets-pill live">Playing</span>':st==='searching'?'<span class="bets-pill live">Searching</span>':'<span class="bets-pill loss">Cancelled</span>';
+        return '<tr><td>#'+Number(r.match_id||0)+'</td><td>'+Number(r.player_count||2)+'P · '+Number(r.bet_amount||0)+'🪙</td><td>'+Number(r.total_pool||0)+'</td><td>'+stHtml+'</td><td style="color:var(--green)">+'+Number(r.platform_cut||0)+'</td></tr>';
+      }).join(''):'<tr><td colspan="5" class="empty">No Ludo matches in selected range.</td></tr>';
+    }).catch(function(e){
+      $('lb-rows').innerHTML='<tr><td colspan="5" class="empty">'+esc(e.message||'Run supabase_ludo.sql in Supabase first.')+'</td></tr>';
+    });
+  }
   function loadBets(){
     if(!isAdmin())return;
     if(activeBetTab==='gold')loadGoldBets();
     else if(activeBetTab==='aviator')loadAviatorBets();
+    else if(activeBetTab==='ludo')loadLudoBets();
     else loadNumberBets();
   }
   setInterval(function(){if(S.token&&!document.hidden&&location.hash==='#/bets')loadBets()},4000);
@@ -4877,6 +5213,1159 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
   setTab('results');
   renderCrashes([]);
   if(isActiveRoute())init();
+})();
+</script>
+
+<script id="play2win-ludo-game">
+(function(){
+  'use strict';
+  var shell=document.getElementById('ludo-shell');
+  if(!shell)return;
+  var bridge=window.Play2WinLudoBridge;
+  if(!bridge)return;
+
+  var $=function(id){return document.getElementById(id);};
+  var BETS=[5,10,25,50,100,200,500];
+  var TURN_SECONDS=30;
+  var MAX_LIVES=3;
+  var OUTER_TRACK=[
+    [6,1],[6,2],[6,3],[6,4],[6,5],
+    [5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],
+    [1,8],[2,8],[3,8],[4,8],[5,8],
+    [6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],
+    [8,13],[8,12],[8,11],[8,10],[8,9],
+    [9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],
+    [13,6],[12,6],[11,6],[10,6],[9,6],
+    [8,5],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0]
+  ];
+  var SAFE_INDICES={0:1,8:1,13:1,21:1,26:1,34:1,39:1,47:1};
+  var COLOR_CFG={
+    red:{startIdx:0,hex:'#e11d48',homeCol:[[7,1],[7,2],[7,3],[7,4],[7,5]],goal:[7,6.2],yard:[[1.5,1.5],[1.5,3.5],[3.5,1.5],[3.5,3.5]]},
+    green:{startIdx:13,hex:'#059669',homeCol:[[1,7],[2,7],[3,7],[4,7],[5,7]],goal:[6.2,7],yard:[[1.5,10.5],[1.5,12.5],[3.5,10.5],[3.5,12.5]]},
+    yellow:{startIdx:26,hex:'#d97706',homeCol:[[7,13],[7,12],[7,11],[7,10],[7,9]],goal:[7,7.8],yard:[[10.5,10.5],[10.5,12.5],[12.5,10.5],[12.5,12.5]]},
+    blue:{startIdx:39,hex:'#2563eb',homeCol:[[13,7],[12,7],[11,7],[10,7],[9,7]],goal:[7.8,7],yard:[[10.5,1.5],[10.5,3.5],[12.5,1.5],[12.5,3.5]]}
+  };
+  var PIP_MAP={
+    1:[0,0,0,0,1,0,0,0,0],
+    2:[1,0,0,0,0,0,0,0,1],
+    3:[1,0,0,0,1,0,0,0,1],
+    4:[1,0,1,0,0,0,1,0,1],
+    5:[1,0,1,0,1,0,1,0,1],
+    6:[1,0,1,1,0,1,1,0,1]
+  };
+  var HEART_SVG='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
+
+  var selectedPlayers=2,selectedBet=10,activeTab='lobby';
+  var activeMatch=null,gameState=null,mySeat=0;
+  var phase='setup'; // 'setup' | 'searching' | 'playing' | 'finished'
+  var searchPollTimer=null,searchTickTimer=null,pvpPollTimer=null,botTimer=null,turnClockTimer=null,diceCycleTimer=null;
+  var searchDeadline=0,turnSecondsLeft=TURN_SECONDS,animating=false,awaitingHumanMove=false,legalMoveTokens=[];
+  var audioCtx=null,soundOn=true;
+  try{if(localStorage.getItem('p2w_ludo_sound')==='0')soundOn=false;}catch(e){}
+
+  function ensureAudio(){
+    if(!soundOn)return null;
+    try{
+      var AC=window.AudioContext||window.webkitAudioContext;
+      if(!AC)return null;
+      if(!audioCtx)audioCtx=new AC();
+      if(audioCtx.state==='suspended')audioCtx.resume().catch(function(){});
+      return audioCtx;
+    }catch(e){return null;}
+  }
+  function playTone(freq,dur,type,vol){
+    if(!soundOn)return;
+    var ctx=ensureAudio();if(!ctx)return;
+    try{
+      var osc=ctx.createOscillator(),g=ctx.createGain(),now=ctx.currentTime;
+      osc.type=type||'sine';osc.frequency.setValueAtTime(freq,now);
+      g.gain.setValueAtTime(0.001,now);
+      g.gain.exponentialRampToValueAtTime(vol||0.12,now+0.015);
+      g.gain.exponentialRampToValueAtTime(0.001,now+dur);
+      osc.connect(g);g.connect(ctx.destination);
+      osc.start(now);osc.stop(now+dur+0.02);
+    }catch(e){}
+  }
+  function sfxDiceTick(){playTone(360+Math.floor(Math.random()*160),0.04,'triangle',0.06);}
+  function sfxDice(){playTone(520,0.07,'triangle',0.11);setTimeout(function(){playTone(690,0.08,'triangle',0.1);},65);}
+  function sfxHop(){playTone(540,0.05,'sine',0.08);}
+  function sfxCut(){playTone(210,0.18,'sawtooth',0.12);setTimeout(function(){playTone(150,0.2,'sawtooth',0.1);},90);}
+  function sfxLifeLost(){playTone(240,0.14,'square',0.1);setTimeout(function(){playTone(165,0.22,'square',0.11);},120);}
+  function sfxHome(){playTone(660,0.09,'sine',0.12);setTimeout(function(){playTone(880,0.14,'sine',0.12);},90);}
+  function sfxWin(){[523,659,784,1046].forEach(function(f,i){setTimeout(function(){playTone(f,0.18,'triangle',0.14);},i*110);});}
+
+  function syncSoundBtn(){
+    var b=$('ludo-sound-btn');if(!b)return;
+    b.textContent=soundOn?'🔊 Sound':'🔇 Muted';
+    b.classList.toggle('muted',!soundOn);
+  }
+  if($('ludo-sound-btn')){
+    $('ludo-sound-btn').addEventListener('click',function(){
+      soundOn=!soundOn;
+      try{localStorage.setItem('p2w_ludo_sound',soundOn?'1':'0');}catch(e){}
+      syncSoundBtn();
+      if(soundOn)playTone(640,0.08,'sine',0.1);
+    });
+  }
+  syncSoundBtn();
+
+  // 15% platform cut, 85% winner prize
+  function calcPrize(pCount,bet){
+    var pool=pCount*bet;
+    var win=Math.max(1,Math.floor(pool*0.85));
+    var cut=Math.max(0,pool-win);
+    return {pool:pool,win:win,cut:cut};
+  }
+  function friendlyLudoErr(e,fallback){
+    var m=(e&&e.message)||fallback||'Request failed.';
+    if(/Could not find the function|schema cache/i.test(m)){
+      return 'Supabase setup baaki hai: Supabase SQL Editor mein supabase_ludo.sql run karein.';
+    }
+    return m;
+  }
+  function setBal(n){
+    var v=Math.max(0,Number(n)||0);
+    var top=$('bal');
+    if(top&&top.dataset.admin!=='1')top.textContent=v.toLocaleString('en-IN');
+  }
+
+  function buildBoardSvg(){
+    var svg=$('ludo-board-svg');if(!svg)return;
+    var parts=[];
+    parts.push('<rect x="0" y="0" width="150" height="150" fill="#f8fafc"/>');
+    for(var r=0;r<15;r++){
+      for(var c=0;c<15;c++){
+        var inYard=(r<6&&c<6)||(r<6&&c>8)||(r>8&&c<6)||(r>8&&c>8)||(r>=6&&r<=8&&c>=6&&c<=8);
+        if(inYard)continue;
+        var fill='#ffffff';
+        if(r===7&&c>=1&&c<=5)fill='#fecdd3';
+        if(c===7&&r>=1&&r<=5)fill='#a7f3d0';
+        if(r===7&&c>=9&&c<=13)fill='#fde68a';
+        if(c===7&&r>=9&&r<=13)fill='#bfdbfe';
+        if(r===6&&c===1)fill='#e11d48';
+        if(r===1&&c===8)fill='#059669';
+        if(r===8&&c===13)fill='#d97706';
+        if(r===13&&c===6)fill='#2563eb';
+        if((r===2&&c===6)||(r===6&&c===12)||(r===12&&c===8)||(r===8&&c===2))fill='#e2e8f0';
+        parts.push('<rect x="'+(c*10)+'" y="'+(r*10)+'" width="10" height="10" fill="'+fill+'" stroke="#cbd5e1" stroke-width="0.6"/>');
+      }
+    }
+    var stars=[[6,1,'#fff'],[2,6,'#64748b'],[1,8,'#fff'],[6,12,'#64748b'],[8,13,'#fff'],[12,8,'#64748b'],[13,6,'#fff'],[8,2,'#64748b']];
+    stars.forEach(function(st){
+      var cx=st[1]*10+5,cy=st[0]*10+6.6;
+      parts.push('<text x="'+cx+'" y="'+cy+'" text-anchor="middle" font-size="5.8" font-weight="900" fill="'+st[2]+'">★</text>');
+    });
+    var yards=[
+      {x:0,y:0,fill:'#e11d48',sx:[20,40],sy:[20,40]},
+      {x:90,y:0,fill:'#059669',sx:[110,130],sy:[20,40]},
+      {x:90,y:90,fill:'#d97706',sx:[110,130],sy:[110,130]},
+      {x:0,y:90,fill:'#2563eb',sx:[20,40],sy:[110,130]}
+    ];
+    yards.forEach(function(yd){
+      parts.push('<rect x="'+yd.x+'" y="'+yd.y+'" width="60" height="60" fill="'+yd.fill+'" stroke="#0f172a" stroke-width="0.7"/>');
+      parts.push('<rect x="'+(yd.x+9)+'" y="'+(yd.y+9)+'" width="42" height="42" rx="6" fill="#ffffff" stroke="rgba(0,0,0,.15)" stroke-width="0.8"/>');
+      yd.sy.forEach(function(cy){
+        yd.sx.forEach(function(cx){
+          parts.push('<circle cx="'+cx+'" cy="'+cy+'" r="5.2" fill="'+yd.fill+'" fill-opacity="0.22" stroke="'+yd.fill+'" stroke-width="1.2"/>');
+        });
+      });
+    });
+    parts.push('<polygon points="60,60 75,75 60,90" fill="#e11d48" stroke="#fff" stroke-width="0.6"/>');
+    parts.push('<polygon points="60,60 90,60 75,75" fill="#059669" stroke="#fff" stroke-width="0.6"/>');
+    parts.push('<polygon points="90,60 90,90 75,75" fill="#d97706" stroke="#fff" stroke-width="0.6"/>');
+    parts.push('<polygon points="60,90 90,90 75,75" fill="#2563eb" stroke="#fff" stroke-width="0.6"/>');
+    parts.push('<circle cx="75" cy="75" r="7.5" fill="#ffffff" stroke="#fbbf24" stroke-width="1.5"/>');
+    parts.push('<text x="75" y="77.8" text-anchor="middle" font-size="7.5">🏆</text>');
+    svg.innerHTML=parts.join('');
+  }
+  buildBoardSvg();
+
+  function renderDiceFace(val){
+    var f=$('ludo-dice-face');if(!f)return;
+    var pips=PIP_MAP[val]||PIP_MAP[6];
+    var isSix=(val===6);
+    f.innerHTML=pips.map(function(on){
+      return '<span class="ludo-pip'+(on?(isSix?' six':''):' off')+'"></span>';
+    }).join('');
+  }
+  renderDiceFace(6);
+
+  function renderLobby(){
+    document.querySelectorAll('#ludo-mode-tabs [data-ludo-players]').forEach(function(b){
+      b.classList.toggle('on',Number(b.dataset.ludoPlayers)===selectedPlayers);
+    });
+    document.querySelectorAll('#ludo-bet-tabs [data-ludo-bet]').forEach(function(b){
+      var amt=Number(b.dataset.ludoBet);
+      b.classList.toggle('on',amt===selectedBet);
+      var small=b.querySelector('[data-ludo-win]');
+      if(small){small.textContent='Win '+calcPrize(selectedPlayers,amt).win+' 🪙';}
+    });
+    var p=calcPrize(selectedPlayers,selectedBet);
+    if($('ludo-sum-bet'))$('ludo-sum-bet').textContent=selectedBet+' Coins';
+    if($('ludo-sum-pcount'))$('ludo-sum-pcount').textContent=String(selectedPlayers);
+    if($('ludo-sum-pool'))$('ludo-sum-pool').textContent=p.pool+' Coins';
+    if($('ludo-sum-cut'))$('ludo-sum-cut').textContent='-'+p.cut+' Coins';
+    if($('ludo-sum-win'))$('ludo-sum-win').textContent=p.win+' Coins';
+    if($('ludo-start-btn'))$('ludo-start-btn').textContent='PLAY LUDO · '+selectedBet+' COINS';
+  }
+
+  function setMainTab(tab){
+    if(tab!=='history'&&tab!=='rules')tab='lobby';
+    activeTab=tab;
+    ['lobby','history','rules'].forEach(function(k){
+      var b=$('ludo-tab-'+k),p=$('ludo-pane-'+k);
+      if(b){b.classList.toggle('on',k===tab);b.setAttribute('aria-selected',k===tab?'true':'false');}
+      if(p)p.classList.toggle('hide',k!==tab);
+    });
+    if(tab==='history')loadHistory();
+  }
+
+  function showPhase(nextPhase){
+    phase=nextPhase;
+    if($('ludo-setup-view'))$('ludo-setup-view').classList.toggle('hide',phase!=='setup');
+    if($('ludo-search-stage'))$('ludo-search-stage').classList.toggle('hide',phase!=='searching');
+    if($('ludo-board-stage'))$('ludo-board-stage').classList.toggle('hide',phase!=='playing'&&phase!=='finished');
+    if($('ludo-main-tabs'))$('ludo-main-tabs').classList.toggle('hide',phase==='searching'||phase==='playing');
+    if(phase==='searching'||phase==='playing')setMainTab('lobby');
+  }
+
+  function stopTurnClock(){
+    if(turnClockTimer){clearInterval(turnClockTimer);turnClockTimer=null;}
+  }
+  function clearAllTimers(){
+    if(searchPollTimer){clearInterval(searchPollTimer);searchPollTimer=null;}
+    if(searchTickTimer){clearInterval(searchTickTimer);searchTickTimer=null;}
+    if(pvpPollTimer){clearInterval(pvpPollTimer);pvpPollTimer=null;}
+    if(botTimer){clearTimeout(botTimer);botTimer=null;}
+    if(diceCycleTimer){clearInterval(diceCycleTimer);diceCycleTimer=null;}
+    stopTurnClock();
+  }
+
+  function loadHistory(){
+    var ss=bridge.getSession();
+    var body=$('ludo-history-body');
+    if(!ss||!ss.token||!body)return;
+    body.innerHTML='<tr><td colspan="5" class="empty">Loading...</td></tr>';
+    bridge.api('ludo_my_history',{p_token:ss.token}).then(function(d){
+      if(d&&d.balance!==undefined)setBal(d.balance);
+      var rows=Array.isArray(d&&d.rows)?d.rows:[];
+      body.innerHTML=rows.length?rows.map(function(r){
+        var st=String(r.player_status||'');
+        var resHtml=st==='won'
+          ?'<b style="color:var(--green)">+'+Number(r.payout||0)+' 🪙</b>'
+          :st==='refunded'
+            ?'<span style="color:var(--mute)">Refund</span>'
+            :st==='lost'
+              ?'<b style="color:var(--red)">-'+Number(r.bet_amount||0)+' 🪙</b>'
+              :'<span class="bets-pill live">Live</span>';
+        return '<tr><td>#'+Number(r.match_id||0)+'</td><td>'+Number(r.player_count||2)+'P</td><td>'+Number(r.bet_amount||0)+'</td><td>'+Number(r.total_pool||0)+'</td><td>'+resHtml+'</td></tr>';
+      }).join(''):'<tr><td colspan="5" class="empty">Abhi tak koi Ludo match nahi khela gaya hai.</td></tr>';
+    }).catch(function(e){
+      body.innerHTML='<tr><td colspan="5" class="empty">'+bridge.esc(friendlyLudoErr(e,'History load nahi ho saki.'))+'</td></tr>';
+    });
+  }
+
+  function renderSearchSeats(match){
+    var grid=$('ludo-search-seats');if(!grid||!match)return;
+    var players=Array.isArray(match.players)?match.players:[];
+    var total=Number(match.player_count||selectedPlayers);
+    var html=[];
+    for(var i=0;i<total;i++){
+      var p=players[i];
+      if(p){
+        var hex=(COLOR_CFG[p.color]&&COLOR_CFG[p.color].hex)||'#3b82f6';
+        html.push('<div class="ludo-seat-card filled"><span class="ludo-seat-dot" style="background:'+hex+'"></span><div style="min-width:0"><b style="display:block;font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+bridge.esc(p.name||'Player')+'</b><small style="color:var(--green);font-size:.68rem;font-weight:800">✓ Ready</small></div></div>');
+      }else{
+        html.push('<div class="ludo-seat-card"><span class="ludo-seat-dot" style="background:rgba(255,255,255,.2)"></span><div><b style="display:block;font-size:.82rem;color:var(--mute)">Searching...</b><small style="color:var(--mute);font-size:.68rem">Slot #'+(i+1)+'</small></div></div>');
+      }
+    }
+    grid.innerHTML=html.join('');
+  }
+
+  function startSearch(){
+    var ss=bridge.getSession();
+    var errEl=$('ludo-lobby-err');
+    if(errEl)errEl.textContent='';
+    if(!ss||!ss.token){if(errEl)errEl.textContent='Please log in again.';return;}
+    if(ss.role==='admin'){if(errEl)errEl.textContent='Admin accounts cannot play Ludo.';return;}
+    var startBtn=$('ludo-start-btn');
+    if(startBtn){startBtn.disabled=true;startBtn.textContent='CONNECTING…';}
+    clearAllTimers();
+
+    bridge.api('ludo_matchmake',{
+      p_token:ss.token,
+      p_player_count:selectedPlayers,
+      p_bet_amount:selectedBet
+    }).then(function(match){
+      if(startBtn)startBtn.disabled=false;
+      renderLobby();
+      if(match.balance!==undefined)setBal(match.balance);
+      bridge.refresh().catch(function(){});
+      activeMatch=match;
+      if(match.status==='playing'){
+        enterMatch(match);
+        return;
+      }
+      showPhase('searching');
+      renderSearchSeats(match);
+      var leftMs=Math.max(1500,Number(match.search_left_ms||10000));
+      searchDeadline=Date.now()+leftMs;
+      if($('ludo-search-timer'))$('ludo-search-timer').textContent=String(Math.ceil(leftMs/1000));
+      if($('ludo-cancel-search'))$('ludo-cancel-search').disabled=false;
+
+      searchTickTimer=setInterval(function(){
+        var rem=Math.max(0,Math.ceil((searchDeadline-Date.now())/1000));
+        if($('ludo-search-timer'))$('ludo-search-timer').textContent=String(rem);
+        if(rem<=0){
+          clearAllTimers();
+          finalizeSearchWithBots();
+        }
+      },250);
+
+      searchPollTimer=setInterval(function(){
+        if(!activeMatch||phase!=='searching')return;
+        bridge.api('ludo_match_status',{p_token:ss.token,p_match_id:activeMatch.id}).then(function(m){
+          if(phase!=='searching')return;
+          activeMatch=m;
+          renderSearchSeats(m);
+          if(m.status==='playing'){
+            clearAllTimers();
+            enterMatch(m);
+          }else if(m.status==='cancelled'){
+            clearAllTimers();
+            showPhase('setup');
+          }
+        }).catch(function(){});
+      },1000);
+    }).catch(function(e){
+      if(startBtn)startBtn.disabled=false;
+      renderLobby();
+      var m=friendlyLudoErr(e,'Could not start Ludo match.');
+      if(errEl)errEl.textContent=m;
+      bridge.toast(m);
+    });
+  }
+
+  function finalizeSearchWithBots(){
+    var ss=bridge.getSession();
+    if(!activeMatch||!ss||!ss.token)return;
+    if($('ludo-search-sub'))$('ludo-search-sub').textContent='Starting table with player…';
+    if($('ludo-cancel-search'))$('ludo-cancel-search').disabled=true;
+    bridge.api('ludo_start_with_bots',{p_token:ss.token,p_match_id:activeMatch.id}).then(function(m){
+      activeMatch=m;
+      enterMatch(m);
+    }).catch(function(e){
+      bridge.toast(friendlyLudoErr(e,'Could not launch match.'));
+      showPhase('setup');
+    });
+  }
+
+  function cancelSearch(silent){
+    var ss=bridge.getSession();
+    var mId=activeMatch&&activeMatch.id;
+    clearAllTimers();
+    activeMatch=null;
+    showPhase('setup');
+    if(!mId||!ss||!ss.token)return;
+    bridge.api('ludo_cancel_search',{p_token:ss.token,p_match_id:mId}).then(function(res){
+      if(res&&res.balance!==undefined)setBal(res.balance);
+      bridge.refresh().catch(function(){});
+      if(!silent)bridge.toast('Match search cancelled · Bet coins refunded!');
+    }).catch(function(){});
+  }
+
+  function countRealHumans(players){
+    return (players||[]).filter(function(p){return !p.is_bot;}).length;
+  }
+  function hasBotsInMatch(){
+    var players=(activeMatch&&activeMatch.players)||[];
+    return players.some(function(p){return !!p.is_bot;});
+  }
+  function ensureLivesState(st,count){
+    if(!Array.isArray(st.lives)||st.lives.length<count){
+      st.lives=[];
+      for(var i=0;i<count;i++)st.lives.push(MAX_LIVES);
+    }
+    if(!Array.isArray(st.eliminated)||st.eliminated.length<count){
+      st.eliminated=[];
+      for(var j=0;j<count;j++)st.eliminated.push(false);
+    }
+  }
+  function nextActiveSeat(fromSeat){
+    var n=activeMatch.players.length;
+    for(var step=1;step<=n;step++){
+      var idx=(fromSeat+step)%n;
+      if(!gameState.eliminated[idx])return idx;
+    }
+    return fromSeat;
+  }
+  function getActiveSeats(){
+    var out=[];
+    var n=activeMatch.players.length;
+    for(var i=0;i<n;i++){
+      if(!gameState.eliminated[i])out.push(i);
+    }
+    return out;
+  }
+
+  function enterMatch(match){
+    clearAllTimers();
+    activeMatch=match;
+    var ss=bridge.getSession();
+    var players=Array.isArray(match.players)?match.players:[];
+    mySeat=players.findIndex(function(p){return String(p.user_id)===String(ss.id);});
+    if(mySeat<0)mySeat=0;
+
+    if(match.state_json&&Array.isArray(match.state_json.tokens)){
+      gameState=JSON.parse(JSON.stringify(match.state_json));
+    }else{
+      var t=[];for(var i=0;i<players.length;i++)t.push([-1,-1,-1,-1]);
+      gameState={tokens:t,turn:0,seq:Number(match.turn_seq||0),consecSix:0,lastRoll:null,winnerSeat:null};
+    }
+    ensureLivesState(gameState,players.length);
+
+    var pCalc=calcPrize(Number(match.player_count||players.length||2),Number(match.bet_amount||10));
+    if($('ludo-match-prize-pill')){
+      $('ludo-match-prize-pill').textContent='🏆 Win '+pCalc.win+' 🪙 · Pool '+pCalc.pool+' 🪙 (15% cut)';
+    }
+    if($('ludo-log-line'))$('ludo-log-line').textContent='Match started! 30s turn timer · 3 ❤️ lives';
+    if($('ludo-result-overlay'))$('ludo-result-overlay').classList.add('hide');
+    if($('ludo-exit-overlay'))$('ludo-exit-overlay').classList.add('hide');
+
+    awaitingHumanMove=false;
+    legalMoveTokens=[];
+    animating=false;
+    showPhase('playing');
+    renderPlayerCards();
+    renderBoardTokens();
+    updateTurnControls();
+    startTurnTimer();
+
+    if(countRealHumans(players)>1){
+      pvpPollTimer=setInterval(pollPvpMatch,1200);
+    }
+    scheduleBotIfNeeded();
+  }
+
+  function renderHeartsHtml(livesCount,isEliminated){
+    var n=Math.max(0,Math.min(MAX_LIVES,Number(livesCount)));
+    var h='<div class="ludo-hearts" aria-label="'+n+' lives remaining">';
+    for(var i=0;i<MAX_LIVES;i++){
+      h+='<span class="ludo-heart '+(i<n?'on':'lost')+'">'+HEART_SVG+'</span>';
+    }
+    if(isEliminated)h+='<span class="ludo-out-badge">OUT</span>';
+    h+='</div>';
+    return h;
+  }
+
+  function renderPlayerCards(){
+    var players=(activeMatch&&activeMatch.players)||[];
+    ensureLivesState(gameState,players.length);
+    ['red','green','blue','yellow'].forEach(function(col){
+      var el=$('ludo-card-'+col);
+      if(!el)return;
+      var seatIdx=players.findIndex(function(p){return p.color===col;});
+      if(seatIdx<0){
+        el.className='ludo-pcard off';
+        el.innerHTML='';
+        return;
+      }
+      var p=players[seatIdx];
+      var isElim=!!gameState.eliminated[seatIdx];
+      var isTurn=(gameState&&Number(gameState.turn)===seatIdx)&&!isElim;
+      var isMe=(seatIdx===mySeat);
+      el.className='ludo-pcard'+(isTurn?' active':'')+(isElim?' eliminated':'');
+      var toks=(gameState&&gameState.tokens&&gameState.tokens[seatIdx])||[-1,-1,-1,-1];
+      var dots=toks.map(function(v){return '<i class="'+(v>=56?'done':'')+'"></i>';}).join('');
+      var init=String(p.name||'P').trim().charAt(0).toUpperCase();
+      var labelName=isMe?(String(p.name||'You')+' (You)'):String(p.name||'Player');
+      var lives=gameState.lives[seatIdx];
+      el.innerHTML='<div class="ludo-pinfo"><span class="ludo-pavatar" style="background:'+COLOR_CFG[col].hex+'">'+bridge.esc(init)+'</span><div class="ludo-pmeta"><span class="ludo-pname">'+bridge.esc(labelName)+'</span>'+renderHeartsHtml(lives,isElim)+'</div></div><div class="ludo-phome-dots">'+dots+'</div>';
+    });
+  }
+
+  function getCellCoord(color,prog,tokIdx){
+    var cfg=COLOR_CFG[color];
+    if(prog<0)return cfg.yard[tokIdx];
+    if(prog<=50)return OUTER_TRACK[(cfg.startIdx+prog)%52];
+    if(prog<=55)return cfg.homeCol[prog-51];
+    return cfg.goal;
+  }
+
+  function renderBoardTokens(){
+    var layer=$('ludo-tokens-layer');
+    if(!layer||!activeMatch||!gameState)return;
+    var players=activeMatch.players||[];
+    ensureLivesState(gameState,players.length);
+    var items=[];
+    var cellGroups={};
+
+    players.forEach(function(p,sIdx){
+      if(gameState.eliminated[sIdx])return;
+      var toks=gameState.tokens[sIdx]||[-1,-1,-1,-1];
+      toks.forEach(function(prog,tIdx){
+        var rc=getCellCoord(p.color,prog,tIdx);
+        var x=((rc[1]+0.5)/15)*100;
+        var y=((rc[0]+0.5)/15)*100;
+        var key=Math.round(x*2)+':'+Math.round(y*2);
+        if(!cellGroups[key])cellGroups[key]=[];
+        var item={seat:sIdx,tok:tIdx,color:p.color,prog:prog,x:x,y:y,key:key};
+        cellGroups[key].push(item);
+        items.push(item);
+      });
+    });
+
+    var offsets=[[0,0],[[-1.5,-1.5],[1.5,1.5]],[[-1.6,-1.2],[1.6,-1.2],[0,1.6]],[[-1.5,-1.5],[1.5,-1.5],[-1.5,1.5],[1.5,1.5]]];
+    layer.innerHTML='';
+    items.forEach(function(it){
+      var grp=cellGroups[it.key];
+      var ox=0,oy=0,scale=1;
+      if(grp.length>1){
+        var idx=grp.indexOf(it);
+        var pat=offsets[Math.min(grp.length,4)-1];
+        var pair=pat[idx%pat.length];
+        ox=pair[0];oy=pair[1];scale=0.82;
+      }
+      var isMovable=awaitingHumanMove&&it.seat===mySeat&&legalMoveTokens.indexOf(it.tok)>=0;
+      var btn=document.createElement('button');
+      btn.type='button';
+      btn.className='ludo-tok '+it.color+(isMovable?' movable':'');
+      btn.style.left=(it.x+ox)+'%';
+      btn.style.top=(it.y+oy)+'%';
+      if(scale<1&&!isMovable)btn.style.transform='translate(-50%,-50%) scale('+scale+')';
+      btn.setAttribute('aria-label',it.color+' token '+(it.tok+1));
+      if(isMovable){
+        btn.addEventListener('click',function(){handleHumanTokenTap(it.tok);});
+      }
+      layer.appendChild(btn);
+    });
+  }
+
+  function renderTurnTimerPill(){
+    var pill=$('ludo-turn-timer');if(!pill)return;
+    var players=(activeMatch&&activeMatch.players)||[];
+    var turnP=players[gameState&&gameState.turn];
+    if(phase!=='playing'||!turnP||turnP.is_bot){
+      pill.className='ludo-timer-pill hide';
+      return;
+    }
+    pill.textContent='⏱ '+turnSecondsLeft+'s';
+    pill.className='ludo-timer-pill'+(turnSecondsLeft<=5?' crit':turnSecondsLeft<=10?' warn':'');
+  }
+
+  function startTurnTimer(){
+    stopTurnClock();
+    if(phase!=='playing'||!activeMatch||!gameState)return;
+    var players=activeMatch.players||[];
+    var seat=gameState.turn;
+    var turnP=players[seat];
+    if(!turnP||turnP.is_bot){
+      renderTurnTimerPill();
+      return;
+    }
+    turnSecondsLeft=(seat===mySeat)?TURN_SECONDS:(TURN_SECONDS+4);
+    renderTurnTimerPill();
+    turnClockTimer=setInterval(function(){
+      if(phase!=='playing'||animating)return;
+      turnSecondsLeft=Math.max(0,turnSecondsLeft-1);
+      renderTurnTimerPill();
+      if(turnSecondsLeft<=0){
+        stopTurnClock();
+        handleTurnTimeout(seat);
+      }
+    },1000);
+  }
+
+  function handleTurnTimeout(seat){
+    if(phase!=='playing'||!activeMatch||!gameState)return;
+    if(gameState.turn!==seat)return;
+    var players=activeMatch.players||[];
+    ensureLivesState(gameState,players.length);
+    var p=players[seat];if(!p)return;
+
+    awaitingHumanMove=false;
+    legalMoveTokens=[];
+    animating=false;
+
+    gameState.lives[seat]=Math.max(0,Number(gameState.lives[seat]||0)-1);
+    var left=gameState.lives[seat];
+    sfxLifeLost();
+
+    if(left<=0){
+      gameState.eliminated[seat]=true;
+      gameState.tokens[seat]=[-1,-1,-1,-1];
+      if(seat===mySeat)bridge.toast('3/3 lives lost! Aap game se OUT ho gaye.');
+      else bridge.toast(p.name+' ran out of 3 lives and is OUT!');
+      if($('ludo-log-line'))$('ludo-log-line').textContent=(seat===mySeat?'You':p.name)+' lost all 3 ❤️ lives — OUT!';
+
+      var active=getActiveSeats();
+      if(active.length<=1){
+        var wSeat=active.length===1?active[0]:nextActiveSeat(seat);
+        var wName=(players[wSeat]&&players[wSeat].name)||'Player';
+        renderPlayerCards();
+        renderBoardTokens();
+        pushPvpStateIfNeeded();
+        settleMatch(wSeat,wName,seat===mySeat?'You missed 3 turns (0/3 ❤️ lives left) — Game Over!':null);
+        return;
+      }
+      // In 1-human vs bots: if human is eliminated, best opponent wins immediately
+      if(seat===mySeat&&hasBotsInMatch()&&countRealHumans(players)<=1){
+        var bestOpp=active[0],bestProg=-99;
+        active.forEach(function(s){
+          var sum=(gameState.tokens[s]||[]).reduce(function(acc,v){return acc+(v<0?0:v+5);},0);
+          if(sum>bestProg){bestProg=sum;bestOpp=s;}
+        });
+        renderPlayerCards();
+        renderBoardTokens();
+        settleMatch(bestOpp,(players[bestOpp]&&players[bestOpp].name)||'Opponent','Aapke 3 ❤️ chances khatam ho gaye — Game Over!');
+        return;
+      }
+    }else{
+      var msg=(seat===mySeat?'Time out! 1 ❤️ life lost ('+left+' left)':p.name+' missed turn ('+left+' ❤️ left)');
+      if($('ludo-log-line'))$('ludo-log-line').textContent=msg;
+      if(seat===mySeat)bridge.toast('30s me roll nahi hua! 1 ❤️ life kam ('+left+' baaki)');
+    }
+
+    gameState.consecSix=0;
+    gameState.turn=nextActiveSeat(seat);
+    gameState.seq=(Number(gameState.seq)||0)+1;
+    renderPlayerCards();
+    renderBoardTokens();
+    updateTurnControls();
+    pushPvpStateIfNeeded();
+    startTurnTimer();
+    scheduleBotIfNeeded();
+  }
+
+  function updateTurnControls(){
+    if(!activeMatch||!gameState)return;
+    var players=activeMatch.players||[];
+    var turnP=players[gameState.turn];
+    var isMyTurn=(gameState.turn===mySeat)&&phase==='playing'&&!gameState.eliminated[mySeat];
+    var diceBtn=$('ludo-dice-btn');
+    var turnTxt=$('ludo-turn-text');
+    if(turnTxt){
+      if(gameState.eliminated[mySeat]){
+        turnTxt.textContent='You are OUT (0/3 ❤️)';
+        turnTxt.style.color='var(--red)';
+      }else if(isMyTurn){
+        turnTxt.textContent=awaitingHumanMove?'Select a glowing token':'Your Turn — Roll Dice!';
+        turnTxt.style.color='var(--green)';
+      }else{
+        turnTxt.textContent=(turnP?turnP.name:'Opponent')+"'s Turn...";
+        turnTxt.style.color='var(--gold-text)';
+      }
+    }
+    if(diceBtn){
+      var canRoll=isMyTurn&&!animating&&!awaitingHumanMove;
+      diceBtn.disabled=!canRoll;
+      diceBtn.classList.toggle('ready',canRoll);
+    }
+    renderTurnTimerPill();
+  }
+
+  function getLegalMoves(seat,roll){
+    var toks=(gameState&&gameState.tokens&&gameState.tokens[seat])||[];
+    var out=[];
+    for(var i=0;i<toks.length;i++){
+      var p=toks[i];
+      if(p<0&&roll===6)out.push(i);
+      else if(p>=0&&p+roll<=56)out.push(i);
+    }
+    return out;
+  }
+
+  function globalTrackOf(color,prog){
+    if(prog<0||prog>50)return -1;
+    return (COLOR_CFG[color].startIdx+prog)%52;
+  }
+
+  // Calibrated dice generator:
+  // - Never allows 3 consecutive 6s (if consecSix >= 2, excludes 6)
+  // - In bot tables, balances odds to ~30% Human / ~70% Bot win probability
+  function rollDiceValue(seat){
+    var allowSix=(Number(gameState&&gameState.consecSix||0)<2);
+    var faces=allowSix?[1,2,3,4,5,6]:[1,2,3,4,5];
+    var players=(activeMatch&&activeMatch.players)||[];
+    var p=players[seat];
+
+    if(!p||!hasBotsInMatch()){
+      return faces[Math.floor(Math.random()*faces.length)];
+    }
+
+    var pCount=players.length;
+    var weights={1:1,2:1,3:1,4:1,5:1,6:1};
+    var toks=gameState.tokens[seat]||[];
+    var myColor=p.color;
+
+    if(p.is_bot){
+      // Boost bot progress slightly more in 2P where 1v1 base is 50/50
+      var sixBoost=(pCount===2)?2.15:(pCount===3)?1.55:1.35;
+      if(allowSix){
+        var allInYard=toks.every(function(v){return v<0;});
+        weights[6]=allInYard?(sixBoost+0.6):sixBoost;
+      }
+      // Mild preference for capture or exact home finish rolls
+      faces.forEach(function(r){
+        var legal=getLegalMoves(seat,r);
+        legal.forEach(function(ti){
+          var next=toks[ti]<0?0:(toks[ti]+r);
+          if(next===56)weights[r]+=0.95;
+          var ng=globalTrackOf(myColor,next);
+          if(ng>=0&&!SAFE_INDICES[ng]){
+            players.forEach(function(op,os){
+              if(os===seat||gameState.eliminated[os])return;
+              (gameState.tokens[os]||[]).forEach(function(opP){
+                if(globalTrackOf(op.color,opP)===ng)weights[r]+=0.95;
+              });
+            });
+          }
+        });
+      });
+    }else{
+      // Human against bots: keep ~30% user win chance
+      if(allowSix)weights[6]=(pCount===2)?0.68:0.82;
+      faces.forEach(function(r){
+        var legal=getLegalMoves(seat,r);
+        legal.forEach(function(ti){
+          var next=toks[ti]<0?0:(toks[ti]+r);
+          if(next===56)weights[r]*=0.82;
+        });
+      });
+    }
+
+    var totalW=0;
+    faces.forEach(function(r){totalW+=weights[r];});
+    var pick=Math.random()*totalW;
+    for(var i=0;i<faces.length;i++){
+      pick-=weights[faces[i]];
+      if(pick<=0)return faces[i];
+    }
+    return faces[faces.length-1];
+  }
+
+  function chooseBestBotToken(seat,roll,legal){
+    var players=activeMatch.players||[];
+    var myColor=players[seat].color;
+    var myToks=gameState.tokens[seat];
+    var bestTok=legal[0],bestScore=-9999;
+
+    legal.forEach(function(ti){
+      var cur=myToks[ti];
+      var next=(cur<0)?0:(cur+roll);
+      var score=0;
+      if(next===56)score+=145;
+      if(cur<0)score+=74;
+      if(next>=51&&cur<51)score+=48;
+      var nextG=globalTrackOf(myColor,next);
+      if(nextG>=0){
+        if(SAFE_INDICES[nextG])score+=48;
+        else{
+          players.forEach(function(op,os){
+            if(os===seat||gameState.eliminated[os])return;
+            (gameState.tokens[os]||[]).forEach(function(opProg){
+              if(globalTrackOf(op.color,opProg)===nextG){
+                score+=op.is_bot?95:135;
+              }
+            });
+          });
+          players.forEach(function(op,os){
+            if(os===seat||gameState.eliminated[os])return;
+            (gameState.tokens[os]||[]).forEach(function(opProg){
+              var og=globalTrackOf(op.color,opProg);
+              if(og>=0){
+                var dist=(nextG-og+52)%52;
+                if(dist>=1&&dist<=6)score-=28;
+              }
+            });
+          });
+        }
+      }
+      var curG=globalTrackOf(myColor,cur);
+      if(curG>=0&&!SAFE_INDICES[curG]){
+        players.forEach(function(op,os){
+          if(os===seat||gameState.eliminated[os])return;
+          (gameState.tokens[os]||[]).forEach(function(opProg){
+            var og=globalTrackOf(op.color,opProg);
+            if(og>=0){
+              var dist=(curG-og+52)%52;
+              if(dist>=1&&dist<=6)score+=36;
+            }
+          });
+        });
+      }
+      score+=cur*0.4+(Math.random()*2);
+      if(score>bestScore){bestScore=score;bestTok=ti;}
+    });
+    return bestTok;
+  }
+
+  function advanceTurnOrBonus(seat,roll,gotCapture,gotHome){
+    var bonus=(roll===6||gotCapture||gotHome);
+    if(bonus){
+      if(roll===6){gameState.consecSix=(gameState.consecSix||0)+1;}
+      else{gameState.consecSix=0;}
+      gameState.turn=seat;
+    }else{
+      gameState.consecSix=0;
+      gameState.turn=nextActiveSeat(seat);
+    }
+    gameState.seq=(Number(gameState.seq)||0)+1;
+  }
+
+  function executeMove(seat,tokIdx,roll){
+    if(phase!=='playing'||!activeMatch||!gameState)return;
+    animating=true;
+    awaitingHumanMove=false;
+    legalMoveTokens=[];
+    updateTurnControls();
+
+    var players=activeMatch.players;
+    var p=players[seat];
+    var cur=gameState.tokens[seat][tokIdx];
+    var target=(cur<0)?0:(cur+roll);
+    var step=cur;
+
+    function finishMove(){
+      var gotCapture=false,gotHome=(target===56);
+      var destG=globalTrackOf(p.color,target);
+      if(destG>=0&&!SAFE_INDICES[destG]){
+        players.forEach(function(op,os){
+          if(os===seat||gameState.eliminated[os])return;
+          var opToks=gameState.tokens[os];
+          for(var k=0;k<opToks.length;k++){
+            if(globalTrackOf(op.color,opToks[k])===destG){
+              opToks[k]=-1;
+              gotCapture=true;
+            }
+          }
+        });
+      }
+      if(gotCapture){
+        sfxCut();
+        if($('ludo-log-line'))$('ludo-log-line').textContent=(seat===mySeat?'You':p.name)+' captured a token! Bonus turn!';
+      }else if(gotHome){
+        sfxHome();
+        if($('ludo-log-line'))$('ludo-log-line').textContent=(seat===mySeat?'You':p.name)+' reached Home! Bonus turn!';
+      }
+
+      var allHome=gameState.tokens[seat].every(function(v){return v>=56;});
+      if(allHome){
+        gameState.winnerSeat=seat;
+        renderPlayerCards();
+        renderBoardTokens();
+        animating=false;
+        pushPvpStateIfNeeded();
+        settleMatch(seat,p.name);
+        return;
+      }
+
+      advanceTurnOrBonus(seat,roll,gotCapture,gotHome);
+      renderPlayerCards();
+      renderBoardTokens();
+      animating=false;
+      updateTurnControls();
+      pushPvpStateIfNeeded();
+      startTurnTimer();
+      scheduleBotIfNeeded();
+    }
+
+    if(cur<0){
+      gameState.tokens[seat][tokIdx]=0;
+      sfxHop();
+      renderBoardTokens();
+      setTimeout(finishMove,180);
+      return;
+    }
+
+    function hopNext(){
+      if(step>=target){
+        finishMove();
+        return;
+      }
+      step++;
+      gameState.tokens[seat][tokIdx]=step;
+      sfxHop();
+      renderBoardTokens();
+      setTimeout(hopNext,110);
+    }
+    hopNext();
+  }
+
+  function pushPvpStateIfNeeded(){
+    var ss=bridge.getSession();
+    if(!activeMatch||!gameState||!ss||!ss.token)return;
+    if(countRealHumans(activeMatch.players)<=1)return;
+    bridge.api('ludo_push_state',{
+      p_token:ss.token,
+      p_match_id:activeMatch.id,
+      p_expected_seq:Math.max(0,Number(gameState.seq||1)-1),
+      p_state_json:gameState
+    }).catch(function(){});
+  }
+
+  function rollForSeat(seat){
+    if(phase!=='playing'||animating||awaitingHumanMove)return;
+    var players=(activeMatch&&activeMatch.players)||[];
+    var p=players[seat];if(!p||gameState.eliminated[seat])return;
+    animating=true;
+    updateTurnControls();
+    var diceBtn=$('ludo-dice-btn');
+    if(diceBtn){
+      diceBtn.classList.remove('landed');
+      diceBtn.classList.add('rolling');
+    }
+
+    var finalRoll=rollDiceValue(seat);
+    var flickCount=0;
+    if(diceCycleTimer){clearInterval(diceCycleTimer);diceCycleTimer=null;}
+    diceCycleTimer=setInterval(function(){
+      flickCount++;
+      renderDiceFace(((flickCount+Math.floor(Math.random()*5))%6)+1);
+      sfxDiceTick();
+    },70);
+
+    setTimeout(function(){
+      if(diceCycleTimer){clearInterval(diceCycleTimer);diceCycleTimer=null;}
+      if(diceBtn){
+        diceBtn.classList.remove('rolling');
+        diceBtn.classList.add('landed');
+      }
+      if(phase!=='playing')return;
+      sfxDice();
+      gameState.lastRoll=finalRoll;
+      renderDiceFace(finalRoll);
+      var actor=(seat===mySeat)?'You':p.name;
+      if($('ludo-log-line'))$('ludo-log-line').textContent=actor+' rolled a '+finalRoll+'!';
+
+      var legal=getLegalMoves(seat,finalRoll);
+      if(!legal.length){
+        if($('ludo-log-line'))$('ludo-log-line').textContent=actor+' rolled '+finalRoll+' — no valid moves.';
+        setTimeout(function(){
+          if(phase!=='playing')return;
+          gameState.consecSix=0;
+          gameState.turn=nextActiveSeat(seat);
+          gameState.seq=(Number(gameState.seq)||0)+1;
+          animating=false;
+          renderPlayerCards();
+          updateTurnControls();
+          pushPvpStateIfNeeded();
+          startTurnTimer();
+          scheduleBotIfNeeded();
+        },560);
+        return;
+      }
+
+      if(p.is_bot){
+        var chosen=chooseBestBotToken(seat,finalRoll,legal);
+        setTimeout(function(){executeMove(seat,chosen,finalRoll);},310);
+        return;
+      }
+
+      var distinctTargets={};
+      legal.forEach(function(ti){
+        var cur=gameState.tokens[seat][ti];
+        distinctTargets[cur<0?0:(cur+finalRoll)]=true;
+      });
+      if(Object.keys(distinctTargets).length===1){
+        setTimeout(function(){executeMove(seat,legal[0],finalRoll);},300);
+      }else{
+        animating=false;
+        awaitingHumanMove=true;
+        legalMoveTokens=legal;
+        renderBoardTokens();
+        updateTurnControls();
+      }
+    },520);
+  }
+
+  function handleHumanTokenTap(tokIdx){
+    if(!awaitingHumanMove||animating||phase!=='playing')return;
+    if(legalMoveTokens.indexOf(tokIdx)<0)return;
+    executeMove(mySeat,tokIdx,Number(gameState.lastRoll||1));
+  }
+
+  function scheduleBotIfNeeded(){
+    if(botTimer){clearTimeout(botTimer);botTimer=null;}
+    if(phase!=='playing'||!activeMatch||!gameState)return;
+    var players=activeMatch.players||[];
+    var turnP=players[gameState.turn];
+    if(!turnP||!turnP.is_bot||gameState.eliminated[gameState.turn])return;
+    var firstHumanSeat=players.findIndex(function(p,idx){return !p.is_bot&&!gameState.eliminated[idx];});
+    if(firstHumanSeat>=0&&firstHumanSeat!==mySeat)return;
+    botTimer=setTimeout(function(){
+      if(phase==='playing'&&gameState&&players[gameState.turn]&&players[gameState.turn].is_bot){
+        rollForSeat(gameState.turn);
+      }
+    },620);
+  }
+
+  function pollPvpMatch(){
+    var ss=bridge.getSession();
+    if(!activeMatch||!ss||!ss.token||phase!=='playing')return;
+    bridge.api('ludo_match_status',{p_token:ss.token,p_match_id:activeMatch.id}).then(function(m){
+      if(phase!=='playing')return;
+      if(m.status==='completed'){
+        showMatchResult({
+          winner_name:m.winner_name,
+          winner_seat:m.winner_seat,
+          total_pool:m.total_pool,
+          platform_cut:m.platform_cut,
+          winner_payout:m.winner_payout,
+          did_i_win:Number(m.winner_seat)===mySeat,
+          balance:m.balance
+        });
+        return;
+      }
+      if(m.state_json&&Number(m.turn_seq||0)>Number(gameState.seq||0)&&!animating&&!awaitingHumanMove){
+        gameState=m.state_json;
+        ensureLivesState(gameState,(activeMatch.players||[]).length);
+        gameState.seq=Number(m.turn_seq||0);
+        if(gameState.lastRoll)renderDiceFace(gameState.lastRoll);
+        renderPlayerCards();
+        renderBoardTokens();
+        updateTurnControls();
+        startTurnTimer();
+        scheduleBotIfNeeded();
+      }
+    }).catch(function(){});
+  }
+
+  function settleMatch(winnerSeat,winnerName,customSub){
+    if(phase==='finished')return;
+    phase='finished';
+    clearAllTimers();
+    var ss=bridge.getSession();
+    if(!activeMatch||!ss||!ss.token)return;
+    bridge.api('ludo_finish_match',{
+      p_token:ss.token,
+      p_match_id:activeMatch.id,
+      p_winner_seat:winnerSeat,
+      p_winner_name:winnerName||''
+    }).then(function(res){
+      if(res&&res.balance!==undefined)setBal(res.balance);
+      bridge.refresh().catch(function(){});
+      if(customSub)res.customSub=customSub;
+      showMatchResult(res);
+    }).catch(function(){
+      var pCalc=calcPrize(activeMatch.player_count||2,activeMatch.bet_amount||10);
+      showMatchResult({
+        winner_name:winnerName||'Player',
+        total_pool:pCalc.pool,
+        platform_cut:pCalc.cut,
+        winner_payout:pCalc.win,
+        did_i_win:(winnerSeat===mySeat),
+        customSub:customSub
+      });
+    });
+  }
+
+  function showMatchResult(res){
+    clearAllTimers();
+    phase='finished';
+    var won=!!(res&&res.did_i_win);
+    if(won)sfxWin();
+    if($('ludo-res-icon'))$('ludo-res-icon').textContent=won?'🏆':'🎲';
+    if($('ludo-res-title'))$('ludo-res-title').textContent=won?'You Won!':'Match Finished';
+    if($('ludo-res-sub'))$('ludo-res-sub').textContent=res&&res.customSub
+      ?res.customSub
+      :won
+        ?('Congratulations! +'+Number(res.winner_payout||0)+' Coins aapke wallet me add ho gaye!')
+        :('Winner: '+(res.winner_name||'Opponent')+' · Agli baar jeetne ke liye Play Again karein!');
+    if($('ludo-res-pool'))$('ludo-res-pool').textContent=Number(res.total_pool||0)+' Coins';
+    if($('ludo-res-cut'))$('ludo-res-cut').textContent='-'+Number(res.platform_cut||0)+' Coins';
+    if($('ludo-res-prize'))$('ludo-res-prize').textContent=(won?'+':'')+Number(res.winner_payout||0)+' Coins';
+    if($('ludo-result-overlay'))$('ludo-result-overlay').classList.remove('hide');
+  }
+
+  // Event listeners
+  if($('ludo-main-tabs')){
+    $('ludo-main-tabs').addEventListener('click',function(e){
+      var b=e.target.closest('[data-ludo-tab]');
+      if(b)setMainTab(b.dataset.ludoTab);
+    });
+  }
+  if($('ludo-mode-tabs')){
+    $('ludo-mode-tabs').addEventListener('click',function(e){
+      var b=e.target.closest('[data-ludo-players]');
+      if(!b)return;
+      selectedPlayers=Number(b.dataset.ludoPlayers)||2;
+      renderLobby();
+    });
+  }
+  if($('ludo-bet-tabs')){
+    $('ludo-bet-tabs').addEventListener('click',function(e){
+      var b=e.target.closest('[data-ludo-bet]');
+      if(!b)return;
+      var amt=Number(b.dataset.ludoBet);
+      if(BETS.indexOf(amt)>=0){selectedBet=amt;renderLobby();}
+    });
+  }
+  if($('ludo-start-btn'))$('ludo-start-btn').addEventListener('click',startSearch);
+  if($('ludo-cancel-search'))$('ludo-cancel-search').addEventListener('click',function(){cancelSearch(false);});
+  if($('ludo-dice-btn'))$('ludo-dice-btn').addEventListener('click',function(){
+    if(phase==='playing'&&gameState&&gameState.turn===mySeat&&!gameState.eliminated[mySeat]&&!animating&&!awaitingHumanMove){
+      rollForSeat(mySeat);
+    }
+  });
+  if($('ludo-exit-btn'))$('ludo-exit-btn').addEventListener('click',function(){
+    if($('ludo-exit-overlay'))$('ludo-exit-overlay').classList.remove('hide');
+  });
+  if($('ludo-exit-stay'))$('ludo-exit-stay').addEventListener('click',function(){
+    if($('ludo-exit-overlay'))$('ludo-exit-overlay').classList.add('hide');
+  });
+  if($('ludo-exit-confirm'))$('ludo-exit-confirm').addEventListener('click',function(){
+    if($('ludo-exit-overlay'))$('ludo-exit-overlay').classList.add('hide');
+    var players=(activeMatch&&activeMatch.players)||[];
+    var opp=players.findIndex(function(pl,idx){return idx!==mySeat&&!pl.is_bot&&!(gameState&&gameState.eliminated&&gameState.eliminated[idx]);});
+    if(opp<0)opp=players.findIndex(function(_,idx){return idx!==mySeat&&!(gameState&&gameState.eliminated&&gameState.eliminated[idx]);});
+    if(opp<0)opp=players.findIndex(function(_,idx){return idx!==mySeat;});
+    if(opp<0)opp=0;
+    var oppName=(players[opp]&&players[opp].name)||'Opponent';
+    var mId=activeMatch&&activeMatch.id;
+    var ss=bridge.getSession();
+    clearAllTimers();
+    activeMatch=null;
+    showPhase('setup');
+    if(mId&&ss&&ss.token){
+      bridge.api('ludo_finish_match',{p_token:ss.token,p_match_id:mId,p_winner_seat:opp,p_winner_name:oppName}).then(function(){
+        bridge.refresh().catch(function(){});
+      }).catch(function(){});
+    }
+  });
+  if($('ludo-res-again'))$('ludo-res-again').addEventListener('click',function(){
+    if($('ludo-result-overlay'))$('ludo-result-overlay').classList.add('hide');
+    activeMatch=null;
+    showPhase('setup');
+    renderLobby();
+  });
+  if($('ludo-res-hist'))$('ludo-res-hist').addEventListener('click',function(){
+    if($('ludo-result-overlay'))$('ludo-result-overlay').classList.add('hide');
+    activeMatch=null;
+    showPhase('setup');
+    setMainTab('history');
+  });
+
+  window.Play2WinLudoOnRoute=function(active){
+    if(active){
+      renderLobby();
+      if(phase==='playing'&&activeMatch){
+        clearAllTimers();
+        if(countRealHumans(activeMatch.players)>1){
+          pvpPollTimer=setInterval(pollPvpMatch,1200);
+        }
+        startTurnTimer();
+        scheduleBotIfNeeded();
+      }else if(phase==='setup'&&activeTab==='history'){
+        loadHistory();
+      }
+    }else{
+      if(phase==='searching'){cancelSearch(true);}
+      else{clearAllTimers();}
+    }
+  };
+
+  renderLobby();
 })();
 </script>
 
