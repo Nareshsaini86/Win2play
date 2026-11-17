@@ -140,6 +140,10 @@ class ExampleRobolectricTest {
     val scriptStart = html.indexOf("<script>\n(function(){")
     assertTrue(scriptStart > html.indexOf("id=\"p2w-reject-wdr-modal\""))
     assertTrue(scriptStart > html.indexOf("id=\"p2w-update-modal\""))
+    assertTrue(html.contains("id=\"admin-upd-live-status\""))
+    assertTrue(html.contains("function compareVersionNames"))
+    assertTrue(html.contains("checkForAppUpdate(false,true)"))
+    assertTrue(html.contains("https://drive.google.com/uc?export=download&confirm=t&id="))
   }
 
   @Test

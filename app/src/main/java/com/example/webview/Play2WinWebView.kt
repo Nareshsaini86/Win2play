@@ -475,6 +475,10 @@ fun createConfiguredWebView(
           return true
         }
       }
+
+    setDownloadListener { downloadUrl, _, _, _, _ ->
+      nativeBridge.openExternalUrl(downloadUrl)
+    }
   }
 }
 

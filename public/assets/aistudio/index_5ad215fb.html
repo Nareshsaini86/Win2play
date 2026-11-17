@@ -1380,7 +1380,8 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
         </div>
         <div class="card" id="admin-app-update-card">
           <div class="srow"><h2 style="margin:0">🚀 App Update Popup</h2><span class="bal" id="admin-upd-current-ver">Installed: v1.4 (Code 5)</span></div>
-          <p class="note" style="margin-top:6px">Naya APK build release karne ke baad yahan Version Code badha kar Publish karein — sabhi users ko app open karte hi Update Popup dikhega aur click karte hi download shuru ho jayega.</p>
+          <p class="note" style="margin-top:6px">Naya APK build release karne ke baad yahan Version Code (ya Version Name) badha kar Publish karein — isse purane sabhi users ko app open karte hi Update Popup dikhega aur Update Now dabate hi APK download shuru ho jayega.</p>
+          <div class="note" id="admin-upd-live-status" style="margin:0 0 10px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--soft);font-weight:700">Checking live popup status…</div>
           <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
             <label>Latest Version Code
               <input id="admin-upd-code" type="number" min="1" step="1" value="5" placeholder="e.g. 6">
@@ -3535,7 +3536,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     if(!u||isWebsiteHomeUrl(u))return '';
     var gd=u.match(/^https?:\/\/drive\.google\.com\/file\/d\/([^\/?#]+)/i)||u.match(/^https?:\/\/drive\.google\.com\/open\?(?:.*&)?id=([^&#]+)/i);
     if(gd&&gd[1]){
-      return 'https://drive.google.com/uc?export=download&id='+encodeURIComponent(gd[1]);
+      return 'https://drive.google.com/uc?export=download&confirm=t&id='+encodeURIComponent(gd[1]);
     }
     if(/^https?:\/\/(?:www\.)?dropbox\.com\//i.test(u)){
       if(/[?&]dl=0\b/i.test(u))return u.replace(/([?&])dl=0\b/i,'$1dl=1');
@@ -3716,6 +3717,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
   window.Play2WinOnSessionReady=function(){
     var ss=bridge.getSession();
     if(ss&&ss.token&&ss.role!=='admin')tryAutoClaimPendingRef();
+    checkForAppUpdate(false,true);
   };
 
   if($('ref-copy-code-btn'))$('ref-copy-code-btn').onclick=function(){
@@ -3770,12 +3772,28 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     if(!ss||!ss.token||ss.role!=='admin')return;
     bridge.api('admin_referral_overview',{p_token:ss.token}).then(function(d){
       if($('admin-ref-download-url'))$('admin-ref-download-url').value=normalizeDirectDownloadUrl(d.download_url||'');
-      if($('admin-upd-code'))$('admin-upd-code').value=Number(d.latest_version_code||1);
-      if($('admin-upd-name'))$('admin-upd-name').value=d.latest_version_name||'1.0';
+      var srvCode=Number(d.latest_version_code||1);
+      var srvName=String(d.latest_version_name||'1.0').trim();
+      var srvUrl=normalizeDirectDownloadUrl(d.update_url||d.download_url||'');
+      if($('admin-upd-code'))$('admin-upd-code').value=(srvCode<=1&&!d.update_url)?(instVer.code+1):srvCode;
+      if($('admin-upd-name'))$('admin-upd-name').value=(srvCode<=1&&!d.update_url)?'':srvName;
       if($('admin-upd-title'))$('admin-upd-title').value=d.update_title||'New Update Available!';
       if($('admin-upd-notes'))$('admin-upd-notes').value=d.update_notes||'';
       if($('admin-upd-url'))$('admin-upd-url').value=normalizeDirectDownloadUrl(d.update_url||'');
       if($('admin-upd-force'))$('admin-upd-force').checked=!!d.force_update;
+      var liveEl=$('admin-upd-live-status');
+      if(liveEl){
+        if(srvCode>1&&srvUrl){
+          liveEl.style.color='var(--green)';
+          liveEl.textContent='● LIVE: v'+srvName+' (Code '+srvCode+')'+(d.force_update?' · Force Update ON':'')+' — Code '+srvCode+' se kam wale sabhi users ko popup dikhega.';
+        }else if(srvCode>1&&!srvUrl){
+          liveEl.style.color='var(--red)';
+          liveEl.textContent='⚠ Version Code '+srvCode+' set hai lekin APK link missing hai — users ko popup nahi dikhega jab tak APK link save na karein.';
+        }else{
+          liveEl.style.color='var(--mute)';
+          liveEl.textContent='○ Popup abhi OFF hai. Users ko popup bhejne ke liye Version Code '+(instVer.code+1)+' (ya purane users se bada) aur APK link Publish karein.';
+        }
+      }
       if($('admin-ref-total-shares'))$('admin-ref-total-shares').textContent=Number(d.total_shares||0);
       if($('admin-ref-total-refers'))$('admin-ref-total-refers').textContent=Number(d.total_referrals||0);
       if($('admin-ref-total-coins'))$('admin-ref-total-coins').textContent=Number(d.total_coins_distributed||0);
@@ -3857,7 +3875,18 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
   if($('settings-app-ver'))$('settings-app-ver').textContent='v'+instVer.name;
   if($('admin-upd-current-ver'))$('admin-upd-current-ver').textContent='Installed: v'+instVer.name+' (Code '+instVer.code+')';
 
-  var activeUpdatePayload=null,dismissedVersionCode=0,lastUpdateCheckAt=0;
+  var activeUpdatePayload=null,dismissedVersionKey='',lastUpdateCheckAt=0;
+  function compareVersionNames(a,b){
+    var pa=String(a||'').replace(/^v/i,'').trim().split('.').map(function(x){return parseInt(x,10)||0;});
+    var pb=String(b||'').replace(/^v/i,'').trim().split('.').map(function(x){return parseInt(x,10)||0;});
+    var len=Math.max(pa.length,pb.length);
+    for(var i=0;i<len;i++){
+      var va=pa[i]||0,vb=pb[i]||0;
+      if(va>vb)return 1;
+      if(va<vb)return -1;
+    }
+    return 0;
+  }
   function showUpdateModal(info){
     var modal=$('p2w-update-modal');
     if(!modal||!info)return;
@@ -3869,6 +3898,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     if($('p2w-upd-title'))$('p2w-upd-title').textContent=info.update_title||'New Update Available!';
     if($('p2w-upd-notes'))$('p2w-upd-notes').textContent=info.update_notes||'Naye features aur improvements ke liye app ko update karein.';
     if($('p2w-upd-status'))$('p2w-upd-status').textContent='';
+    if($('p2w-upd-go')){$('p2w-upd-go').disabled=false;$('p2w-upd-go').textContent='Update Now';}
     if($('p2w-upd-later'))$('p2w-upd-later').classList.toggle('hide',force);
     modal.classList.remove('hide');
   }
@@ -3876,27 +3906,37 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     var modal=$('p2w-update-modal');
     if(modal)modal.classList.add('hide');
     if(rememberDismiss&&activeUpdatePayload){
-      dismissedVersionCode=Number(activeUpdatePayload.latest_version_code||0);
+      dismissedVersionKey=String(activeUpdatePayload.latest_version_code||0)+':'+String(activeUpdatePayload.latest_version_name||'');
     }
   }
-  function checkForAppUpdate(manual){
+  function checkForAppUpdate(manual,bypassThrottle){
     var now=Date.now();
-    if(!manual&&now-lastUpdateCheckAt<25000)return Promise.resolve();
-    lastUpdateCheckAt=now;
+    if(!manual&&!bypassThrottle&&now-lastUpdateCheckAt<25000)return Promise.resolve();
     return bridge.api('get_public_download_info',{}).then(function(info){
+      lastUpdateCheckAt=Date.now();
       if(!info)return;
       var latestCode=Number(info.latest_version_code||1);
+      var latestName=String(info.latest_version_name||'').trim();
       var updateUrl=normalizeDirectDownloadUrl(info.update_url||info.download_url||'');
-      if(latestCode>instVer.code&&updateUrl){
+      var hasNewerCode=latestCode>instVer.code;
+      var hasNewerName=latestCode>=instVer.code&&latestName&&compareVersionNames(latestName,instVer.name)>0;
+      var isNewer=hasNewerCode||hasNewerName;
+      var versionKey=latestCode+':'+latestName;
+      if(isNewer&&updateUrl){
         var ss=bridge.getSession();
         if(!manual&&ss&&ss.role==='admin')return;
-        if(!manual&&!info.force_update&&dismissedVersionCode>=latestCode)return;
+        if(!manual&&!info.force_update&&dismissedVersionKey===versionKey)return;
         info.update_url=updateUrl;
         showUpdateModal(info);
       }else if(manual){
-        bridge.toast('Aap latest version (v'+instVer.name+') use kar rahe hain!');
+        if(isNewer&&!updateUrl){
+          bridge.toast('Update v'+(latestName||latestCode)+' available hai, lekin Admin ne APK link set nahi kiya hai.');
+        }else{
+          bridge.toast('Aap latest version (v'+instVer.name+') use kar rahe hain!');
+        }
       }
     }).catch(function(e){
+      lastUpdateCheckAt=0;
       if(manual)bridge.toast(friendlyRefErr(e,'Update check failed.'));
     });
   }
@@ -3904,21 +3944,25 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
 
   if($('p2w-upd-go'))$('p2w-upd-go').onclick=function(){
     var url=normalizeDirectDownloadUrl(activeUpdatePayload&&(activeUpdatePayload.update_url||activeUpdatePayload.download_url)||'');
-    var st=$('p2w-upd-status');
+    var st=$('p2w-upd-status'),goBtn=$('p2w-upd-go');
     if(!url){
       if(st)st.textContent='Update APK link abhi set nahi hua hai.';
       return;
     }
-    if(st)st.textContent='Download shuru ho raha hai... Complete hone par Install / Update par tap karein.';
+    if(goBtn){goBtn.disabled=true;goBtn.textContent='Starting Update...';}
+    if(st)st.textContent='Download shuru ho raha hai! Download complete hote hi "Open / Install" par tap karein (aapka account/coins safe rahenge).';
     if(window.Play2WinNative&&window.Play2WinNative.openExternalUrl){
       window.Play2WinNative.openExternalUrl(url);
     }else{
       var win=window.open(url,'_blank','noopener');
       if(!win)window.location.href=url;
     }
+    setTimeout(function(){
+      if(goBtn){goBtn.disabled=false;goBtn.textContent='Update Now';}
+    },1500);
   };
   if($('p2w-upd-later'))$('p2w-upd-later').onclick=function(){hideUpdateModal(true);};
-  if($('m-check-update'))$('m-check-update').onclick=function(){checkForAppUpdate(true);};
+  if($('m-check-update'))$('m-check-update').onclick=function(){checkForAppUpdate(true,true);};
 
   function saveAdminAppUpdate(turnOff){
     var ss=bridge.getSession(),msg=$('admin-upd-msg');
@@ -3971,8 +4015,9 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
   if($('admin-upd-save'))$('admin-upd-save').onclick=function(){saveAdminAppUpdate(false);};
   if($('admin-upd-off'))$('admin-upd-off').onclick=function(){saveAdminAppUpdate(true);};
 
-  setTimeout(function(){checkForAppUpdate(false);},900);
+  setTimeout(function(){checkForAppUpdate(false,true);},400);
   document.addEventListener('visibilitychange',function(){if(!document.hidden)checkForAppUpdate(false);});
+  window.addEventListener('focus',function(){checkForAppUpdate(false);});
   setInterval(function(){if(!document.hidden)checkForAppUpdate(false);},60000);
 })();
 </script>
