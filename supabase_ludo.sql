@@ -87,7 +87,8 @@ begin
       'referral_settings','user_referrals','referral_events','email_auth_accounts',
       'aviator_rounds','aviator_global_rounds','aviator_bets',
       'number_game_admin_overrides','withdrawal_rejection_reasons',
-      'ludo_matches','ludo_match_players','ludo_platform_fees'
+      'ludo_matches','ludo_match_players','ludo_platform_fees',
+      'rummy_matches','rummy_match_players','rummy_platform_fees'
     )
   group by t.table_schema, t.table_name
   having bool_or(c.column_name = 'id')
