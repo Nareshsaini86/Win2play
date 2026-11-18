@@ -715,6 +715,21 @@ img{ -webkit-user-drag:none; user-drag:none; }
 .rummy-act-btn.declare{background:linear-gradient(135deg,#35f0a8,#0f9d6a);color:#042416;border:0}
 .rummy-act-btn:disabled{opacity:.42;cursor:not-allowed}
 @media (max-width:390px){.rummy-hand-card{width:35px;height:55px;margin-left:-10px}.rummy-deck-stack{width:62px}.rummy-wild-peek{width:32px;height:48px}.rummy-card-mini{width:38px;height:56px}}
+.rummy-decl-card{max-width:430px;max-height:88vh;max-height:88dvh;display:flex;flex-direction:column;text-align:left;padding:15px 13px}
+.rummy-decl-hdr{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.rummy-decl-title{margin:0;font-size:1rem;font-weight:950;color:#fff;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rummy-decl-timer{flex:0 0 auto;padding:4px 10px;border-radius:999px;background:rgba(255,209,102,.18);border:1px solid rgba(255,209,102,.55);color:#fde68a;font-size:.76rem;font-weight:950;white-space:nowrap}
+.rummy-decl-meta{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;padding:7px 10px;border-radius:11px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.35);margin-bottom:10px;font-size:.73rem;font-weight:850;color:#d1fae5}
+.rummy-decl-groups{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;padding:8px 6px;border-radius:14px;background:radial-gradient(circle at 50% 25%,#123726,#071d14 85%);border:1px solid rgba(255,209,102,.28);overflow-y:auto;max-height:46vh;max-height:46dvh}
+.rummy-decl-groups .rummy-group-box{padding:4px 4px 0}
+.rummy-decl-groups .rummy-group-cards{min-height:58px;padding:4px 2px 3px}
+.rummy-decl-groups .rummy-hand-card{width:34px;height:52px;margin-left:-9px;cursor:default;pointer-events:none}
+.rummy-decl-groups .rummy-hand-card:first-child{margin-left:0}
+.rummy-decl-groups .rummy-hand-card .r-top{font-size:.66rem}
+.rummy-decl-groups .rummy-hand-card .r-mid{font-size:.98rem}
+.rummy-decl-groups .rummy-group-ribbon{font-size:.54rem;padding:2px 6px}
+.rummy-decl-foot{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.rummy-decl-my-pts{font-size:.75rem;color:var(--mute);font-weight:800;text-align:center}
 </style>
 
 <style id="admin-game-bets-tabs-style">
@@ -1402,6 +1417,21 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
         </div>
       </div>
 
+      <div id="rummy-declare-overlay" class="ludo-overlay hide" role="dialog" aria-modal="true" aria-labelledby="rummy-decl-title">
+        <div class="ludo-res-card rummy-decl-card">
+          <div class="rummy-decl-hdr">
+            <h3 class="rummy-decl-title" id="rummy-decl-title">🃏 Opponent Declared!</h3>
+            <span class="rummy-decl-timer" id="rummy-decl-timer" aria-live="polite">Result in 10s</span>
+          </div>
+          <div class="rummy-decl-meta" id="rummy-decl-meta">Wild Joker: A · Valid Show</div>
+          <div class="rummy-decl-groups" id="rummy-decl-groups"></div>
+          <div class="rummy-decl-foot">
+            <div class="rummy-decl-my-pts" id="rummy-decl-my-pts"></div>
+            <button type="button" class="ludo-start-btn" id="rummy-decl-skip" style="min-height:44px;padding:10px">View Result Now</button>
+          </div>
+        </div>
+      </div>
+
       <div id="rummy-result-overlay" class="ludo-overlay hide" role="dialog" aria-modal="true" aria-labelledby="rummy-res-title">
         <div class="ludo-res-card">
           <div class="ludo-res-icon" id="rummy-res-icon">🏆</div>
@@ -1703,7 +1733,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
       <button class="menu-btn hide" id="m-admin-tx" type="button"><span>Transactions</span><span aria-hidden="true">›</span></button>
       <button class="menu-btn" id="m-pw" type="button"><span>🔒 Change password</span><span aria-hidden="true">›</span></button>
       <button class="menu-btn" id="m-check-update" type="button" aria-label="Check for App Update">
-        <span>🔄 App Update</span><span class="bal" id="settings-app-ver" style="font-size:.72rem;min-height:26px;padding:3px 9px">v1.4</span>
+        <span>🔄 App Update</span><span class="bal" id="settings-app-ver" style="font-size:.72rem;min-height:26px;padding:3px 9px">v1.5</span>
       </button>
       <button class="place logout" id="s-logout" style="margin-top:16px">Log out</button>
       <footer class="p2w-policy-footer" aria-label="Play2Win information and policies">
@@ -1972,7 +2002,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
           </div>
         </div>
         <div class="card" id="admin-app-update-card">
-          <div class="srow"><h2 style="margin:0">🚀 App Update Popup</h2><span class="bal" id="admin-upd-current-ver">Installed: v1.4 (Code 5)</span></div>
+          <div class="srow"><h2 style="margin:0">🚀 App Update Popup</h2><span class="bal" id="admin-upd-current-ver">Installed: v1.5 (Code 6)</span></div>
           <p class="note" style="margin-top:6px">After releasing a new APK build, increase the Version Code (or Version Name) here and click Publish — users on older builds will see the Update Popup automatically on launch, and tapping Update Now will start downloading the APK.</p>
           <div class="note" id="admin-upd-live-status" style="margin:0 0 10px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--soft);font-weight:700">Checking live popup status…</div>
           <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
@@ -2182,7 +2212,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
 <div id="p2w-update-modal" class="p2w-upd-backdrop hide" role="dialog" aria-modal="true" aria-labelledby="p2w-upd-title">
   <div class="p2w-upd-card">
     <div class="p2w-upd-icon" aria-hidden="true">🚀</div>
-    <span class="p2w-upd-ver-pill" id="p2w-upd-ver">v1.3 → v1.4</span>
+    <span class="p2w-upd-ver-pill" id="p2w-upd-ver">v1.4 → v1.5</span>
     <h3 id="p2w-upd-title">New Update Available!</h3>
     <div class="p2w-upd-notes" id="p2w-upd-notes">Update the app for new features and improvements.</div>
     <button type="button" class="place" id="p2w-upd-go" style="margin-top:0">Update Now</button>
@@ -2235,15 +2265,36 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
   var $=function(i){return document.getElementById(i)};
   var S={token:null,id:null,role:null,balance:0,round:0,deadline:0,results:[],pending:[],mine:[],users:[],displayName:null,email:null};
   var target=null,amount=10,busy=false,lastRound=0,fetching=false,lastRevealedRound=0,roundRevealTimer=null;
-  try{S.token=localStorage.getItem('np_token');S.id=localStorage.getItem('np_id');S.displayName=localStorage.getItem('np_display_name');S.email=localStorage.getItem('np_email')}catch(e){}
+  try{
+    var _tk=localStorage.getItem('np_token'),_id=localStorage.getItem('np_id'),_dn=localStorage.getItem('np_display_name'),_em=localStorage.getItem('np_email');
+    S.token=(_tk&&_tk!=='undefined'&&_tk!=='null')?_tk:null;
+    S.id=(_id&&_id!=='undefined'&&_id!=='null')?_id:null;
+    S.displayName=(_dn&&_dn!=='undefined'&&_dn!=='null')?_dn:null;
+    S.email=(_em&&_em!=='undefined'&&_em!=='null')?_em:null;
+  }catch(e){}
 
   function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
   function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(function(){t.classList.remove('show')},3500)}
+  function normalizeAuthError(msg){
+    var s=String(msg||'').trim();
+    if(!s)return s;
+    if(/Email ID ya Password galat hai/i.test(s))return 'Invalid Email ID or password.';
+    if(/Valid Email ID enter karein/i.test(s))return 'Please enter a valid Email ID.';
+    if(/Password kam se kam 6 characters/i.test(s))return 'Password must be at least 6 characters.';
+    if(/Is Email ID se account pehle se bana hai/i.test(s))return 'An account with this Email ID already exists. Please log in.';
+    return s;
+  }
   function api(fn,args){
     if(SUPABASE_URL.indexOf('PASTE')===0)return Promise.reject(new Error('The app is not connected to the database yet. See README.md.'));
     return fetch(SUPABASE_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'Content-Type':'application/json',apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY},body:JSON.stringify(args||{})})
     .then(function(r){return r.text().then(function(t){var j=null;try{j=t?JSON.parse(t):null}catch(e){}
-      if(!r.ok){var m=(j&&j.message)||'Request failed. Check your connection.';if(/Session expired/.test(m))logout(true);throw new Error(m)}return j})},
+      if(!r.ok||(j&&typeof j==='object'&&!Array.isArray(j)&&j.success===false)){
+        var m=(j&&(j.message||j.error))||'Request failed. Check your connection.';
+        if(/Session expired/.test(m))logout(true);
+        throw new Error(m);
+      }
+      return j;
+    })},
       function(){throw new Error('No internet connection.')});
   }
 
@@ -2338,13 +2389,17 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
   if($('auth-tab-signup'))$('auth-tab-signup').onclick=function(){setAuthMode('signup')};
 
   function applySessionLogin(r){
-    S.token=r.token;S.id=r.id;S.role=r.role||'user';
-    S.displayName=r.name||r.display_name||r.email||r.id;
+    if(!r||r.success===false||!r.token){
+      throw new Error(normalizeAuthError((r&&(r.error||r.message))||'Invalid Email ID or password.'));
+    }
+    S.token=String(r.token);S.id=r.id?String(r.id):(r.email?String(r.email):null);S.role=r.role||'user';
+    S.displayName=r.name||r.display_name||r.email||S.id;
     S.email=r.email||null;
     try{
-      localStorage.setItem('np_token',r.token);localStorage.setItem('np_id',r.id);
+      localStorage.setItem('np_token',S.token);
+      if(S.id)localStorage.setItem('np_id',S.id);
       if(S.displayName)localStorage.setItem('np_display_name',S.displayName);
-      if(S.email)localStorage.setItem('np_email',S.email);
+      if(S.email)localStorage.setItem('np_email',S.email);else localStorage.removeItem('np_email');
     }catch(x){}
     start();
   }
@@ -2370,7 +2425,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     }).then(function(r){
       return r.text().then(function(t){
         var j=t?JSON.parse(t):null;
-        if(!r.ok)throw new Error((j&&j.message)||'Account registration failed.');
+        if(!r.ok||(j&&typeof j==='object'&&!Array.isArray(j)&&j.success===false))throw new Error((j&&(j.message||j.error))||'Account registration failed.');
         return j;
       });
     });
@@ -2381,29 +2436,41 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     e.style.color='var(--red)';e.textContent='';
     if(!id||!pw){e.textContent='Please enter both Email ID / User ID and Password.';return}
     $('a-go').disabled=true;
-    var p=setup
-      ?api('setup_admin',{p_id:id,p_pw:pw}).then(function(){return api('login',{p_id:id,p_pw:pw})})
-      :api('login',{p_id:id,p_pw:pw}).catch(function(loginErr){
-        if(id.indexOf('@')<1)throw loginErr;
-        return api('email_login',{p_email:id,p_password:pw}).catch(function(emailErr){
-          if(!supa||!supa.auth||!supa.auth.signInWithPassword)throw emailErr;
-          return supa.auth.signInWithPassword({email:id,password:pw}).then(function(authRes){
-            if(authRes.error)throw new Error(authRes.error.message||loginErr.message);
+    var p;
+    if(setup){
+      p=api('setup_admin',{p_id:id,p_pw:pw}).then(function(){return api('login',{p_id:id,p_pw:pw})});
+    }else if(id.indexOf('@')>0){
+      var normEmail=id.toLowerCase();
+      p=api('email_login',{p_email:normEmail,p_password:pw}).catch(function(emailErr){
+        return api('login',{p_id:id,p_pw:pw}).catch(function(loginErr){
+          if(!supa||!supa.auth||!supa.auth.signInWithPassword)throw emailErr||loginErr;
+          return supa.auth.signInWithPassword({email:normEmail,password:pw}).then(function(authRes){
+            if(authRes.error){
+              if(/confirm|verif/i.test(authRes.error.message||''))throw new Error('Please verify your email address before logging in.');
+              throw emailErr||loginErr||new Error(authRes.error.message);
+            }
             if(!authRes.data||!authRes.data.session)throw new Error('Please verify your email first.');
             return exchangeSupabaseJwtForWallet(authRes.data.session);
           });
         });
       });
+    }else{
+      p=api('login',{p_id:id,p_pw:pw});
+    }
     p.then(function(r){
       $('a-pw').value='';
       resetPasswordToggle('a-show-pw',['a-pw']);
       applySessionLogin(r);
     }).catch(function(x){
-      e.textContent=x.message||'Login failed.';
+      e.textContent=normalizeAuthError(x&&x.message)||'Login failed.';
     }).then(function(){
       $('a-go').disabled=false;
     });
   };
+  ['a-id','a-pw'].forEach(function(fid){
+    var el=$(fid);
+    if(el)el.addEventListener('keydown',function(ev){if(ev.key==='Enter'){ev.preventDefault();$('a-go').click();}});
+  });
 
   if($('su-go'))$('su-go').onclick=function(){
     var name=($('su-name')?$('su-name').value:'').trim();
@@ -2460,12 +2527,16 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
       })
       .catch(function(x){
         e.style.color='var(--red)';
-        e.textContent=(x&&x.message)||'Could not create account.';
+        e.textContent=normalizeAuthError(x&&x.message)||'Could not create account.';
       })
       .then(function(){
         $('su-go').disabled=false;$('su-go').textContent='Create Account';
       });
   };
+  ['su-name','su-email','su-pw','su-pw2'].forEach(function(fid){
+    var el=$(fid);
+    if(el)el.addEventListener('keydown',function(ev){if(ev.key==='Enter'&&$('su-go')){ev.preventDefault();$('su-go').click();}});
+  });
 
   function getOAuthRedirectUrl(){
     var isNative=!!(window.Play2WinNative&&window.Play2WinNative.isNativeApp&&window.Play2WinNative.isNativeApp());
@@ -2600,6 +2671,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
       if(silent)sessionStorage.setItem('np_msg','Session expired. Please log in again.');
     }catch(e){}
     googleLoginFinishing=false;
+    setAuthMode('login');
     location.hash='';
     showAuth();
   }
@@ -3997,14 +4069,19 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
   $('pw-go').onclick=function(){
     var e=$('pw-err'),oldPw=$('pw-old').value,n=$('pw-new').value;e.style.color='var(--red)';e.textContent='';
     if(n!==$('pw-new2').value){e.textContent='New passwords do not match.';return}
-    api('change_password',{p_token:S.token,p_old:oldPw,p_new:n}).catch(function(err){
-      return api('email_change_password',{p_token:S.token,p_old:oldPw,p_new:n}).catch(function(){throw err});
-    }).then(function(){
+    var pwReq=S.email
+      ?api('email_change_password',{p_token:S.token,p_old:oldPw,p_new:n}).catch(function(emailPwErr){
+        return api('change_password',{p_token:S.token,p_old:oldPw,p_new:n}).catch(function(){throw emailPwErr});
+      })
+      :api('change_password',{p_token:S.token,p_old:oldPw,p_new:n}).catch(function(err){
+        return api('email_change_password',{p_token:S.token,p_old:oldPw,p_new:n}).catch(function(){throw err});
+      });
+    pwReq.then(function(){
       ['pw-old','pw-new','pw-new2'].forEach(function(i){$(i).value=''});
       resetPasswordToggle('pw-show',['pw-old','pw-new','pw-new2']);
       refreshChangePwMatch();
       e.style.color='var(--green)';e.textContent='Password changed successfully.';
-    }).catch(function(x){e.textContent=x.message});
+    }).catch(function(x){e.textContent=normalizeAuthError(x&&x.message)});
   };
   $('s-logout').onclick=function(){logout()};
 
@@ -4544,7 +4621,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
 
   // ---- App Update Checker & Admin Release Popup ----
   function getInstalledVersion(){
-    var code=5,name='1.4';
+    var code=6,name='1.5';
     try{
       if(window.Play2WinNative&&window.Play2WinNative.getAppVersionCode){
         var c=Number(window.Play2WinNative.getAppVersionCode());
@@ -6904,6 +6981,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
   var $=function(id){return document.getElementById(id);};
   var BETS=[5,10,25,50,100,200,500];
   var TURN_SECONDS=30;
+  var DECLARE_REVEAL_SECONDS=10;
   var MAX_LIVES=3;
   var SUITS=['S','H','D','C'];
   var SUIT_SYM={S:'♠',H:'♥',D:'♦',C:'♣',J:'🃏'};
@@ -6912,9 +6990,10 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
 
   var selectedBet=10,activeTab='lobby';
   var activeMatch=null,gameState=null,mySeat=0;
-  var phase='setup'; // 'setup' | 'searching' | 'playing' | 'finished'
-  var searchPollTimer=null,searchTickTimer=null,pvpPollTimer=null,botTimer=null,turnClockTimer=null;
+  var phase='setup'; // 'setup' | 'searching' | 'playing' | 'revealing' | 'finished'
+  var searchPollTimer=null,searchTickTimer=null,pvpPollTimer=null,botTimer=null,turnClockTimer=null,revealTimer=null;
   var searchDeadline=0,turnSecondsLeft=TURN_SECONDS,turnDeadlineMs=0,lastTickSec=-1,isSyncingClock=false;
+  var revealDeadlineMs=0,pendingResultRes=null,revealFinished=false;
   var routeActive=(String(window.location.hash||'').indexOf('#/rummy')>=0);
   // Multi-select + manual MPL arrangement state
   var selectedIds=[];
@@ -7267,6 +7346,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     var validManual=(hand.length===13&&deadwood===0&&pureCount>=1&&seqCount>=2);
     return {
       groups:resolved,
+      declareGroups:validManual?resolved:autoEv.groups,
       pureCount:pureCount,
       seqCount:seqCount,
       deadwood:deadwood,
@@ -7351,19 +7431,23 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     phase=nextPhase;
     if($('rummy-setup-view'))$('rummy-setup-view').classList.toggle('hide',phase!=='setup');
     if($('rummy-search-stage'))$('rummy-search-stage').classList.toggle('hide',phase!=='searching');
-    if($('rummy-board-stage'))$('rummy-board-stage').classList.toggle('hide',phase!=='playing'&&phase!=='finished');
-    if($('rummy-main-tabs'))$('rummy-main-tabs').classList.toggle('hide',phase==='searching'||phase==='playing');
-    if(phase==='searching'||phase==='playing')setMainTab('lobby');
+    if($('rummy-board-stage'))$('rummy-board-stage').classList.toggle('hide',phase!=='playing'&&phase!=='revealing'&&phase!=='finished');
+    if($('rummy-main-tabs'))$('rummy-main-tabs').classList.toggle('hide',phase==='searching'||phase==='playing'||phase==='revealing');
+    if(phase==='searching'||phase==='playing'||phase==='revealing')setMainTab('lobby');
   }
 
   function stopTurnClock(){
     if(turnClockTimer){clearInterval(turnClockTimer);turnClockTimer=null;}
+  }
+  function stopRevealTimer(){
+    if(revealTimer){clearInterval(revealTimer);revealTimer=null;}
   }
   function clearAllTimers(){
     if(searchPollTimer){clearInterval(searchPollTimer);searchPollTimer=null;}
     if(searchTickTimer){clearInterval(searchTickTimer);searchTickTimer=null;}
     if(pvpPollTimer){clearInterval(pvpPollTimer);pvpPollTimer=null;}
     if(botTimer){clearTimeout(botTimer);botTimer=null;}
+    stopRevealTimer();
     stopTurnClock();
   }
 
@@ -7507,10 +7591,14 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
       $('rummy-match-prize-pill').textContent='🏆 Win '+pCalc.win+' 🪙 · Pool '+pCalc.pool+' 🪙 (15% cut)';
     }
     if($('rummy-result-overlay'))$('rummy-result-overlay').classList.add('hide');
+    if($('rummy-declare-overlay'))$('rummy-declare-overlay').classList.add('hide');
     if($('rummy-exit-overlay'))$('rummy-exit-overlay').classList.add('hide');
     selectedIds=[];
     myGroups=[];
     turnDeadlineMs=0;
+    revealDeadlineMs=0;
+    pendingResultRes=null;
+    revealFinished=false;
     lastTickSec=-1;
     syncMyGroupsWithHand(gameState.hands[mySeat]||[],gameState.wildRank,true);
     showPhase('playing');
@@ -7815,8 +7903,11 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     var finalEv=evaluateRummyHand(hand,wildRank);
     if(finalEv.validDeclare){
       gameState.winnerSeat=botSeat;
+      gameState.declaredGroups=finalEv.groups;
+      gameState.declaredWildRank=wildRank;
+      gameState.declaredDiscard=discarded||null;
       renderAll();
-      settleMatch(botSeat,turnP.name,turnP.name+' declared a valid Rummy hand!');
+      startOpponentDeclareReveal(botSeat,turnP.name,finalEv.groups,wildRank,discarded,turnP.name+' declared a valid Rummy hand!');
       return false;
     }
 
@@ -8006,6 +8097,9 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     var players=(activeMatch&&activeMatch.players)||[];
     var me=players[mySeat];
     gameState.winnerSeat=mySeat;
+    gameState.declaredGroups=ev.declareGroups||ev.groups;
+    gameState.declaredWildRank=gameState.wildRank;
+    gameState.declaredDiscard=(gameState.discardPile&&gameState.discardPile.length)?gameState.discardPile[gameState.discardPile.length-1]:null;
     pushPvpStateIfNeeded();
     settleMatch(mySeat,(me&&me.name)||'You');
   }
@@ -8269,8 +8363,11 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
       var finalEv=evaluateRummyHand(hand,wildRank);
       if(finalEv.validDeclare){
         gameState.winnerSeat=botSeat;
+        gameState.declaredGroups=finalEv.groups;
+        gameState.declaredWildRank=wildRank;
+        gameState.declaredDiscard=discarded||null;
         renderAll();
-        settleMatch(botSeat,turnP.name,turnP.name+' declared a valid Rummy hand!');
+        startOpponentDeclareReveal(botSeat,turnP.name,finalEv.groups,wildRank,discarded,turnP.name+' declared a valid Rummy hand!');
         return;
       }
 
@@ -8301,15 +8398,28 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     bridge.api('rummy_match_status',{p_token:ss.token,p_match_id:activeMatch.id}).then(function(m){
       if(phase!=='playing')return;
       if(m.status==='completed'){
-        showMatchResult({
+        var wSeat=Number(m.winner_seat);
+        var resPayload={
           winner_name:m.winner_name,
-          winner_seat:m.winner_seat,
+          winner_seat:wSeat,
           total_pool:m.total_pool,
           platform_cut:m.platform_cut,
           winner_payout:m.winner_payout,
-          did_i_win:Number(m.winner_seat)===mySeat,
+          did_i_win:wSeat===mySeat,
           balance:m.balance
-        });
+        };
+        var stJson=m.state_json||gameState;
+        var oppGroups=(stJson&&Array.isArray(stJson.declaredGroups)&&stJson.declaredGroups.length)?stJson.declaredGroups:null;
+        var wr=(stJson&&(stJson.declaredWildRank||stJson.wildRank))||(gameState&&gameState.wildRank)||1;
+        if(!oppGroups&&wSeat!==mySeat&&stJson&&Array.isArray(stJson.hands)&&Array.isArray(stJson.hands[wSeat])&&stJson.hands[wSeat].length===13){
+          var checkEv=evaluateRummyHand(stJson.hands[wSeat],wr);
+          if(checkEv.validDeclare)oppGroups=checkEv.groups;
+        }
+        if(wSeat!==mySeat&&oppGroups&&oppGroups.length){
+          startOpponentDeclareReveal(wSeat,m.winner_name||'Opponent',oppGroups,wr,stJson.declaredDiscard||null,null,resPayload);
+          return;
+        }
+        showMatchResult(resPayload);
         return;
       }
       if(m.state_json&&Number(m.turn_seq||0)>Number(gameState.seq||0)){
@@ -8324,11 +8434,122 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     }).catch(function(){});
   }
 
+  function renderDeclareGroupsHtml(groups,wildRank){
+    if(!Array.isArray(groups)||!groups.length){
+      return '<div style="color:#cbd5e1;font-size:.82rem;padding:12px">No card groups available.</div>';
+    }
+    return groups.map(function(g){
+      var gType=String((g&&g.type)||'dead');
+      var cards=Array.isArray(g&&g.cards)?g.cards:[];
+      var lbl=String((g&&g.label)||'Group');
+      var cardsHtml=cards.map(function(c){
+        var isW=isJokerCard(c,wildRank);
+        var cls='rummy-hand-card'+(isW?' joker':isRedCard(c)?' red':'');
+        var rText=c.suit==='J'?'JKR':(RANK_LBL[c.rank]||c.rank);
+        var sText=SUIT_SYM[c.suit]||'';
+        return '<div class="'+cls+'" aria-label="'+rText+' '+c.suit+'">'
+          +'<span class="r-top">'+rText+'</span>'
+          +'<span class="r-suit-sm">'+sText+'</span>'
+          +'<span class="r-mid">'+sText+'</span>'
+          +(isW?'<span class="r-wild">J</span>':'')
+          +'</div>';
+      }).join('');
+      return '<div class="rummy-group-box '+bridge.esc(gType)+'"><div class="rummy-group-cards">'+cardsHtml+'</div><div class="rummy-group-ribbon">'+bridge.esc(lbl)+'</div></div>';
+    }).join('');
+  }
+
+  function finishDeclareReveal(){
+    stopRevealTimer();
+    revealDeadlineMs=0;
+    if($('rummy-declare-overlay'))$('rummy-declare-overlay').classList.add('hide');
+    if(pendingResultRes){
+      var res=pendingResultRes;
+      pendingResultRes=null;
+      showMatchResult(res);
+    }
+  }
+
+  function syncRevealCountdown(){
+    if(phase!=='revealing')return;
+    var rem=Math.max(0,Math.ceil((revealDeadlineMs-Date.now())/1000));
+    var timerEl=$('rummy-decl-timer');
+    if(timerEl){
+      timerEl.textContent=rem>0?('Result in '+rem+'s'):(pendingResultRes?'Opening Result...':'Finalizing...');
+    }
+    if(rem<=0){
+      revealFinished=true;
+      if(pendingResultRes)finishDeclareReveal();
+    }
+  }
+
+  function startOpponentDeclareReveal(winnerSeat,winnerName,groups,wildRank,discardedCard,customSub,preResolvedRes){
+    if(phase==='revealing'||phase==='finished')return;
+    clearAllTimers();
+    turnDeadlineMs=0;
+    showPhase('revealing');
+    revealFinished=false;
+    pendingResultRes=preResolvedRes||null;
+    revealDeadlineMs=Date.now()+(DECLARE_REVEAL_SECONDS*1000);
+
+    var oppName=winnerName||'Opponent';
+    if($('rummy-decl-title'))$('rummy-decl-title').textContent='🃏 '+oppName+' Declared!';
+    var metaText='Wild Joker: '+(RANK_LBL[wildRank]||wildRank);
+    if(discardedCard)metaText+=' · Finished with '+cardLabel(discardedCard);
+    metaText+=' · 0 Deadwood';
+    if($('rummy-decl-meta'))$('rummy-decl-meta').textContent=metaText;
+    if($('rummy-decl-groups'))$('rummy-decl-groups').innerHTML=renderDeclareGroupsHtml(groups,wildRank);
+
+    var myHand=(gameState&&gameState.hands&&gameState.hands[mySeat])||[];
+    var myEv=evaluateManualGroups(myHand,wildRank);
+    if($('rummy-decl-my-pts'))$('rummy-decl-my-pts').textContent='Your Hand: '+Number(myEv.bestDeadwood||0)+' pts deadwood';
+    if($('rummy-decl-timer'))$('rummy-decl-timer').textContent='Result in '+DECLARE_REVEAL_SECONDS+'s';
+    if($('rummy-declare-overlay'))$('rummy-declare-overlay').classList.remove('hide');
+    sfxLose();
+
+    revealTimer=setInterval(syncRevealCountdown,250);
+
+    if(pendingResultRes){
+      syncRevealCountdown();
+      return;
+    }
+    var ss=bridge.getSession();
+    if(!activeMatch||!ss||!ss.token){
+      var fb=calcPrize(10);
+      pendingResultRes={winner_name:oppName,total_pool:fb.pool,platform_cut:fb.cut,winner_payout:fb.win,did_i_win:false,customSub:customSub};
+      syncRevealCountdown();
+      return;
+    }
+    bridge.api('rummy_finish_match',{
+      p_token:ss.token,
+      p_match_id:activeMatch.id,
+      p_winner_seat:winnerSeat,
+      p_winner_name:oppName
+    }).then(function(res){
+      if(res&&res.balance!==undefined)setBal(res.balance);
+      bridge.refresh().catch(function(){});
+      if(customSub)res.customSub=customSub;
+      pendingResultRes=res;
+      if(revealFinished||phase!=='revealing')finishDeclareReveal();
+    }).catch(function(){
+      var pCalc=calcPrize((activeMatch&&activeMatch.bet_amount)||10);
+      pendingResultRes={
+        winner_name:oppName,
+        total_pool:pCalc.pool,
+        platform_cut:pCalc.cut,
+        winner_payout:pCalc.win,
+        did_i_win:(winnerSeat===mySeat),
+        customSub:customSub
+      };
+      if(revealFinished||phase!=='revealing')finishDeclareReveal();
+    });
+  }
+
   function settleMatch(winnerSeat,winnerName,customSub){
     if(phase==='finished')return;
     phase='finished';
     turnDeadlineMs=0;
     clearAllTimers();
+    if($('rummy-declare-overlay'))$('rummy-declare-overlay').classList.add('hide');
     var ss=bridge.getSession();
     if(!activeMatch||!ss||!ss.token)return;
     bridge.api('rummy_finish_match',{
@@ -8356,7 +8577,11 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
 
   function showMatchResult(res){
     turnDeadlineMs=0;
+    revealDeadlineMs=0;
+    pendingResultRes=null;
+    revealFinished=false;
     clearAllTimers();
+    if($('rummy-declare-overlay'))$('rummy-declare-overlay').classList.add('hide');
     phase='finished';
     var won=!!(res&&res.did_i_win);
     if(won)sfxWin();else sfxLose();
@@ -8459,7 +8684,11 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     var mId=activeMatch&&activeMatch.id;
     var ss=bridge.getSession();
     turnDeadlineMs=0;
+    revealDeadlineMs=0;
+    pendingResultRes=null;
+    revealFinished=false;
     clearAllTimers();
+    if($('rummy-declare-overlay'))$('rummy-declare-overlay').classList.add('hide');
     activeMatch=null;
     showPhase('setup');
     if(mId&&ss&&ss.token){
@@ -8468,14 +8697,22 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
       }).catch(function(){});
     }
   });
+  if($('rummy-decl-skip'))$('rummy-decl-skip').addEventListener('click',function(){
+    if(phase!=='revealing')return;
+    revealFinished=true;
+    if(pendingResultRes){finishDeclareReveal();}
+    else if($('rummy-decl-timer')){$('rummy-decl-timer').textContent='Opening Result...';}
+  });
   if($('rummy-res-again'))$('rummy-res-again').addEventListener('click',function(){
     if($('rummy-result-overlay'))$('rummy-result-overlay').classList.add('hide');
+    if($('rummy-declare-overlay'))$('rummy-declare-overlay').classList.add('hide');
     activeMatch=null;
     showPhase('setup');
     renderLobby();
   });
   if($('rummy-res-hist'))$('rummy-res-hist').addEventListener('click',function(){
     if($('rummy-result-overlay'))$('rummy-result-overlay').classList.add('hide');
+    if($('rummy-declare-overlay'))$('rummy-declare-overlay').classList.add('hide');
     activeMatch=null;
     showPhase('setup');
     setMainTab('history');
@@ -8483,9 +8720,11 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
 
   document.addEventListener('visibilitychange',function(){
     if(!document.hidden&&phase==='playing'&&activeMatch){syncTurnClock(true);}
+    else if(!document.hidden&&phase==='revealing'){syncRevealCountdown();}
   });
   window.addEventListener('focus',function(){
     if(phase==='playing'&&activeMatch){syncTurnClock(true);}
+    else if(phase==='revealing'){syncRevealCountdown();}
   });
 
   window.Play2WinRummyOnRoute=function(active){
@@ -8499,13 +8738,16 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
           startTurnTimer(false);
           if(!botTimer)scheduleBotIfNeeded();
         }
+      }else if(phase==='revealing'){
+        syncRevealCountdown();
+        if(phase==='revealing'&&!revealTimer){revealTimer=setInterval(syncRevealCountdown,250);}
       }else if(phase==='setup'&&activeTab==='history'){
         loadHistory();
       }
     }else{
       cleanupDrag();
       if(phase==='searching'){cancelSearch(true);}
-      else if(phase!=='playing'){clearAllTimers();}
+      else if(phase!=='playing'&&phase!=='revealing'){clearAllTimers();}
     }
   };
 

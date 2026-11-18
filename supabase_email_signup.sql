@@ -135,15 +135,15 @@ declare
 begin
   v_email := lower(trim(coalesce(p_email, '')));
   if v_email !~ '^[^@\s]+@[^@\s]+\.[^@\s]{2,}$' then
-    raise exception 'Valid Email ID enter karein.';
+    raise exception 'Please enter a valid Email ID.';
   end if;
 
   if length(coalesce(p_password, '')) < 6 then
-    raise exception 'Password kam se kam 6 characters ka hona chahiye.';
+    raise exception 'Password must be at least 6 characters.';
   end if;
 
   if exists (select 1 from public.email_auth_accounts where email = v_email) then
-    raise exception 'Is Email ID se account pehle se bana hai. Kripya Log in karein.';
+    raise exception 'An account with this Email ID already exists. Please log in.';
   end if;
 
   select * into v_schema from public._p2w_detect_auth_schema();
@@ -159,7 +159,7 @@ begin
     execute format('select id::text from %s where lower(email) = $1 limit 1', v_schema.users_table)
       into v_existing_id using v_email;
     if v_existing_id is not null then
-      raise exception 'Is Email ID se account pehle se bana hai. Kripya Log in karein.';
+      raise exception 'An account with this Email ID already exists. Please log in.';
     end if;
   end if;
 
@@ -267,7 +267,7 @@ begin
     exception
       when check_violation or unique_violation then
         if position('email' in lower(sqlerrm)) > 0 then
-          raise exception 'Is Email ID se account pehle se bana hai. Kripya Log in karein.';
+          raise exception 'An account with this Email ID already exists. Please log in.';
         end if;
         v_last_err := sqlerrm;
     end;
@@ -342,11 +342,11 @@ begin
   v_email := lower(trim(coalesce(p_email, '')));
   select * into v_acc from public.email_auth_accounts where email = v_email;
   if not found then
-    raise exception 'Email ID ya Password galat hai.';
+    raise exception 'Invalid Email ID or password.';
   end if;
 
   if v_acc.password_hash <> crypt(coalesce(p_password, ''), v_acc.password_hash) then
-    raise exception 'Email ID ya Password galat hai.';
+    raise exception 'Invalid Email ID or password.';
   end if;
 
   select * into v_schema from public._p2w_detect_auth_schema();
