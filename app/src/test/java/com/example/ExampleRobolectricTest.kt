@@ -4,8 +4,10 @@ import android.content.Context
 import android.net.Uri
 import androidx.test.core.app.ApplicationProvider
 import com.example.webview.APP_START_URL
+import com.example.webview.Play2WinNativeBridge
 import com.example.webview.extractInAppRedirectUrl
 import com.example.webview.shouldKeepUrlInWebView
+import java.util.concurrent.atomic.AtomicBoolean
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -220,10 +222,49 @@ class ExampleRobolectricTest {
     assertTrue(html.contains("p2w-rm-jk"))
     assertTrue(html.contains("width:clamp(50px,15.5vw,64px)!important"))
     assertTrue(html.contains("max-width:clamp(82px,24vw,96px)!important"))
-    assertTrue(html.contains("data-coming-soon=\"Fruit Cut\""))
+    assertFalse(html.contains("data-coming-soon=\"Fruit Cut\""))
+    assertTrue(html.contains("data-open-route=\"fruitcut\""))
+    assertTrue(html.contains("id=\"v-fruitcut\""))
+    listOf(5, 10, 25, 50, 100, 200, 500).forEach { bet ->
+      assertTrue(html.contains("data-fruitcut-bet=\"$bet\""))
+    }
+    assertTrue(html.contains("id=\"fc-search-stage\""))
+    assertTrue(html.contains("id=\"fc-canvas\""))
+    assertTrue(html.contains("id=\"fc-match-timer\""))
+    assertTrue(html.contains("fruitcut_matchmake"))
+    assertTrue(html.contains("fruitcut_start_with_bots"))
+    assertTrue(html.contains("fruitcut_push_state"))
+    assertTrue(html.contains("fruitcut_finish_match"))
+    assertTrue(html.contains("id=\"bets-tab-fruitcut\""))
+    assertTrue(html.contains("id=\"bets-pane-fruitcut\""))
+    assertTrue(html.contains("admin_fruitcut_bets"))
+    assertTrue(html.contains("id=\"fb-from-date\""))
+    assertTrue(html.contains("id=\"fb-to-date\""))
+    assertTrue(html.contains("id=\"fb-daily-rows\""))
+    val fcScript = html.substringAfter("<script id=\"play2win-fruitcut-game\">").substringBefore("</script>")
+    assertTrue(fcScript.contains("MATCH_SECONDS=120"))
+    assertTrue(fcScript.contains("MAX_BOMB_CHANCES=3"))
+    assertTrue(fcScript.contains("BOT_WIN_RATE=0.60"))
+    assertTrue(fcScript.contains("matchDeadlineMs"))
+    assertTrue(fcScript.contains("function syncMatchClock"))
+    assertTrue(fcScript.contains("function flushComboStreak"))
+    assertTrue(fcScript.contains("function flashScoreDelta"))
+    assertTrue(fcScript.contains("function setFullscreenArenaMode"))
+    assertTrue(fcScript.contains("setGameFullscreenMode"))
+    assertTrue(fcScript.contains("setPullRefreshLocked"))
+    assertTrue(fcScript.contains("__p2wForceDisablePull"))
+    assertTrue(fcScript.contains("Play2WinFruitCutOnRoute"))
+    assertTrue(html.contains("body.fc-fullscreen-play"))
+    assertTrue(html.contains("id=\"fc-arena-sound-btn\""))
+    assertTrue(html.contains("id=\"fc-me-delta\""))
+    assertFalse(html.contains("fc-match-prize-pill"))
     assertTrue(html.contains("p2w-fc-mel"))
     assertTrue(html.contains("data-back=\"#/settings\" style=\"margin:6px 0 0\">‹ Back to Profile"))
     assertTrue(html.contains("p2w-tp-chip"))
+    assertFalse(html.contains("gold-history"))
+    assertFalse(html.contains("launch-cup"))
+    assertFalse(html.contains("game-launcher"))
+    assertEquals(listOf("index_5ad215fb.html"), context.assets.list("aistudio")?.toList())
     assertTrue(html.contains("https://drive.google.com/uc?export=download&confirm=t&id="))
   }
 
@@ -258,5 +299,42 @@ class ExampleRobolectricTest {
     assertTrue(shouldKeepUrlInWebView(Uri.parse("https://appassets.androidplatform.net/www/index.html")))
     assertFalse(shouldKeepUrlInWebView(Uri.parse("https://play.google.com/store/apps")))
     assertFalse(shouldKeepUrlInWebView(Uri.parse("upi://pay?pa=test@upi")))
+  }
+
+  @Test
+  fun `native bridge locks pull to refresh during game fullscreen mode and restores on exit`() {
+    val context = ApplicationProvider.getApplicationContext<Context>()
+    val canPull = AtomicBoolean(true)
+    val locked = AtomicBoolean(false)
+    var lastLockCallback: Boolean? = null
+    var lastFullscreenCallback: Boolean? = null
+
+    val bridge =
+      Play2WinNativeBridge(
+        context = context,
+        onThemeChanged = {},
+        canPullRefresh = canPull,
+        pullRefreshLocked = locked,
+        onPullRefreshLockChanged = { lastLockCallback = it },
+        onGameFullscreenChanged = { lastFullscreenCallback = it },
+      )
+
+    bridge.setGameFullscreenMode(true)
+    org.robolectric.shadows.ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+    assertTrue(locked.get())
+    assertFalse(canPull.get())
+    assertEquals(true, lastLockCallback)
+    assertEquals(true, lastFullscreenCallback)
+
+    // Subsequent touchstart pull-refresh updates cannot re-enable pull-to-refresh while locked
+    bridge.setCanPullRefresh(true)
+    assertFalse(canPull.get())
+
+    bridge.setGameFullscreenMode(false)
+    org.robolectric.shadows.ShadowLooper.runUiThreadTasksIncludingDelayedTasks()
+    assertFalse(locked.get())
+    assertTrue(canPull.get())
+    assertEquals(false, lastLockCallback)
+    assertEquals(false, lastFullscreenCallback)
   }
 }

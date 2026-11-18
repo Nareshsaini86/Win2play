@@ -68,6 +68,10 @@ android {
       assets.srcDirs("src/main/assets", "${rootDir}/public/assets")
     }
   }
+  androidResources {
+    ignoreAssetsPattern =
+      "!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~:!Screenshot_*:!image_*:!Image_November_*"
+  }
   testOptions { unitTests { isIncludeAndroidResources = true } }
   dependenciesInfo {
     includeInApk = false

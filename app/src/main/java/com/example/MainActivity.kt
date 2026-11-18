@@ -2,6 +2,7 @@ package com.example
 
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -58,6 +59,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.example.ui.theme.DayBackground
 import com.example.ui.theme.MidnightNavy
 import com.example.ui.theme.MyApplicationTheme
@@ -158,7 +161,33 @@ fun Play2WinShell(
   var canGoBack by remember { mutableStateOf(false) }
   var jsDialog by remember { mutableStateOf<JsDialogState?>(null) }
   val canPullRefresh = remember { AtomicBoolean(true) }
+  val pullRefreshLocked = remember { AtomicBoolean(false) }
+  var isPullRefreshLocked by remember { mutableStateOf(false) }
+  var isGameFullscreen by remember { mutableStateOf(false) }
+  var hasEnteredGameFullscreen by remember { mutableStateOf(false) }
   var swipeRefreshRef by remember { mutableStateOf<WebViewSwipeRefreshLayout?>(null) }
+  val rootView = LocalView.current
+
+  LaunchedEffect(isGameFullscreen) {
+    val activity = context as? Activity ?: return@LaunchedEffect
+    if (isGameFullscreen) {
+      hasEnteredGameFullscreen = true
+      activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+    } else if (hasEnteredGameFullscreen) {
+      activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    }
+    if (!rootView.isInEditMode) {
+      val window = activity.window ?: return@LaunchedEffect
+      val controller = WindowCompat.getInsetsController(window, rootView)
+      controller.systemBarsBehavior =
+        WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+      if (isGameFullscreen) {
+        controller.hide(WindowInsetsCompat.Type.systemBars())
+      } else {
+        controller.show(WindowInsetsCompat.Type.systemBars())
+      }
+    }
+  }
 
   val startUrl = remember {
     val ref = initialReferralCode
@@ -169,6 +198,7 @@ fun Play2WinShell(
     createConfiguredWebView(
       context = context,
       canPullRefresh = canPullRefresh,
+      pullRefreshLocked = pullRefreshLocked,
       onProgressChanged = { progress = it },
       onLoadingChanged = { loading -> isLoading = loading },
       onRefreshFinished = {
@@ -180,6 +210,19 @@ fun Play2WinShell(
       onThemeChanged = onThemeChanged,
       onJsDialog = { jsDialog = it },
       onCanGoBackChanged = { canGoBack = it },
+      onPullRefreshLockChanged = { locked ->
+        isPullRefreshLocked = locked
+        if (locked) {
+          isPullRefreshing = false
+          swipeRefreshRef?.isRefreshing = false
+          swipeRefreshRef?.isEnabled = false
+        } else {
+          swipeRefreshRef?.isEnabled = hasLoadedOnce && errorMessage == null && !isGameFullscreen
+        }
+      },
+      onGameFullscreenChanged = { fullscreen ->
+        isGameFullscreen = fullscreen
+      },
     ).apply {
       if (isNetworkAvailable(context)) {
         loadUrl(startUrl)
@@ -216,9 +259,14 @@ fun Play2WinShell(
   }
 
   val swipeRefreshLayout = remember(webView) {
-    WebViewSwipeRefreshLayout(context, webView, canPullRefresh).apply {
+    WebViewSwipeRefreshLayout(context, webView, canPullRefresh, pullRefreshLocked).apply {
       applyThemeColors(isDayTheme)
       setOnRefreshListener {
+        if (pullRefreshLocked.get() || isGameFullscreen) {
+          isPullRefreshing = false
+          isRefreshing = false
+          return@setOnRefreshListener
+        }
         if (isNetworkAvailable(context)) {
           errorMessage = null
           isPullRefreshing = true
@@ -253,6 +301,7 @@ fun Play2WinShell(
 
   DisposableEffect(webView) {
     onDispose {
+      (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
       swipeRefreshLayout.removeAllViews()
       webView.stopLoading()
       webView.destroy()
@@ -267,17 +316,22 @@ fun Play2WinShell(
 
   Surface(
     modifier =
-      Modifier
-        .fillMaxSize()
-        .background(backdropColor)
-        .windowInsetsPadding(WindowInsets.safeDrawing),
+      Modifier.fillMaxSize().background(backdropColor).let { base ->
+        if (isGameFullscreen) base else base.windowInsetsPadding(WindowInsets.safeDrawing)
+      },
     color = backdropColor,
   ) {
     Box(modifier = Modifier.fillMaxSize()) {
       AndroidView(
         factory = { swipeRefreshLayout },
         update = { refreshLayout ->
-          refreshLayout.isEnabled = hasLoadedOnce && errorMessage == null
+          val allowRefresh =
+            hasLoadedOnce && errorMessage == null && !isPullRefreshLocked && !isGameFullscreen
+          refreshLayout.isEnabled = allowRefresh
+          if (!allowRefresh && refreshLayout.isRefreshing) {
+            refreshLayout.isRefreshing = false
+            isPullRefreshing = false
+          }
         },
         modifier = Modifier.fillMaxSize().testTag("play2win_webview"),
       )

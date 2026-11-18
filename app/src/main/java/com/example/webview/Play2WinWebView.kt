@@ -53,6 +53,9 @@ class Play2WinNativeBridge(
   private val context: Context,
   private val onThemeChanged: (Boolean) -> Unit,
   private val canPullRefresh: AtomicBoolean,
+  private val pullRefreshLocked: AtomicBoolean,
+  private val onPullRefreshLockChanged: (Boolean) -> Unit,
+  private val onGameFullscreenChanged: (Boolean) -> Unit,
 ) {
   private val mainHandler = Handler(Looper.getMainLooper())
 
@@ -67,7 +70,24 @@ class Play2WinNativeBridge(
 
   @JavascriptInterface
   fun setCanPullRefresh(allowed: Boolean) {
-    canPullRefresh.set(allowed)
+    canPullRefresh.set(allowed && !pullRefreshLocked.get())
+  }
+
+  @JavascriptInterface
+  fun setPullRefreshLocked(locked: Boolean) {
+    pullRefreshLocked.set(locked)
+    if (locked) canPullRefresh.set(false)
+    mainHandler.post { onPullRefreshLockChanged(locked) }
+  }
+
+  @JavascriptInterface
+  fun setGameFullscreenMode(enabled: Boolean) {
+    pullRefreshLocked.set(enabled)
+    canPullRefresh.set(!enabled)
+    mainHandler.post {
+      onPullRefreshLockChanged(enabled)
+      onGameFullscreenChanged(enabled)
+    }
   }
 
   @JavascriptInterface
@@ -126,15 +146,6 @@ class Play2WinNativeBridge(
     }
   }
 
-  @JavascriptInterface
-  fun openExternalAuth(url: String?) {
-    val cleanUrl = url.orEmpty().trim()
-    if (!cleanUrl.startsWith("https://") && !cleanUrl.startsWith("http://")) return
-    mainHandler.post {
-      openInCustomTabOrBrowser(context, Uri.parse(cleanUrl))
-    }
-  }
-
   var onGoogleErrorDetected: ((String) -> Unit)? = null
 
   @JavascriptInterface
@@ -156,6 +167,7 @@ fun isNetworkAvailable(context: Context): Boolean {
 fun createConfiguredWebView(
   context: Context,
   canPullRefresh: AtomicBoolean,
+  pullRefreshLocked: AtomicBoolean,
   onProgressChanged: (Int) -> Unit,
   onLoadingChanged: (Boolean) -> Unit,
   onRefreshFinished: () -> Unit,
@@ -163,6 +175,8 @@ fun createConfiguredWebView(
   onThemeChanged: (Boolean) -> Unit,
   onJsDialog: (JsDialogState) -> Unit,
   onCanGoBackChanged: (Boolean) -> Unit,
+  onPullRefreshLockChanged: (Boolean) -> Unit,
+  onGameFullscreenChanged: (Boolean) -> Unit,
 ): WebView {
   return WebView(context).apply {
     layoutParams =
@@ -227,7 +241,15 @@ fun createConfiguredWebView(
       WebSettingsCompat.setRequestedWithHeaderOriginAllowList(settings, emptySet())
     }
 
-    val nativeBridge = Play2WinNativeBridge(context, onThemeChanged, canPullRefresh)
+    val nativeBridge =
+      Play2WinNativeBridge(
+        context = context,
+        onThemeChanged = onThemeChanged,
+        canPullRefresh = canPullRefresh,
+        pullRefreshLocked = pullRefreshLocked,
+        onPullRefreshLockChanged = onPullRefreshLockChanged,
+        onGameFullscreenChanged = onGameFullscreenChanged,
+      )
     nativeBridge.onGoogleErrorDetected = { reason ->
       stopLoading()
       loadUrl("$APP_START_URL?google_error=${Uri.encode(reason)}")
@@ -384,14 +406,15 @@ fun createConfiguredWebView(
                     return !!(docScroll && docScroll.scrollTop > 0);
                   };
                   document.addEventListener('touchstart', function(ev) {
-                    var blocked = hasScrolledAncestor(ev.target);
+                    var blocked = !!window.__p2wForceDisablePull || hasScrolledAncestor(ev.target);
                     if (window.Play2WinNative && window.Play2WinNative.setCanPullRefresh) {
                       window.Play2WinNative.setCanPullRefresh(!blocked);
                     }
                   }, { capture: true, passive: true });
                   var resetPull = function() {
+                    var allow = !window.__p2wForceDisablePull;
                     if (window.Play2WinNative && window.Play2WinNative.setCanPullRefresh) {
-                      window.Play2WinNative.setCanPullRefresh(true);
+                      window.Play2WinNative.setCanPullRefresh(allow);
                     }
                   };
                   document.addEventListener('touchend', resetPull, { capture: true, passive: true });

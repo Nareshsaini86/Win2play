@@ -16,6 +16,7 @@ class WebViewSwipeRefreshLayout(
   context: Context,
   private val webView: WebView,
   private val canPullRefresh: AtomicBoolean,
+  private val pullRefreshLocked: AtomicBoolean = AtomicBoolean(false),
 ) : SwipeRefreshLayout(context) {
   private var hasActiveDownPointer = false
 
@@ -26,7 +27,10 @@ class WebViewSwipeRefreshLayout(
         ViewGroup.LayoutParams.MATCH_PARENT,
       )
     setOnChildScrollUpCallback { _, _ ->
-      !canPullRefresh.get() || webView.scrollY > 0 || webView.canScrollVertically(-1)
+      pullRefreshLocked.get() ||
+        !canPullRefresh.get() ||
+        webView.scrollY > 0 ||
+        webView.canScrollVertically(-1)
     }
     addView(webView)
   }
@@ -51,15 +55,21 @@ class WebViewSwipeRefreshLayout(
         ev.actionMasked == MotionEvent.ACTION_CANCEL
     ) {
       hasActiveDownPointer = false
-      canPullRefresh.set(true)
+      if (!pullRefreshLocked.get()) {
+        canPullRefresh.set(true)
+      }
     }
     return handled
   }
 
   override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
+    if (!isEnabled || pullRefreshLocked.get() || !canPullRefresh.get()) {
+      hasActiveDownPointer = false
+      return false
+    }
     return when (ev.actionMasked) {
       MotionEvent.ACTION_DOWN -> {
-        val eligible = isEnabled && !isRefreshing && !canChildScrollUp()
+        val eligible = isEnabled && !pullRefreshLocked.get() && !isRefreshing && !canChildScrollUp()
         val intercepted = super.onInterceptTouchEvent(ev)
         hasActiveDownPointer = eligible
         intercepted
@@ -79,9 +89,13 @@ class WebViewSwipeRefreshLayout(
   }
 
   override fun onTouchEvent(ev: MotionEvent): Boolean {
+    if (!isEnabled || pullRefreshLocked.get() || !canPullRefresh.get()) {
+      hasActiveDownPointer = false
+      return false
+    }
     return when (ev.actionMasked) {
       MotionEvent.ACTION_DOWN -> {
-        val eligible = isEnabled && !isRefreshing && !canChildScrollUp()
+        val eligible = isEnabled && !pullRefreshLocked.get() && !isRefreshing && !canChildScrollUp()
         val handled = super.onTouchEvent(ev)
         hasActiveDownPointer = eligible
         handled
