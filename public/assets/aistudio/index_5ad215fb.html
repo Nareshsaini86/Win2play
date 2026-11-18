@@ -243,18 +243,25 @@ body.has-bottom-nav .toast{bottom:calc(86px + env(safe-area-inset-bottom,0px))}
 
 
 
-/* Responsive home game launcher grid across every phone and tablet width */
+/* Responsive & jewel-toned luxury home game launcher across every phone and tablet */
+#v-home .home-section-head{
+  margin:2px 2px 6px;
+}
+#v-home .home-section-head h2{
+  font-size:1.14rem;letter-spacing:-.01em;
+}
 #v-home .game-launch-grid{
   display:grid!important;
   grid-template-columns:repeat(3,minmax(0,1fr))!important;
-  gap:clamp(8px,2.8vw,14px)!important;
+  gap:clamp(8px,2.2vw,12px)!important;
   align-items:stretch!important;
-  justify-items:stretch!important;
+  justify-items:center!important;
   width:100%!important;
-  padding:10px 0 18px!important;
+  padding:4px 0 12px!important;
 }
 #v-home .game-launch-item{
-  display:block!important;
+  display:flex!important;
+  justify-content:center!important;
   width:100%!important;
   max-width:none!important;
   min-width:0!important;
@@ -268,94 +275,103 @@ body.has-bottom-nav .toast{bottom:calc(86px + env(safe-area-inset-bottom,0px))}
 #v-home .game-launch-box{
   position:relative;isolation:isolate;overflow:hidden;
   width:100%!important;
+  max-width:clamp(82px,24vw,96px)!important;
   height:auto!important;
-  min-height:clamp(88px,25vw,118px)!important;
-  aspect-ratio:1/1.06;
+  min-height:clamp(78px,22vw,92px)!important;
+  aspect-ratio:1/1.02;
   margin:0 auto!important;
-  padding:clamp(8px,2.4vw,12px) clamp(4px,1.4vw,8px)!important;
-  border-radius:clamp(17px,4.8vw,25px)!important;
+  padding:clamp(5px,1.5vw,7px) clamp(4px,1.2vw,6px) clamp(6px,1.5vw,8px)!important;
+  border-radius:clamp(16px,4.2vw,21px)!important;
   display:flex!important;flex-direction:column;align-items:center;justify-content:center;
-  gap:clamp(5px,1.8vw,9px)!important;
-  border:1px solid rgba(255,255,255,.48)!important;
-  box-shadow:0 12px 26px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.7)!important;
-  transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;
+  gap:4px!important;
+  border:1px solid rgba(255,255,255,.24)!important;
+  box-shadow:0 10px 20px rgba(4,8,24,.40),inset 0 1px 0 rgba(255,255,255,.45),inset 0 -8px 16px rgba(0,0,0,.28)!important;
+  transition:transform .16s cubic-bezier(.22,.8,.28,1),box-shadow .16s ease,filter .16s ease;
 }
 #v-home .game-launch-box:before{
-  content:"";position:absolute;inset:5px;border:1px solid rgba(255,255,255,.32);
-  border-radius:calc(clamp(17px,4.8vw,25px) - 5px);pointer-events:none;z-index:-1;
+  content:"";position:absolute;inset:1px;
+  border-radius:calc(clamp(16px,4.2vw,21px) - 1px);
+  border-top:1px solid rgba(255,255,255,.32);
+  background:linear-gradient(180deg,rgba(255,255,255,.12) 0%,rgba(255,255,255,0) 42%);
+  pointer-events:none;z-index:-1;
 }
 #v-home .game-launch-box:after{
-  content:"";position:absolute;top:-38%;left:-35%;width:85%;height:75%;
-  transform:rotate(28deg);background:linear-gradient(to bottom,rgba(255,255,255,.45),rgba(255,255,255,0));
+  content:"";position:absolute;top:-45%;left:-30%;width:90%;height:78%;
+  transform:rotate(24deg);
+  background:linear-gradient(to bottom,rgba(255,255,255,.22),rgba(255,255,255,0));
   border-radius:50%;pointer-events:none;z-index:-1;
 }
 #v-home .game-launch-item:active .game-launch-box{
-  transform:translateY(2px) scale(.96);filter:brightness(1.06);
+  transform:translateY(2px) scale(.955);filter:brightness(1.09);
+  box-shadow:0 6px 16px rgba(4,8,24,.5),inset 0 1px 0 rgba(255,255,255,.5)!important;
 }
 #v-home .game-launch-icon{
   position:relative;
-  width:clamp(46px,14vw,64px)!important;
-  height:clamp(46px,14vw,64px)!important;
+  width:clamp(50px,15.5vw,64px)!important;
+  height:clamp(50px,15.5vw,64px)!important;
   min-width:0!important;
   min-height:0!important;
   flex:0 0 auto;
   display:flex!important;align-items:center;justify-content:center;
-  margin:0!important;font-size:initial!important;
-  filter:drop-shadow(0 5px 5px rgba(0,0,0,.24))!important;
+  margin:0!important;padding:0!important;border:0!important;background:transparent!important;
+  box-shadow:none!important;font-size:initial!important;
+  filter:drop-shadow(0 5px 8px rgba(0,0,0,.38))!important;
+}
+#v-home .game-launch-icon svg{
+  width:100%!important;height:100%!important;display:block;overflow:visible;
 }
 #v-home .game-launch-name{
   display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;
-  font-size:clamp(10.5px,3vw,12.5px)!important;line-height:1.1;font-weight:950!important;
-  letter-spacing:.2px;color:var(--ink)!important;white-space:nowrap;
-  text-shadow:0 1px 5px rgba(0,0,0,.22);
+  font-size:clamp(10px,2.7vw,11.5px)!important;line-height:1.12;font-weight:900!important;
+  letter-spacing:.2px;color:#ffffff!important;white-space:nowrap;
+  text-shadow:0 1px 4px rgba(0,0,0,.55);
 }
 #v-home .game-launch-item:focus-visible{outline:0}
 #v-home .game-launch-item:focus-visible .game-launch-box{outline:3px solid var(--violet);outline-offset:4px}
 
-/* Number Game: glossy blue number tile */
+/* Number Game: sapphire & gold prediction tile */
+#v-home .game-launch-item[data-open-route="play"] .game-launch-box,
 #v-home .game-launch-box:has(.number-game-icon){
-  background:radial-gradient(circle at 25% 12%,#8fe3ff 0,#369dff 34%,#1762d5 72%,#103d9d 100%)!important;
+  background:radial-gradient(circle at 22% 10%,rgba(96,195,255,.52) 0,transparent 56%),radial-gradient(circle at 85% 95%,rgba(37,99,235,.55) 0,transparent 55%),linear-gradient(155deg,#1d4ed8 0%,#122b7a 54%,#0a1642 100%)!important;
+  border-color:rgba(125,211,252,.45)!important;
 }
-#v-home .number-game-icon{
-  border-radius:clamp(13px,3.8vw,17px)!important;
-  display:grid!important;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;
-  place-items:center;gap:2px!important;padding:clamp(4px,1.4vw,7px)!important;
-  border:2px solid rgba(255,255,255,.92)!important;
-  background:linear-gradient(145deg,#0d4ca9,#168de9 55%,#073b91)!important;
-  box-shadow:inset 0 2px 7px rgba(255,255,255,.35),0 5px 12px rgba(0,26,90,.35);
-  color:#fff!important;font-size:clamp(13px,3.8vw,17px)!important;font-weight:1000!important;line-height:1!important;
-  text-shadow:0 2px 3px rgba(0,0,0,.35);
-}
-#v-home .number-game-icon span{
-  display:block!important;font-size:inherit!important;line-height:1!important;
-}
-
-/* Gold Ball: emerald glass cup with glowing golden ball */
+/* Gold Ball: imperial amber & emerald jewel tile */
+#v-home .game-launch-item[data-open-route="goldball"] .game-launch-box,
 #v-home .game-launch-box:has(.goldball-launch-icon){
-  background:radial-gradient(circle at 50% 0%,#fff0b2 0,#ffc94d 36%,#f39a16 76%,#bd650b 100%)!important;
+  background:radial-gradient(circle at 50% 8%,rgba(255,224,115,.48) 0,transparent 55%),radial-gradient(circle at 80% 92%,rgba(16,185,129,.4) 0,transparent 52%),linear-gradient(155deg,#b45309 0%,#522909 55%,#1f1407 100%)!important;
+  border-color:rgba(253,224,71,.48)!important;
 }
-#v-home .goldball-launch-icon{
-  overflow:visible!important;
-  border-radius:clamp(14px,4vw,20px);
-  background:radial-gradient(circle at 50% 20%,rgba(255,255,255,.38),rgba(255,255,255,0) 62%);
+#v-home .goldball-launch-icon{overflow:visible!important}
+#v-home .goldball-launch-icon .launch-cup,#v-home .goldball-launch-icon .launch-ball{display:none}
+/* Aviator: crimson & gold jet flight tile */
+#v-home .game-launch-item[data-open-route="aviator"] .game-launch-box,
+#v-home .game-launch-box:has(.aviator-launch-icon){
+  background:radial-gradient(circle at 22% 12%,rgba(251,113,133,.52) 0,transparent 56%),radial-gradient(circle at 85% 92%,rgba(244,63,94,.45) 0,transparent 52%),linear-gradient(155deg,#be123c 0%,#6c0e2a 55%,#270714 100%)!important;
+  border-color:rgba(253,164,175,.45)!important;
 }
-#v-home .launch-cup{
-  position:absolute;left:17%;right:17%;bottom:7%;height:61%;
-  border-radius:8px 8px 16px 16px;
-  clip-path:polygon(12% 0,88% 0,100% 100%,0 100%);
-  background:linear-gradient(100deg,#00695f 0%,#00d9b8 24%,#8bfff0 39%,#009c87 57%,#004e49 100%);
-  border:2px solid rgba(213,255,246,.95);
-  box-shadow:inset 0 3px 8px rgba(255,255,255,.75),0 8px 12px rgba(0,54,47,.35);
+/* Ludo: emerald royal board tile */
+#v-home .game-launch-item[data-open-route="ludo"] .game-launch-box,
+#v-home .game-launch-box:has(.ludo-launch-icon){
+  background:radial-gradient(circle at 22% 12%,rgba(52,211,153,.52) 0,transparent 56%),radial-gradient(circle at 85% 92%,rgba(16,185,129,.42) 0,transparent 52%),linear-gradient(155deg,#059669 0%,#064e3b 55%,#03241c 100%)!important;
+  border-color:rgba(110,231,183,.45)!important;
 }
-#v-home .launch-cup:after{
-  content:"";position:absolute;left:10%;right:10%;top:2%;height:19%;border-radius:50%;
-  background:linear-gradient(180deg,#fff,#9affee 70%,#22bfa9);
-  box-shadow:0 2px 4px rgba(0,0,0,.18);
+/* Rummy: azure casino card tile */
+#v-home .game-launch-item[data-open-route="rummy"] .game-launch-box,
+#v-home .game-launch-box:has(.rummy-launch-icon){
+  background:radial-gradient(circle at 22% 12%,rgba(56,189,248,.52) 0,transparent 56%),radial-gradient(circle at 85% 92%,rgba(14,165,233,.45) 0,transparent 52%),linear-gradient(155deg,#0284c7 0%,#07426d 55%,#041e36 100%)!important;
+  border-color:rgba(125,211,252,.45)!important;
 }
-#v-home .launch-ball{
-  position:absolute;z-index:3;top:6%;left:50%;transform:translateX(-35%);width:36%;height:36%;border-radius:50%;
-  background:radial-gradient(circle at 29% 22%,#fffbd0 0,#ffe76b 22%,#ffb900 58%,#d76b00 100%);
-  box-shadow:0 0 0 3px rgba(255,236,145,.2),0 0 15px 5px rgba(255,207,48,.75),0 5px 8px rgba(104,54,0,.35);
+/* 3 Patti: royal amethyst velvet tile */
+#v-home .game-launch-item[data-coming-soon="3 Patti"] .game-launch-box,
+#v-home .game-launch-box:has(.teenpatti-launch-icon){
+  background:radial-gradient(circle at 22% 12%,rgba(192,132,252,.52) 0,transparent 56%),radial-gradient(circle at 85% 92%,rgba(147,51,234,.45) 0,transparent 52%),linear-gradient(155deg,#7e22ce 0%,#3b126b 55%,#190733 100%)!important;
+  border-color:rgba(216,180,254,.45)!important;
+}
+/* Fruit Cut: tropical citrus & crimson blade tile */
+#v-home .game-launch-item[data-coming-soon="Fruit Cut"] .game-launch-box,
+#v-home .game-launch-box:has(.fruitcut-launch-icon){
+  background:radial-gradient(circle at 22% 12%,rgba(251,146,60,.55) 0,transparent 56%),radial-gradient(circle at 85% 92%,rgba(244,63,94,.48) 0,transparent 52%),linear-gradient(155deg,#ea580c 0%,#881337 55%,#2e0717 100%)!important;
+  border-color:rgba(253,186,116,.5)!important;
 }
 #v-home .coming-soon-row-head{
   display:flex;align-items:center;gap:10px;margin:4px 2px 8px;
@@ -373,47 +389,7 @@ body.has-bottom-nav .toast{bottom:calc(86px + env(safe-area-inset-bottom,0px))}
   padding-top:4px!important;padding-bottom:20px!important;
 }
 #v-home .game-launch-item.is-coming-soon .game-launch-box{
-  opacity:.95;
-}
-#v-home .game-launch-box:has(.aviator-launch-icon){
-  background:radial-gradient(circle at 25% 12%,#ff9bb0 0,#f43f5e 36%,#be123c 76%,#7f0928 100%)!important;
-}
-#v-home .aviator-launch-icon{
-  border-radius:clamp(13px,3.8vw,18px);
-  background:radial-gradient(circle at 50% 35%,rgba(255,255,255,.26),rgba(0,0,0,.15));
-  border:2px solid rgba(255,235,238,.85);
-  box-shadow:inset 0 2px 8px rgba(255,255,255,.35),0 6px 14px rgba(100,0,28,.4);
-}
-#v-home .aviator-launch-icon svg{width:64%;height:64%;display:block;filter:drop-shadow(0 3px 5px rgba(0,0,0,.35))}
-#v-home .game-launch-box:has(.ludo-launch-icon){
-  background:radial-gradient(circle at 25% 12%,#a3ffd0 0,#1fd18b 36%,#0c8e5c 76%,#065637 100%)!important;
-}
-#v-home .ludo-launch-icon{
-  border-radius:clamp(13px,3.8vw,18px);
-  background:linear-gradient(145deg,rgba(255,255,255,.24),rgba(0,0,0,.16));
-  border:2px solid rgba(225,255,240,.88);
-  box-shadow:inset 0 2px 8px rgba(255,255,255,.35),0 6px 14px rgba(0,68,42,.38);
-}
-#v-home .game-launch-box:has(.teenpatti-launch-icon){
-  background:radial-gradient(circle at 25% 12%,#ebb8ff 0,#a855f7 36%,#6d28d9 76%,#43128f 100%)!important;
-}
-#v-home .teenpatti-launch-icon{
-  border-radius:clamp(13px,3.8vw,18px);
-  background:linear-gradient(145deg,rgba(255,255,255,.22),rgba(0,0,0,.18));
-  border:2px solid rgba(245,225,255,.88);
-  box-shadow:inset 0 2px 8px rgba(255,255,255,.35),0 6px 14px rgba(58,12,118,.42);
-}
-#v-home .game-launch-box:has(.rummy-launch-icon){
-  background:radial-gradient(circle at 25% 12%,#a5f3fc 0,#06b6d4 36%,#0284c7 76%,#0c4a6e 100%)!important;
-}
-#v-home .rummy-launch-icon{
-  border-radius:clamp(13px,3.8vw,18px);
-  background:linear-gradient(145deg,rgba(255,255,255,.24),rgba(0,0,0,.16));
-  border:2px solid rgba(224,248,255,.88);
-  box-shadow:inset 0 2px 8px rgba(255,255,255,.35),0 6px 14px rgba(8,58,94,.42);
-}
-#v-home .ludo-launch-icon svg,#v-home .teenpatti-launch-icon svg,#v-home .rummy-launch-icon svg{
-  width:72%;height:72%;display:block;filter:drop-shadow(0 3px 5px rgba(0,0,0,.32));
+  opacity:.94;
 }
 @media(min-width:580px){
   #v-home .game-launch-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:14px!important}
@@ -985,21 +961,72 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
       <div class="game-launch-grid">
         <button class="game-launch-item" type="button" data-open-route="play" aria-label="Open Number Game">
           <span class="game-launch-box" aria-hidden="true">
-            <span class="game-launch-icon number-game-icon"><span>1 2</span><span>3 4</span></span>
+            <span class="game-launch-icon number-game-icon">
+              <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                <defs>
+                  <radialGradient id="p2w-ng-g" cx="32%" cy="24%" r="72%"><stop offset="0%" stop-color="#86efac"/><stop offset="55%" stop-color="#10b981"/><stop offset="100%" stop-color="#047857"/></radialGradient>
+                  <radialGradient id="p2w-ng-r" cx="32%" cy="24%" r="72%"><stop offset="0%" stop-color="#fda4af"/><stop offset="55%" stop-color="#f43f5e"/><stop offset="100%" stop-color="#9f1239"/></radialGradient>
+                  <radialGradient id="p2w-ng-y" cx="30%" cy="22%" r="74%"><stop offset="0%" stop-color="#fef9c3"/><stop offset="45%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#b45309"/></radialGradient>
+                  <linearGradient id="p2w-ng-ring" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse"><stop stop-color="#fde68a"/><stop offset="1" stop-color="#38bdf8"/></linearGradient>
+                </defs>
+                <rect x="6" y="10" width="52" height="46" rx="15" fill="#0b1f54" fill-opacity="0.72" stroke="url(#p2w-ng-ring)" stroke-width="2"/>
+                <circle cx="21" cy="24" r="10.5" fill="url(#p2w-ng-g)" stroke="#ecfdf5" stroke-width="1.4"/>
+                <ellipse cx="18" cy="19.5" rx="3.5" ry="1.8" transform="rotate(-25 18 19.5)" fill="#fff" fill-opacity="0.55"/>
+                <text x="21" y="28.2" text-anchor="middle" fill="#fff" font-size="12" font-weight="900" font-family="system-ui,sans-serif">7</text>
+                <circle cx="43" cy="24" r="10.5" fill="url(#p2w-ng-r)" stroke="#fff1f2" stroke-width="1.4"/>
+                <ellipse cx="40" cy="19.5" rx="3.5" ry="1.8" transform="rotate(-25 40 19.5)" fill="#fff" fill-opacity="0.55"/>
+                <text x="43" y="28.2" text-anchor="middle" fill="#fff" font-size="12" font-weight="900" font-family="system-ui,sans-serif">5</text>
+                <circle cx="32" cy="40" r="12.5" fill="url(#p2w-ng-y)" stroke="#fffbeb" stroke-width="1.8"/>
+                <ellipse cx="28" cy="34.5" rx="4.2" ry="2.2" transform="rotate(-24 28 34.5)" fill="#fff" fill-opacity="0.65"/>
+                <text x="32" y="44.8" text-anchor="middle" fill="#451a03" font-size="14" font-weight="900" font-family="system-ui,sans-serif">9</text>
+                <path d="M13 48l1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.2-2.4 1.2.5-2.6-1.9-1.8 2.6-.4Z" fill="#fde047"/>
+                <circle cx="52" cy="45" r="2" fill="#7dd3fc"/>
+              </svg>
+            </span>
             <span class="game-launch-name">Number Game</span>
           </span>
         </button>
         <button class="game-launch-item" type="button" data-open-route="goldball" aria-label="Open Gold Ball Challenge">
           <span class="game-launch-box" aria-hidden="true">
-            <span class="game-launch-icon goldball-launch-icon"><span class="launch-ball"></span><span class="launch-cup"></span></span>
+            <span class="game-launch-icon goldball-launch-icon">
+              <span class="launch-ball"></span><span class="launch-cup"></span>
+              <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                <defs>
+                  <radialGradient id="p2w-gb-orb" cx="32%" cy="25%" r="72%"><stop offset="0%" stop-color="#fffef0"/><stop offset="28%" stop-color="#fde047"/><stop offset="68%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#9a3412"/></radialGradient>
+                  <linearGradient id="p2w-gb-cup" x1="14" y1="26" x2="50" y2="56" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#0f766e"/><stop offset="30%" stop-color="#2dd4bf"/><stop offset="56%" stop-color="#0d9488"/><stop offset="100%" stop-color="#042f2e"/></linearGradient>
+                  <linearGradient id="p2w-gb-rim" x1="16" y1="26" x2="48" y2="26" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#99f6e4"/><stop offset="50%" stop-color="#ffffff"/><stop offset="100%" stop-color="#5eead4"/></linearGradient>
+                </defs>
+                <circle cx="32" cy="19" r="14" fill="#fde047" fill-opacity="0.22"/>
+                <circle cx="32" cy="18" r="10.5" fill="url(#p2w-gb-orb)" stroke="#fef9c3" stroke-width="1.5"/>
+                <ellipse cx="28.5" cy="13.8" rx="3.8" ry="2" transform="rotate(-25 28.5 13.8)" fill="#ffffff" fill-opacity="0.78"/>
+                <path d="M16 27h32l-4.5 27.5a5 5 0 0 1-5 4.2h-13a5 5 0 0 1-5-4.2L16 27Z" fill="url(#p2w-gb-cup)" stroke="#99f6e4" stroke-width="1.8" stroke-linejoin="round"/>
+                <ellipse cx="32" cy="27" rx="16" ry="4.2" fill="url(#p2w-gb-rim)" stroke="#0f766e" stroke-width="1.2"/>
+                <ellipse cx="32" cy="27" rx="11.5" ry="2.2" fill="#042f2e" fill-opacity="0.45"/>
+                <path d="M22 33l2 19" stroke="#ffffff" stroke-opacity="0.45" stroke-width="2.6" stroke-linecap="round"/>
+                <path d="M47 10l1.1 2.4 2.4 1.1-2.4 1.1-1.1 2.4-1.1-2.4-2.4-1.1 2.4-1.1Z" fill="#fef08a"/>
+                <circle cx="15" cy="15" r="1.8" fill="#fde047"/>
+              </svg>
+            </span>
             <span class="game-launch-name">Gold Ball</span>
           </span>
         </button>
         <button class="game-launch-item" type="button" data-open-route="aviator" aria-label="Open Aviator Crash Game">
           <span class="game-launch-box" aria-hidden="true">
             <span class="game-launch-icon aviator-launch-icon">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M21 15.5V13.5L13.5 9V3.8C13.5 2.8 12.8 2 12 2C11.2 2 10.5 2.8 10.5 3.8V9L3 13.5V15.5L10.5 13.2V18.3L8.2 20V21.5L12 20.4L15.8 21.5V20L13.5 18.3V13.2L21 15.5Z" fill="#ffffff" stroke="#ffd866" stroke-width="1.1" stroke-linejoin="round" transform="rotate(35 12 12)"/>
+              <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="p2w-av-trail" x1="8" y1="52" x2="50" y2="20" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#fb7185" stop-opacity="0.05"/><stop offset="65%" stop-color="#fb7185" stop-opacity="0.7"/><stop offset="100%" stop-color="#fde047"/></linearGradient>
+                  <linearGradient id="p2w-av-body" x1="16" y1="16" x2="54" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#ffffff"/><stop offset="52%" stop-color="#ffe4e6"/><stop offset="100%" stop-color="#fb7185"/></linearGradient>
+                  <linearGradient id="p2w-av-wing" x1="20" y1="18" x2="42" y2="46" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#fef08a"/><stop offset="100%" stop-color="#f59e0b"/></linearGradient>
+                </defs>
+                <path d="M8 52Q28 48 48 22" stroke="url(#p2w-av-trail)" stroke-width="5" stroke-linecap="round"/>
+                <path d="M8 52Q28 48 48 22L48 54H8Z" fill="#f43f5e" fill-opacity="0.22"/>
+                <path d="M12 40l8-3-4 7Z" fill="#fde047"/>
+                <path d="M18 35l11-2 19-16c2.5-2 6-1.4 5.6 1.2-.3 2-3 5-5.5 7L34 38l1 12-5 3-3-10-8 2-4-5 3-5Z" fill="url(#p2w-av-body)" stroke="#fff1f2" stroke-width="1.4" stroke-linejoin="round"/>
+                <path d="M29 29L20 15l7-2 12 10Z" fill="url(#p2w-av-wing)" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"/>
+                <ellipse cx="42.5" cy="21" rx="4.2" ry="2" transform="rotate(-38 42.5 21)" fill="#38bdf8" stroke="#e0f2fe" stroke-width="1"/>
+                <circle cx="19" cy="20" r="2" fill="#fde047"/>
+                <circle cx="51" cy="40" r="2.2" fill="#fda4af"/>
               </svg>
             </span>
             <span class="game-launch-name">Aviator</span>
@@ -1008,17 +1035,30 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
         <button class="game-launch-item" type="button" data-open-route="ludo" aria-label="Open Ludo Game">
           <span class="game-launch-box" aria-hidden="true">
             <span class="game-launch-icon ludo-launch-icon">
-              <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
-                <rect x="4" y="4" width="40" height="40" rx="9" fill="#ffffff" stroke="#ffe07d" stroke-width="2"/>
-                <rect x="7" y="7" width="14" height="14" rx="3.5" fill="#ff4d6d"/>
-                <rect x="27" y="7" width="14" height="14" rx="3.5" fill="#2ee6a0"/>
-                <rect x="7" y="27" width="14" height="14" rx="3.5" fill="#3b82f6"/>
-                <rect x="27" y="27" width="14" height="14" rx="3.5" fill="#ffb703"/>
-                <circle cx="14" cy="14" r="3" fill="#fff"/>
-                <circle cx="34" cy="14" r="3" fill="#fff"/>
-                <circle cx="14" cy="34" r="3" fill="#fff"/>
-                <circle cx="34" cy="34" r="3" fill="#fff"/>
-                <polygon points="24,18 30,24 24,30 18,24" fill="#ffc94d" stroke="#0b0d22" stroke-width="1.4"/>
+              <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="p2w-ld-board" x1="8" y1="8" x2="54" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#e2e8f0"/></linearGradient>
+                  <linearGradient id="p2w-ld-die" x1="34" y1="32" x2="58" y2="56" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#cbd5e1"/></linearGradient>
+                </defs>
+                <rect x="7" y="7" width="44" height="44" rx="10" fill="url(#p2w-ld-board)" stroke="#fde047" stroke-width="2.2"/>
+                <rect x="10.5" y="10.5" width="15" height="15" rx="4" fill="#f43f5e"/>
+                <rect x="32.5" y="10.5" width="15" height="15" rx="4" fill="#10b981"/>
+                <rect x="10.5" y="32.5" width="15" height="15" rx="4" fill="#3b82f6"/>
+                <rect x="32.5" y="32.5" width="15" height="15" rx="4" fill="#f59e0b"/>
+                <circle cx="18" cy="18" r="3.4" fill="#fff"/>
+                <circle cx="40" cy="18" r="3.4" fill="#fff"/>
+                <circle cx="18" cy="40" r="3.4" fill="#fff"/>
+                <circle cx="40" cy="40" r="3.4" fill="#fff"/>
+                <polygon points="29,21 37,29 29,37 21,29" fill="#fbbf24" stroke="#0f172a" stroke-width="1.5"/>
+                <circle cx="29" cy="29" r="2.5" fill="#fff"/>
+                <g transform="rotate(-10 47 46)">
+                  <rect x="36" y="35" width="22" height="22" rx="6" fill="url(#p2w-ld-die)" stroke="#fef08a" stroke-width="1.8"/>
+                  <circle cx="42" cy="41" r="2.2" fill="#1e293b"/>
+                  <circle cx="52" cy="41" r="2.2" fill="#1e293b"/>
+                  <circle cx="47" cy="46" r="2.5" fill="#dc2626"/>
+                  <circle cx="42" cy="51" r="2.2" fill="#1e293b"/>
+                  <circle cx="52" cy="51" r="2.2" fill="#1e293b"/>
+                </g>
               </svg>
             </span>
             <span class="game-launch-name">Ludo</span>
@@ -1027,16 +1067,27 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
         <button class="game-launch-item" type="button" data-open-route="rummy" aria-label="Open Rummy Game">
           <span class="game-launch-box" aria-hidden="true">
             <span class="game-launch-icon rummy-launch-icon">
-              <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
-                <g transform="rotate(-11 20 26)">
-                  <rect x="8" y="10" width="19" height="27" rx="4" fill="#f8fafc" stroke="#93c5fd" stroke-width="1.6"/>
-                  <text x="11.5" y="20" fill="#0f172a" font-size="8" font-weight="900" font-family="system-ui,sans-serif">7</text>
-                  <circle cx="15" cy="26" r="2.2" fill="#0f172a"/><circle cx="19.5" cy="26" r="2.2" fill="#0f172a"/><circle cx="17.2" cy="22.5" r="2.2" fill="#0f172a"/>
+              <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="p2w-rm-c1" x1="8" y1="12" x2="32" y2="50" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#dbeafe"/></linearGradient>
+                  <linearGradient id="p2w-rm-c2" x1="20" y1="8" x2="46" y2="50" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#ffe4e6"/></linearGradient>
+                  <linearGradient id="p2w-rm-jk" x1="30" y1="12" x2="56" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#fef9c3"/><stop offset="55%" stop-color="#fde047"/><stop offset="100%" stop-color="#f59e0b"/></linearGradient>
+                </defs>
+                <g transform="rotate(-15 20 35)">
+                  <rect x="9" y="13" width="23" height="34" rx="5" fill="url(#p2w-rm-c1)" stroke="#93c5fd" stroke-width="1.6"/>
+                  <text x="13" y="24" fill="#0f172a" font-size="9" font-weight="900" font-family="system-ui,sans-serif">A</text>
+                  <path d="M20.5 27c-3 3-4.3 4.8-2.4 6.5 1.1 1 2.4.4 2.4-.7 0 1.1 1.3 1.7 2.4.7 1.9-1.7.6-3.5-2.4-6.5Z" fill="#0f172a"/>
                 </g>
-                <g transform="rotate(9 29 26)">
-                  <rect x="20" y="8" width="20" height="28" rx="4" fill="#ffffff" stroke="#ffd166" stroke-width="1.8"/>
-                  <text x="23.5" y="18" fill="#d97706" font-size="8" font-weight="900" font-family="system-ui,sans-serif">J</text>
-                  <path d="M30 18l2.1 4.3 4.7.7-3.4 3.3.8 4.7L30 28.8 25.8 31l.8-4.7-3.4-3.3 4.7-.7L30 18Z" fill="#f59e0b"/>
+                <g transform="rotate(2 32 32)">
+                  <rect x="20" y="9" width="24" height="36" rx="5" fill="url(#p2w-rm-c2)" stroke="#fda4af" stroke-width="1.6"/>
+                  <text x="24" y="20" fill="#e11d48" font-size="9" font-weight="900" font-family="system-ui,sans-serif">K</text>
+                  <path d="M32 35c-3.8-2.8-5.3-5.2-5.3-7.3a3 3 0 0 1 5.3-2 3 3 0 0 1 5.3 2c0 2.1-1.5 4.5-5.3 7.3Z" fill="#e11d48"/>
+                </g>
+                <g transform="rotate(17 44 35)">
+                  <rect x="32" y="13" width="24" height="35" rx="5" fill="url(#p2w-rm-jk)" stroke="#fffbeb" stroke-width="1.8"/>
+                  <path d="M37 28l2.5-6 4.5 3.5L48.5 22l2.5 6H37Z" fill="#92400e"/>
+                  <circle cx="44" cy="35" r="2.2" fill="#92400e"/>
+                  <text x="36" y="21" fill="#78350f" font-size="7.5" font-weight="900" font-family="system-ui,sans-serif">JKR</text>
                 </g>
               </svg>
             </span>
@@ -1052,25 +1103,61 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
         <button class="game-launch-item is-coming-soon" type="button" data-coming-soon="3 Patti" aria-label="3 Patti - Coming Soon">
           <span class="game-launch-box" aria-hidden="true">
             <span class="game-launch-icon teenpatti-launch-icon">
-              <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
-                <g transform="rotate(-14 18 28)">
-                  <rect x="8" y="10" width="18" height="26" rx="4" fill="#fff7ed" stroke="#ffd166" stroke-width="1.6"/>
-                  <text x="12" y="20" fill="#18181b" font-size="8.5" font-weight="900" font-family="system-ui,sans-serif">A</text>
-                  <path d="M17 23c-2.5 2.4-3.5 4-2 5.4 1 .9 2 .4 2-.5 0 .9 1 1.4 2 .5 1.5-1.4.5-3-2-5.4Z" fill="#18181b"/>
+              <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="p2w-tp-c1" x1="8" y1="12" x2="30" y2="48" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#f3e8ff"/></linearGradient>
+                  <linearGradient id="p2w-tp-c2" x1="20" y1="8" x2="44" y2="46" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#fffbeb"/><stop offset="100%" stop-color="#fde68a"/></linearGradient>
+                  <radialGradient id="p2w-tp-chip" cx="35%" cy="30%" r="72%"><stop offset="0%" stop-color="#fde047"/><stop offset="60%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#9a3412"/></radialGradient>
+                </defs>
+                <g transform="rotate(-16 20 34)">
+                  <rect x="9" y="13" width="22" height="33" rx="5" fill="url(#p2w-tp-c1)" stroke="#d8b4fe" stroke-width="1.6"/>
+                  <text x="13" y="23.5" fill="#18181b" font-size="9" font-weight="900" font-family="system-ui,sans-serif">A</text>
+                  <path d="M20 26.5c-2.8 2.8-4 4.6-2.2 6.2 1 .9 2.2.4 2.2-.6 0 1 1.2 1.5 2.2.6 1.8-1.6.6-3.4-2.2-6.2Z" fill="#18181b"/>
                 </g>
-                <g transform="rotate(14 30 28)">
-                  <rect x="22" y="10" width="18" height="26" rx="4" fill="#fff7ed" stroke="#ffd166" stroke-width="1.6"/>
-                  <text x="26" y="20" fill="#e11d48" font-size="8.5" font-weight="900" font-family="system-ui,sans-serif">Q</text>
-                  <polygon points="31,22 35,26.5 31,31 27,26.5" fill="#e11d48"/>
+                <g transform="rotate(16 44 34)">
+                  <rect x="33" y="13" width="22" height="33" rx="5" fill="url(#p2w-tp-c1)" stroke="#fda4af" stroke-width="1.6"/>
+                  <text x="37" y="23.5" fill="#e11d48" font-size="9" font-weight="900" font-family="system-ui,sans-serif">A</text>
+                  <polygon points="44,26.5 48.5,31.5 44,36.5 39.5,31.5" fill="#e11d48"/>
                 </g>
                 <g>
-                  <rect x="15" y="7" width="18" height="27" rx="4" fill="#ffffff" stroke="#ffbe0b" stroke-width="1.8"/>
-                  <text x="18.5" y="17" fill="#dc2626" font-size="8.5" font-weight="900" font-family="system-ui,sans-serif">K</text>
-                  <path d="M24 29c-3.2-2.3-4.5-4.4-4.5-6.2a2.6 2.6 0 0 1 4.5-1.7 2.6 2.6 0 0 1 4.5 1.7c0 1.8-1.3 3.9-4.5 6.2Z" fill="#dc2626"/>
+                  <rect x="20.5" y="7.5" width="23" height="35" rx="5" fill="url(#p2w-tp-c2)" stroke="#fbbf24" stroke-width="1.8"/>
+                  <text x="24.5" y="18.5" fill="#dc2626" font-size="9.5" font-weight="900" font-family="system-ui,sans-serif">A</text>
+                  <path d="M32 34c-3.8-2.7-5.3-5.1-5.3-7.2a3 3 0 0 1 5.3-2 3 3 0 0 1 5.3 2c0 2.1-1.5 4.5-5.3 7.2Z" fill="#dc2626"/>
                 </g>
+                <circle cx="48" cy="48" r="10.5" fill="url(#p2w-tp-chip)" stroke="#fef9c3" stroke-width="1.8"/>
+                <circle cx="48" cy="48" r="6.5" stroke="#78350f" stroke-dasharray="2.4 2.4" stroke-width="1.5"/>
+                <circle cx="48" cy="48" r="2.5" fill="#fef08a"/>
               </svg>
             </span>
             <span class="game-launch-name">3 Patti</span>
+          </span>
+        </button>
+        <button class="game-launch-item is-coming-soon" type="button" data-coming-soon="Fruit Cut" aria-label="Fruit Cut - Coming Soon">
+          <span class="game-launch-box" aria-hidden="true">
+            <span class="game-launch-icon fruitcut-launch-icon">
+              <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                <defs>
+                  <radialGradient id="p2w-fc-mel" cx="45%" cy="40%" r="65%"><stop offset="0%" stop-color="#fda4af"/><stop offset="55%" stop-color="#f43f5e"/><stop offset="100%" stop-color="#be123c"/></radialGradient>
+                  <linearGradient id="p2w-fc-rind" x1="10" y1="30" x2="50" y2="54" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#15803d"/></linearGradient>
+                  <linearGradient id="p2w-fc-org" x1="34" y1="8" x2="58" y2="30" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#fde047"/><stop offset="100%" stop-color="#f97316"/></linearGradient>
+                  <linearGradient id="p2w-fc-slash" x1="8" y1="54" x2="58" y2="8" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="50%" stop-color="#ffffff"/><stop offset="100%" stop-color="#fef08a"/></linearGradient>
+                </defs>
+                <circle cx="44" cy="20" r="11" fill="url(#p2w-fc-org)" stroke="#fff7ed" stroke-width="1.6"/>
+                <circle cx="44" cy="20" r="8" fill="#fb923c" stroke="#fef3c7" stroke-width="1"/>
+                <path d="M44 12v16M36 20h16M38.5 14.5l11 11M49.5 14.5l-11 11" stroke="#fef3c7" stroke-width="1.1" stroke-linecap="round"/>
+                <path d="M10 34a22 22 0 0 0 42 4L10 34Z" fill="url(#p2w-fc-rind)" stroke="#dcfce7" stroke-width="1.5" stroke-linejoin="round"/>
+                <path d="M13 34.5a18.5 18.5 0 0 0 36 3.2L13 34.5Z" fill="#ecfccb"/>
+                <path d="M15.5 34.8a15.8 15.8 0 0 0 31 2.7L15.5 34.8Z" fill="url(#p2w-fc-mel)"/>
+                <circle cx="24" cy="40" r="1.4" fill="#1e293b"/>
+                <circle cx="31" cy="43" r="1.4" fill="#1e293b"/>
+                <circle cx="37" cy="40" r="1.4" fill="#1e293b"/>
+                <path d="M7 51Q28 31 57 9Q32 35 11 55Z" fill="url(#p2w-fc-slash)"/>
+                <circle cx="17" cy="21" r="2.6" fill="#fde047"/>
+                <circle cx="24" cy="14" r="1.7" fill="#fda4af"/>
+                <circle cx="52" cy="46" r="2.2" fill="#fed7aa"/>
+              </svg>
+            </span>
+            <span class="game-launch-name">Fruit Cut</span>
           </span>
         </button>
       </div>
@@ -1526,17 +1613,6 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
         <p class="ad-reward-status" id="ad-reward-status" aria-live="polite">Rewarded ads are not configured yet.</p>
       </section>
 
-      <button class="ref-banner" id="m-share" type="button" data-open-route="share" aria-label="Share app and earn 20 coins" style="margin-top:12px">
-        <div>
-          <b>🎁 Share App &amp; Earn 20 Coins</b>
-          <span>Invite friends with your app link — +20 Welcome Coins for your friend and +20 Coins for you</span>
-        </div>
-        <span style="font-size:1.3rem;font-weight:900;color:var(--gold-text)" aria-hidden="true">›</span>
-      </button>
-      <button class="menu-btn hide" id="m-ref-network" type="button" data-open-route="ref-network" aria-label="My Referral Network" style="margin-top:10px">
-        <span>📊 My Referral Network</span><span aria-hidden="true">›</span>
-      </button>
-
     </section>
 
     <section id="v-wallet" class="hide">
@@ -1657,7 +1733,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     </section>
 
     <section id="v-share" class="hide">
-      <button class="mini" data-back="#/rewards" style="margin:6px 0 0">‹ Back to Rewards</button>
+      <button class="mini" data-back="#/settings" style="margin:6px 0 0">‹ Back to Profile</button>
       <section class="ref-card" id="referral-card" aria-label="Share app and earn 20 coins">
         <div class="ref-head">
           <div>
@@ -1697,7 +1773,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     </section>
 
     <section id="v-ref-network" class="hide">
-      <button class="mini" data-back="#/rewards" style="margin:6px 0 0">‹ Back to Rewards</button>
+      <button class="mini" data-back="#/settings" style="margin:6px 0 0">‹ Back to Profile</button>
       <section class="ref-card" id="ref-network-card" aria-label="My Referral Network">
         <div class="ref-head">
           <div>
@@ -1736,6 +1812,16 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
         <div class="srow"><span>Total users</span><b id="st-users">0</b></div>
         <div class="srow" style="margin-top:8px"><span>Total coins (all users)</span><b id="st-total">0</b></div>
       </div>
+      <button class="ref-banner" id="m-share" type="button" data-open-route="share" aria-label="Share app and earn 20 coins" style="margin:0 0 12px">
+        <div>
+          <b>🎁 Share App &amp; Earn 20 Coins</b>
+          <span>Invite friends with your app link — +20 Welcome Coins for your friend and +20 Coins for you</span>
+        </div>
+        <span style="font-size:1.3rem;font-weight:900;color:var(--gold-text)" aria-hidden="true">›</span>
+      </button>
+      <button class="menu-btn hide" id="m-ref-network" type="button" data-open-route="ref-network" aria-label="My Referral Network" style="margin:0 0 12px">
+        <span>📊 My Referral Network</span><span aria-hidden="true">›</span>
+      </button>
       <div class="card">
         <div style="font-weight:700;margin-bottom:10px">Game Theme</div>
         <div class="row c2" style="margin-top:0">
@@ -2764,16 +2850,16 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     clearPlayOnlyEffects();
     document.querySelectorAll('#nav a').forEach(function(a){a.classList.toggle('on',a.dataset.r===r)});
     var activeBnav='home';
-    if(r==='rewards'||r==='share'||r==='ref-network')activeBnav='rewards';
+    if(r==='rewards')activeBnav='rewards';
     else if(r==='wallet'||r==='add'||r==='withdraw'||(r==='tx'&&!isAdmin()))activeBnav='wallet';
-    else if(r==='settings'||r==='pw')activeBnav='settings';
+    else if(r==='settings'||r==='pw'||r==='share'||r==='ref-network')activeBnav='settings';
     document.querySelectorAll('#bottom-nav [data-bnav]').forEach(function(a){a.classList.toggle('on',a.getAttribute('data-bnav')===activeBnav)});
-    if(r==='rewards'){loadDailyRewards();if(!isAdmin()&&window.Play2WinLoadReferrals)window.Play2WinLoadReferrals();}
+    if(r==='rewards'){loadDailyRewards();}
     if(r==='wallet'){renderWallet();loadWalletSummary();}
     if(r==='mine')loadMine();
     if(r==='admin'){if(adminAlertsEnabled)primeAdminAlertAudio();loadUsers();loadAdminPaymentUpis();loadDepositRequests();loadWithdrawalRequests();pollAdminRequests();if(window.Play2WinLoadAdminReferrals)window.Play2WinLoadAdminReferrals();}
     if(r==='bets')loadBets();
-    if(r==='settings'){renderSettings();}
+    if(r==='settings'){renderSettings();if(!isAdmin()&&window.Play2WinLoadReferrals)window.Play2WinLoadReferrals();}
     if(r==='share'){if(window.Play2WinLoadReferrals)window.Play2WinLoadReferrals();}
     if(r==='ref-network'){if(window.Play2WinLoadReferralNetwork)window.Play2WinLoadReferralNetwork();}
     if(r==='add'){loadMyDeposits();}
@@ -4033,6 +4119,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     $('st-amt').textContent=isAdmin()?'Admin':Number(S.balance||0).toLocaleString('en-IN')+' coins';
     $('st-sub').textContent=[S.email,S.phone?'Phone: '+S.phone:'',S.id&&S.id!==nm?'ID: '+S.id:''].filter(Boolean).join(' · ')||'Play2Win Member';
     $('st-admin').classList.toggle('hide',!isAdmin());
+    if($('m-share'))$('m-share').classList.toggle('hide',isAdmin());
     if($('m-admin-tx'))$('m-admin-tx').classList.toggle('hide',!isAdmin());
     if(isAdmin())api('admin_list_users',{p_token:S.token}).then(function(us){
       var t=0;us.forEach(function(u){t+=u.balance});$('st-users').textContent=us.length;$('st-total').textContent=t;
