@@ -124,8 +124,8 @@ class ExampleRobolectricTest {
     assertTrue(html.contains("function startFlySound"))
     assertTrue(html.contains("function playCrashSound"))
     assertFalse(html.contains("M21 3L14.2 21L10.5 13.5L3 9.8L21 3Z"))
-    assertEquals(6, BuildConfig.VERSION_CODE)
-    assertEquals("1.5", BuildConfig.VERSION_NAME)
+    assertEquals(7, BuildConfig.VERSION_CODE)
+    assertEquals("1.6", BuildConfig.VERSION_NAME)
     assertTrue(html.contains("#bal::after{display:none}"))
     assertTrue(html.contains("\$('bal').textContent=isAdmin()?'Admin':Number(S.balance||0).toLocaleString('en-IN');"))
     assertTrue(html.contains("id=\"p2w-reject-wdr-modal\""))
@@ -209,6 +209,8 @@ class ExampleRobolectricTest {
     assertTrue(html.contains("id=\"admin-upd-live-status\""))
     assertTrue(html.contains("function compareVersionNames"))
     assertTrue(html.contains("checkForAppUpdate(false,true)"))
+    assertTrue(html.contains("grid-template-columns:repeat(3,minmax(0,1fr))!important"))
+    assertFalse(html.contains("#v-home .game-launch-item,#v-home .game-launch-icon{width:58px!important"))
     assertTrue(html.contains("https://drive.google.com/uc?export=download&confirm=t&id="))
   }
 
