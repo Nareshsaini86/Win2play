@@ -955,15 +955,27 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
       <button class="place" id="a-go" style="margin-top:4px">Log in</button>
     </div>
     <div id="auth-signup-pane" class="hide">
-      <label>Full Name (optional)<input id="su-name" autocomplete="name" placeholder="Enter your full name"></label>
-      <label>Email ID<input id="su-email" type="email" autocomplete="email" placeholder="example@gmail.com"></label>
-      <label>Set Password<input id="su-pw" type="password" autocomplete="new-password" placeholder="Minimum 6 characters"></label>
-      <label>Confirm Password<input id="su-pw2" type="password" autocomplete="new-password" placeholder="Re-enter password"></label>
-      <div class="pw-match" id="su-match"></div>
-      <label class="pw-toggle"><input id="su-show-pw" type="checkbox"><span>Show password</span></label>
-      <div class="err" id="su-err"></div>
-      <button class="place" id="su-go" style="margin-top:4px">Create Account</button>
-      <div class="note" style="margin-top:8px">Set up your own Email ID and password for a new account.</div>
+      <div id="su-step-1">
+        <label>Full Name (optional)<input id="su-name" autocomplete="name" placeholder="Enter your full name"></label>
+        <label>Email ID<input id="su-email" type="email" autocomplete="email" placeholder="example@gmail.com"></label>
+        <label>Set Password<input id="su-pw" type="password" autocomplete="new-password" placeholder="Minimum 6 characters"></label>
+        <label>Confirm Password<input id="su-pw2" type="password" autocomplete="new-password" placeholder="Re-enter password"></label>
+        <div class="pw-match" id="su-match"></div>
+        <label class="pw-toggle"><input id="su-show-pw" type="checkbox"><span>Show password</span></label>
+        <button class="place" id="su-go" style="margin-top:4px">Send 6-Digit OTP</button>
+        <div class="note" style="margin-top:8px">A 6-digit verification OTP will be sent to your Email ID before your account is created.</div>
+      </div>
+      <div id="su-otp-box" class="hide" style="padding:12px;border-radius:14px;background:var(--soft);border:1px solid var(--line)">
+        <div style="font-weight:900;color:var(--gold-text);font-size:.94rem">✉️ Verify Your Email ID</div>
+        <div class="note" id="su-otp-sent-to" style="margin:4px 0 10px"></div>
+        <label>Enter 6-Digit OTP<input id="su-otp" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="••••••" style="letter-spacing:.4em;text-align:center;font-size:1.25rem;font-weight:950"></label>
+        <button type="button" class="place" id="su-verify-go" style="margin-top:6px">Verify OTP &amp; Create Account</button>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+          <button type="button" class="mini" id="su-resend-otp" style="min-height:40px">Resend OTP</button>
+          <button type="button" class="mini" id="su-change-email" style="min-height:40px">Edit Email</button>
+        </div>
+      </div>
+      <div class="err" id="su-err" style="margin-top:8px"></div>
     </div>
     <div id="google-divider" style="text-align:center;margin:12px 0;color:var(--mute);font-size:.8rem">— OR —</div>
     <button class="place" id="google-login" type="button" style="margin-top:0;background:#fff;color:#222;box-shadow:none">Continue with Google</button>
@@ -2711,6 +2723,7 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     $('app').classList.add('hide');if($('bottom-nav'))$('bottom-nav').classList.add('hide');document.body.classList.remove('has-bottom-nav');$('v-auth').classList.remove('hide');$('bal').textContent='';$('bal').dataset.admin='0';
     if($('a-err'))$('a-err').textContent='';
     if($('su-err'))$('su-err').textContent='';
+    pendingSignup=null;if($('su-otp'))$('su-otp').value='';if(typeof showSignupStep==='function')showSignupStep(1);
     ['v-add','v-withdraw','v-wallet'].forEach(function(id){if($(id))$(id).classList.add('hide')});
     api('has_admin').then(function(has){
       $('auth-title').textContent=has?(authMode==='signup'?'Create new account':'Log in'):'Set up the admin account';
@@ -2775,65 +2788,200 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
     if(el)el.addEventListener('keydown',function(ev){if(ev.key==='Enter'){ev.preventDefault();$('a-go').click();}});
   });
 
-  if($('su-go'))$('su-go').onclick=function(){
-    var name=($('su-name')?$('su-name').value:'').trim();
-    var email=($('su-email')?$('su-email').value:'').trim().toLowerCase();
-    var pw=$('su-pw')?$('su-pw').value:'';
-    var pw2=$('su-pw2')?$('su-pw2').value:'';
+  var pendingSignup=null,suResendTimer=null,suResendLeft=0,suMailCallbacks={};
+  window.__p2wOtpMailCb=function(cbId,result){
+    var fn=suMailCallbacks[cbId];
+    if(!fn)return;
+    delete suMailCallbacks[cbId];
+    fn(result);
+  };
+
+  function dispatchOtpEmailViaNativeOrEdge(otpData){
+    var smtp=(otpData&&otpData.smtp)||{};
+    if(window.Play2WinNative&&window.Play2WinNative.sendSignupOtpEmail){
+      return new Promise(function(resolve,reject){
+        var cbId='otp_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
+        var done=false;
+        var timer=setTimeout(function(){
+          if(done)return;
+          done=true;
+          delete suMailCallbacks[cbId];
+          reject(new Error('Email server timed out. Please check your internet connection and try again.'));
+        },25000);
+        suMailCallbacks[cbId]=function(res){
+          if(done)return;
+          done=true;
+          clearTimeout(timer);
+          if(res&&res.success){resolve(res);}
+          else{reject(new Error((res&&res.error)||'Could not send OTP email.'));}
+        };
+        try{
+          window.Play2WinNative.sendSignupOtpEmail(
+            cbId,
+            String(otpData.email||''),
+            String(otpData.display_name||''),
+            String(otpData.otp||''),
+            String(smtp.host||'smtp.gmail.com'),
+            Number(smtp.port||465),
+            String(smtp.sender_email||''),
+            String(smtp.sender_name||'Play2Win'),
+            String(smtp.smtp_password||'')
+          );
+        }catch(err){
+          clearTimeout(timer);
+          delete suMailCallbacks[cbId];
+          reject(err);
+        }
+      });
+    }
+    return fetch(SUPABASE_URL+'/functions/v1/send-signup-otp',{
+      method:'POST',
+      headers:{'Content-Type':'application/json',apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY},
+      body:JSON.stringify({email:otpData.email,display_name:otpData.display_name,otp:otpData.otp})
+    }).then(function(r){
+      if(!r.ok)throw new Error('OTP email delivery requires the Play2Win Android app.');
+      return r.json();
+    },function(){
+      throw new Error('OTP email delivery requires the Play2Win Android app.');
+    });
+  }
+
+  function startResendCooldown(seconds){
+    if(suResendTimer){clearInterval(suResendTimer);suResendTimer=null;}
+    suResendLeft=Math.max(0,Number(seconds)||30);
+    var btn=$('su-resend-otp');
+    var paint=function(){
+      if(!btn)return;
+      if(suResendLeft>0){
+        btn.disabled=true;
+        btn.textContent='Resend ('+suResendLeft+'s)';
+      }else{
+        btn.disabled=false;
+        btn.textContent='Resend OTP';
+      }
+    };
+    paint();
+    if(suResendLeft>0){
+      suResendTimer=setInterval(function(){
+        suResendLeft--;
+        paint();
+        if(suResendLeft<=0&&suResendTimer){clearInterval(suResendTimer);suResendTimer=null;}
+      },1000);
+    }
+  }
+
+  function showSignupStep(step){
+    var isOtp=step===2;
+    if($('su-step-1'))$('su-step-1').classList.toggle('hide',isOtp);
+    if($('su-otp-box'))$('su-otp-box').classList.toggle('hide',!isOtp);
+    if(!isOtp&&suResendTimer){clearInterval(suResendTimer);suResendTimer=null;}
+  }
+
+  function sendSignupOtpFlow(fromResend){
+    var name=(pendingSignup&&fromResend)?pendingSignup.name:(($('su-name')?$('su-name').value:'').trim());
+    var email=(pendingSignup&&fromResend)?pendingSignup.email:(($('su-email')?$('su-email').value:'').trim().toLowerCase());
+    var pw=(pendingSignup&&fromResend)?pendingSignup.pw:($('su-pw')?$('su-pw').value:'');
+    var pw2=(pendingSignup&&fromResend)?pendingSignup.pw:($('su-pw2')?$('su-pw2').value:'');
     var e=$('su-err');
     e.style.color='var(--red)';e.textContent='';
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){e.textContent='Please enter a valid Email ID.';return}
-    if(pw.length<6){e.textContent='Password must be at least 6 characters.';return}
-    if(pw!==pw2){e.textContent='Passwords do not match.';return}
-    $('su-go').disabled=true;$('su-go').textContent='Creating account...';
-    var oauthRedirect=getOAuthRedirectUrl();
-    api('email_signup',{p_email:email,p_password:pw,p_name:name})
-      .then(function(r){
-        $('su-pw').value='';$('su-pw2').value='';
-        resetPasswordToggle('su-show-pw',['su-pw','su-pw2']);
-        refreshSignupMatch();
-        toast('Account created! +20 Welcome Coins credited.');
-        applySessionLogin(r);
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){e.textContent='Please enter a valid Email ID.';return;}
+    if(pw.length<6){e.textContent='Password must be at least 6 characters.';return;}
+    if(pw!==pw2){e.textContent='Passwords do not match.';return;}
+
+    var triggerBtn=fromResend?$('su-resend-otp'):$('su-go');
+    if(triggerBtn){
+      triggerBtn.disabled=true;
+      triggerBtn.textContent=fromResend?'Sending...':'Sending OTP...';
+    }
+    api('request_signup_otp',{p_email:email,p_password:pw,p_name:name})
+      .then(function(otpRes){
+        return dispatchOtpEmailViaNativeOrEdge(otpRes).then(function(){
+          return otpRes;
+        });
+      })
+      .then(function(otpRes){
+        pendingSignup={name:name,email:email,pw:pw};
+        showSignupStep(2);
+        if($('su-otp')){$('su-otp').value='';$('su-otp').focus();}
+        var fromEmail=(otpRes&&otpRes.smtp&&otpRes.smtp.sender_email)||'supportplay2win@gmail.com';
+        if($('su-otp-sent-to'))$('su-otp-sent-to').textContent='6-digit OTP sent to '+email+' from '+fromEmail+' (check Inbox or Spam · valid 10 min).';
+        startResendCooldown(30);
+        toast('6-digit OTP sent to '+email);
       })
       .catch(function(rpcErr){
         var msg=(rpcErr&&rpcErr.message)||'';
-        var missingFn=/Could not find the function|schema cache/i.test(msg);
-        if(!missingFn)throw rpcErr;
-        if(!supa||!supa.auth||!supa.auth.signUp){
-          throw new Error('Signup setup pending: Run supabase_email_signup.sql in the Supabase SQL Editor.');
+        if(/Could not find the function|schema cache/i.test(msg)){
+          msg='Signup OTP setup pending: Run supabase_email_signup.sql in the Supabase SQL Editor.';
         }
-        return supa.auth.signUp({
-          email:email,
-          password:pw,
-          options:{
-            data:{full_name:name||email.split('@')[0],name:name||email.split('@')[0]},
-            emailRedirectTo:oauthRedirect
-          }
-        }).then(function(res){
-          if(res.error)throw res.error;
-          if(res.data&&res.data.session){
-            return exchangeSupabaseJwtForWallet(res.data.session).then(function(r){
-              $('su-pw').value='';$('su-pw2').value='';
-              resetPasswordToggle('su-show-pw',['su-pw','su-pw2']);
-              refreshSignupMatch();
-              toast('Account created!');
-              applySessionLogin(r);
-            });
-          }
-          $('su-pw').value='';$('su-pw2').value='';
-          resetPasswordToggle('su-show-pw',['su-pw','su-pw2']);
-          refreshSignupMatch();
-          e.style.color='var(--green)';
-          e.textContent='Account created! Click the verification link sent to '+email+', then log in.';
-          if($('a-id'))$('a-id').value=email;
-        });
-      })
-      .catch(function(x){
         e.style.color='var(--red)';
-        e.textContent=normalizeAuthError(x&&x.message)||'Could not create account.';
+        e.textContent=normalizeAuthError(msg)||'Could not send OTP email.';
       })
       .then(function(){
-        $('su-go').disabled=false;$('su-go').textContent='Create Account';
+        if($('su-go')){$('su-go').disabled=false;$('su-go').textContent='Send 6-Digit OTP';}
+        if(fromResend&&suResendLeft<=0&&$('su-resend-otp')){$('su-resend-otp').disabled=false;$('su-resend-otp').textContent='Resend OTP';}
+      });
+  }
+
+  if($('su-go'))$('su-go').onclick=function(){sendSignupOtpFlow(false);};
+  if($('su-resend-otp'))$('su-resend-otp').onclick=function(){
+    if(suResendLeft>0)return;
+    sendSignupOtpFlow(true);
+  };
+  if($('su-change-email'))$('su-change-email').onclick=function(){
+    pendingSignup=null;
+    if($('su-otp'))$('su-otp').value='';
+    if($('su-err'))$('su-err').textContent='';
+    showSignupStep(1);
+  };
+  if($('su-otp')){
+    $('su-otp').addEventListener('input',function(){
+      this.value=this.value.replace(/\D+/g,'').slice(0,6);
+    });
+    $('su-otp').addEventListener('keydown',function(ev){
+      if(ev.key==='Enter'&&$('su-verify-go')){ev.preventDefault();$('su-verify-go').click();}
+    });
+  }
+  if($('su-verify-go'))$('su-verify-go').onclick=function(){
+    var e=$('su-err');
+    e.style.color='var(--red)';e.textContent='';
+    if(!pendingSignup){
+      e.textContent='Please enter your Email ID and tap Send 6-Digit OTP first.';
+      showSignupStep(1);
+      return;
+    }
+    var otp=($('su-otp')?$('su-otp').value:'').replace(/\D+/g,'');
+    if(!/^\d{6}$/.test(otp)){
+      e.textContent='Please enter the 6-digit OTP sent to '+pendingSignup.email+'.';
+      return;
+    }
+    $('su-verify-go').disabled=true;$('su-verify-go').textContent='Verifying OTP...';
+    api('verify_signup_otp_and_create',{
+      p_email:pendingSignup.email,
+      p_otp:otp,
+      p_password:pendingSignup.pw,
+      p_name:pendingSignup.name
+    })
+      .then(function(r){
+        pendingSignup=null;
+        if($('su-otp'))$('su-otp').value='';
+        if($('su-pw'))$('su-pw').value='';
+        if($('su-pw2'))$('su-pw2').value='';
+        resetPasswordToggle('su-show-pw',['su-pw','su-pw2']);
+        refreshSignupMatch();
+        showSignupStep(1);
+        toast('Email verified! Account created · +20 Welcome Coins credited.');
+        applySessionLogin(r);
+      })
+      .catch(function(x){
+        var msg=(x&&x.message)||'Invalid or expired OTP.';
+        if(/Could not find the function|schema cache/i.test(msg)){
+          msg='Signup OTP setup pending: Run supabase_email_signup.sql in the Supabase SQL Editor.';
+        }
+        e.style.color='var(--red)';
+        e.textContent=normalizeAuthError(msg);
+      })
+      .then(function(){
+        if($('su-verify-go')){$('su-verify-go').disabled=false;$('su-verify-go').textContent='Verify OTP & Create Account';}
       });
   };
   ['su-name','su-email','su-pw','su-pw2'].forEach(function(fid){
@@ -3382,7 +3530,14 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
         }
         setBulkBusy(false);
         loadUsers();
-        if(opts&&opts.reloadRefs&&window.Play2WinLoadAdminReferrals)window.Play2WinLoadAdminReferrals();
+        if(opts&&opts.reloadAll){
+          loadDepositRequests();
+          loadWithdrawalRequests();
+          if(typeof loadBets==='function')loadBets();
+          if(window.Play2WinLoadAdminReferrals)window.Play2WinLoadAdminReferrals();
+        }else if(opts&&opts.reloadRefs&&window.Play2WinLoadAdminReferrals){
+          window.Play2WinLoadAdminReferrals();
+        }
         var msg=label+': '+ok+'/'+ids.length+' users updated.';
         if(fail>0)msg+=' Failed: '+fail+(lastErr?' ('+lastErr+')':'');
         toast(msg);
@@ -3443,8 +3598,16 @@ tr.is-selected td{background:rgba(255,201,77,.09)}
   if($('admin-bulk-delete'))$('admin-bulk-delete').onclick=function(){
     var ids=getSelectedUserIds();
     if(!ids.length){toast('Please select at least 1 user first.');return;}
-    if(!confirm('Delete '+ids.length+' selected user(s)? This cannot be undone.'))return;
-    runBulkUserAction('Deleted',function(uid){return api('admin_delete_user',{p_token:S.token,p_id:uid});},{clearAfter:true});
+    if(!confirm('Delete '+ids.length+' selected user(s) and ALL their data from every database table? This cannot be undone.'))return;
+    runBulkUserAction('Deleted',function(uid){
+      return api('admin_delete_user_full',{p_token:S.token,p_id:uid}).catch(function(err){
+        var msg=String((err&&err.message)||err||'');
+        if(/Could not find the function|PGRST202|404/i.test(msg)){
+          throw new Error('Please run supabase_admin_delete_user_full.sql in Supabase SQL Editor first to delete user data from every table.');
+        }
+        throw err;
+      });
+    },{clearAfter:true,reloadAll:true});
   };
 
   function loadUsers(){

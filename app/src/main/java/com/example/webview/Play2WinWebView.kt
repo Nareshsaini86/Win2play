@@ -34,7 +34,9 @@ import androidx.webkit.WebViewFeature
 import com.example.BuildConfig
 import com.example.R
 import java.io.IOException
+import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
+import org.json.JSONObject
 
 const val APP_ASSET_HOST = "appassets.androidplatform.net"
 const val APP_START_URL = "https://$APP_ASSET_HOST/www/index.html"
@@ -58,6 +60,8 @@ class Play2WinNativeBridge(
   private val onGameFullscreenChanged: (Boolean) -> Unit,
 ) {
   private val mainHandler = Handler(Looper.getMainLooper())
+  private val mailExecutor = Executors.newCachedThreadPool()
+  var onEvaluateJs: ((String) -> Unit)? = null
 
   @JavascriptInterface
   fun isNativeApp(): Boolean = true
@@ -152,6 +156,42 @@ class Play2WinNativeBridge(
   fun onGoogleAuthError(reason: String?) {
     val clean = reason.orEmpty().trim().ifEmpty { "google_error" }
     mainHandler.post { onGoogleErrorDetected?.invoke(clean) }
+  }
+
+  @JavascriptInterface
+  fun sendSignupOtpEmail(
+    callbackId: String?,
+    toEmail: String?,
+    recipientName: String?,
+    otpCode: String?,
+    smtpHost: String?,
+    smtpPort: Int,
+    senderEmail: String?,
+    senderName: String?,
+    smtpPassword: String?,
+  ) {
+    val cbId = callbackId.orEmpty()
+    mailExecutor.execute {
+      val result =
+        SmtpOtpMailer.sendOtpEmail(
+          host = smtpHost.orEmpty().ifEmpty { "smtp.gmail.com" },
+          port = smtpPort,
+          senderEmail = senderEmail.orEmpty(),
+          senderName = senderName.orEmpty().ifEmpty { "Play2Win" },
+          smtpPassword = smtpPassword.orEmpty(),
+          toEmail = toEmail.orEmpty(),
+          recipientName = recipientName.orEmpty(),
+          otpCode = otpCode.orEmpty(),
+        )
+      val json =
+        JSONObject()
+          .put("success", result.success)
+          .put("error", result.errorMessage ?: "")
+          .toString()
+      val script =
+        "window.__p2wOtpMailCb && window.__p2wOtpMailCb(${JSONObject.quote(cbId)}, $json);"
+      mainHandler.post { onEvaluateJs?.invoke(script) }
+    }
   }
 }
 
@@ -253,6 +293,9 @@ fun createConfiguredWebView(
     nativeBridge.onGoogleErrorDetected = { reason ->
       stopLoading()
       loadUrl("$APP_START_URL?google_error=${Uri.encode(reason)}")
+    }
+    nativeBridge.onEvaluateJs = { script ->
+      post { evaluateJavascript(script, null) }
     }
     addJavascriptInterface(nativeBridge, "Play2WinNative")
 

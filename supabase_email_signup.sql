@@ -1,8 +1,10 @@
--- Play2Win Self-Service Email + Password Sign Up, Login & Password Change (Supabase SQL Migration)
+-- Play2Win Self-Service Email + Password Sign Up (with 6-Digit Email OTP Verification), Login & Password Change
 -- Run this script once in your Supabase Dashboard -> SQL Editor.
--- Fixes:
---   1. null value in column "pw" of relation "app_users" violates not-null constraint
---   2. new row for relation "app_users" violates check constraint "app_users_id_check"
+-- Includes:
+--   1. public.email_smtp_settings table storing sender Gmail + password for OTP emails
+--   2. public.email_signup_otps table storing 6-digit signup verification OTPs (10 min expiry, attempt limits)
+--   3. request_signup_otp / verify_signup_otp_and_create RPCs (user is only created after 6-digit OTP verification)
+--   4. email_login & email_change_password RPCs
 
 create extension if not exists pgcrypto;
 
@@ -13,6 +15,45 @@ create table if not exists public.email_auth_accounts (
   password_hash text not null,
   created_at timestamptz not null default now()
 );
+
+create table if not exists public.email_smtp_settings (
+  id integer primary key default 1 check (id = 1),
+  sender_email text not null,
+  smtp_password text not null,
+  smtp_host text not null default 'smtp.gmail.com',
+  smtp_port integer not null default 465,
+  sender_name text not null default 'Play2Win',
+  updated_at timestamptz not null default now()
+);
+
+insert into public.email_smtp_settings (id, sender_email, smtp_password, smtp_host, smtp_port, sender_name, updated_at)
+values (1, 'supportplay2win@gmail.com', 'NSProl@8685', 'smtp.gmail.com', 465, 'Play2Win', now())
+on conflict (id) do update
+set sender_email = excluded.sender_email,
+    smtp_password = excluded.smtp_password,
+    smtp_host = excluded.smtp_host,
+    smtp_port = excluded.smtp_port,
+    sender_name = excluded.sender_name,
+    updated_at = now();
+
+create table if not exists public.email_signup_otps (
+  email text primary key,
+  otp_code text not null,
+  display_name text not null default '',
+  password_hash text not null,
+  attempts integer not null default 0,
+  expires_at timestamptz not null,
+  last_sent_at timestamptz not null default now(),
+  verified_at timestamptz
+);
+
+alter table public.email_auth_accounts enable row level security;
+alter table public.email_smtp_settings enable row level security;
+alter table public.email_signup_otps enable row level security;
+
+revoke all on public.email_auth_accounts from anon, authenticated;
+revoke all on public.email_smtp_settings from anon, authenticated;
+revoke all on public.email_signup_otps from anon, authenticated;
 
 create or replace function public._p2w_detect_auth_schema()
 returns table(users_table text, balance_col text, sessions_table text)
@@ -33,7 +74,7 @@ begin
     on c.table_schema = t.table_schema and c.table_name = t.table_name
   where t.table_type = 'BASE TABLE'
     and t.table_schema not in ('pg_catalog','information_schema','auth','storage','realtime','supabase_functions','vault','extensions')
-    and t.table_name not in ('referral_settings','user_referrals','referral_events','email_auth_accounts')
+    and t.table_name not in ('referral_settings','user_referrals','referral_events','email_auth_accounts','email_smtp_settings','email_signup_otps')
   group by t.table_schema, t.table_name
   having bool_or(c.column_name = 'id')
      and bool_or(c.column_name in ('balance','coins','credits'))
@@ -99,9 +140,9 @@ begin
 end;
 $$;
 
-create or replace function public.email_signup(
+create or replace function public._p2w_create_verified_email_user(
   p_email text,
-  p_password text,
+  p_pw_hash text,
   p_name text default ''
 )
 returns jsonb
@@ -117,7 +158,6 @@ declare
   v_sess_name text;
   v_email text;
   v_name text;
-  v_pw_hash text;
   v_id_type text;
   v_user_id text;
   v_existing_id text;
@@ -136,10 +176,6 @@ begin
   v_email := lower(trim(coalesce(p_email, '')));
   if v_email !~ '^[^@\s]+@[^@\s]+\.[^@\s]{2,}$' then
     raise exception 'Please enter a valid Email ID.';
-  end if;
-
-  if length(coalesce(p_password, '')) < 6 then
-    raise exception 'Password must be at least 6 characters.';
   end if;
 
   if exists (select 1 from public.email_auth_accounts where email = v_email) then
@@ -168,8 +204,6 @@ begin
     v_name := split_part(v_email, '@', 1);
   end if;
 
-  v_pw_hash := crypt(p_password, gen_salt('bf'));
-
   select data_type into v_id_type
   from information_schema.columns
   where table_schema = v_users_schema and table_name = v_users_name and column_name = 'id';
@@ -177,7 +211,6 @@ begin
   if v_id_type = 'uuid' then
     v_candidates := array[gen_random_uuid()::text];
   else
-    -- Generate compact alphanumeric / underscore / numeric IDs that satisfy app_users_id_check
     v_candidates := array[
       'u' || substr(md5(v_email || ':' || clock_timestamp()::text || random()::text), 1, 7),
       'u' || substr(md5(v_email || ':' || random()::text), 1, 5),
@@ -226,7 +259,7 @@ begin
         v_vals := array_append(v_vals, quote_literal(v_name));
       elsif v_col_rec.column_name in ('pw', 'password_hash', 'pw_hash', 'password') then
         v_cols := array_append(v_cols, format('%I', v_col_rec.column_name));
-        v_vals := array_append(v_vals, quote_literal(v_pw_hash));
+        v_vals := array_append(v_vals, quote_literal(p_pw_hash));
       elsif v_col_rec.column_name = 'salt' then
         v_cols := array_append(v_cols, 'salt');
         v_vals := array_append(v_vals, quote_literal(''));
@@ -285,7 +318,7 @@ begin
   end if;
 
   insert into public.email_auth_accounts (email, user_id, display_name, password_hash)
-  values (v_email, v_user_id, v_name, v_pw_hash);
+  values (v_email, v_user_id, v_name, p_pw_hash);
 
   v_token := encode(gen_random_bytes(24), 'hex');
 
@@ -312,6 +345,206 @@ begin
     'email', v_email,
     'display_name', v_name
   );
+end;
+$$;
+
+create or replace function public.request_signup_otp(
+  p_email text,
+  p_password text,
+  p_name text default ''
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+declare
+  v_schema record;
+  v_users_schema text;
+  v_users_name text;
+  v_email text;
+  v_name text;
+  v_pw_hash text;
+  v_existing_id text;
+  v_prev public.email_signup_otps;
+  v_smtp public.email_smtp_settings;
+  v_rand bytea;
+  v_rand_num bigint;
+  v_otp text;
+begin
+  v_email := lower(trim(coalesce(p_email, '')));
+  if v_email !~ '^[^@\s]+@[^@\s]+\.[^@\s]{2,}$' then
+    raise exception 'Please enter a valid Email ID.';
+  end if;
+
+  if length(coalesce(p_password, '')) < 6 then
+    raise exception 'Password must be at least 6 characters.';
+  end if;
+
+  if exists (select 1 from public.email_auth_accounts where email = v_email) then
+    raise exception 'An account with this Email ID already exists. Please log in.';
+  end if;
+
+  select * into v_schema from public._p2w_detect_auth_schema();
+  v_users_schema := replace(split_part(v_schema.users_table, '.', 1), '"', '');
+  v_users_name := replace(split_part(v_schema.users_table, '.', 2), '"', '');
+
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = v_users_schema and table_name = v_users_name and column_name = 'email'
+  ) then
+    execute format('select id::text from %s where lower(email) = $1 limit 1', v_schema.users_table)
+      into v_existing_id using v_email;
+    if v_existing_id is not null then
+      raise exception 'An account with this Email ID already exists. Please log in.';
+    end if;
+  end if;
+
+  select * into v_prev from public.email_signup_otps where email = v_email;
+  if found and v_prev.last_sent_at > now() - interval '25 seconds' then
+    return jsonb_build_object(
+      'success', false,
+      'message', 'Please wait ' || greatest(1, ceil(extract(epoch from (v_prev.last_sent_at + interval '25 seconds' - now())))::int) || 's before requesting another OTP.'
+    );
+  end if;
+
+  select * into v_smtp from public.email_smtp_settings where id = 1;
+  if not found or coalesce(v_smtp.sender_email, '') = '' or coalesce(v_smtp.smtp_password, '') = '' then
+    raise exception 'Email sender settings are missing in database (email_smtp_settings).';
+  end if;
+
+  v_name := trim(coalesce(p_name, ''));
+  if v_name = '' then
+    v_name := split_part(v_email, '@', 1);
+  end if;
+
+  v_pw_hash := crypt(p_password, gen_salt('bf'));
+  v_rand := gen_random_bytes(4);
+  v_rand_num := (
+    get_byte(v_rand, 0)::bigint * 16777216 +
+    get_byte(v_rand, 1)::bigint * 65536 +
+    get_byte(v_rand, 2)::bigint * 256 +
+    get_byte(v_rand, 3)::bigint
+  ) % 900000;
+  v_otp := lpad((100000 + v_rand_num)::text, 6, '0');
+
+  insert into public.email_signup_otps (email, otp_code, display_name, password_hash, attempts, expires_at, last_sent_at, verified_at)
+  values (v_email, v_otp, v_name, v_pw_hash, 0, now() + interval '10 minutes', now(), null)
+  on conflict (email) do update
+  set otp_code = excluded.otp_code,
+      display_name = excluded.display_name,
+      password_hash = excluded.password_hash,
+      attempts = 0,
+      expires_at = excluded.expires_at,
+      last_sent_at = now(),
+      verified_at = null;
+
+  return jsonb_build_object(
+    'ok', true,
+    'email', v_email,
+    'display_name', v_name,
+    'otp', v_otp,
+    'expires_in_sec', 600,
+    'smtp', jsonb_build_object(
+      'host', v_smtp.smtp_host,
+      'port', v_smtp.smtp_port,
+      'sender_email', v_smtp.sender_email,
+      'sender_name', v_smtp.sender_name,
+      'smtp_password', v_smtp.smtp_password
+    )
+  );
+end;
+$$;
+
+create or replace function public.verify_signup_otp_and_create(
+  p_email text,
+  p_otp text,
+  p_password text default null,
+  p_name text default ''
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+declare
+  v_email text;
+  v_otp text;
+  v_rec public.email_signup_otps;
+  v_pw_hash text;
+  v_name text;
+  v_res jsonb;
+begin
+  v_email := lower(trim(coalesce(p_email, '')));
+  v_otp := regexp_replace(trim(coalesce(p_otp, '')), '\s+', '', 'g');
+
+  if v_email !~ '^[^@\s]+@[^@\s]+\.[^@\s]{2,}$' then
+    return jsonb_build_object('success', false, 'message', 'Please enter a valid Email ID.');
+  end if;
+
+  if v_otp !~ '^\d{6}$' then
+    return jsonb_build_object('success', false, 'message', 'Please enter the 6-digit OTP sent to your email.');
+  end if;
+
+  select * into v_rec from public.email_signup_otps where email = v_email;
+  if not found then
+    return jsonb_build_object('success', false, 'message', 'No active OTP found for this email. Please tap Send OTP first.');
+  end if;
+
+  if v_rec.expires_at < now() then
+    return jsonb_build_object('success', false, 'message', 'OTP has expired. Please tap Resend OTP.');
+  end if;
+
+  if v_rec.attempts >= 5 then
+    return jsonb_build_object('success', false, 'message', 'Too many incorrect OTP attempts. Please request a new OTP.');
+  end if;
+
+  if v_rec.otp_code <> v_otp then
+    update public.email_signup_otps
+    set attempts = attempts + 1
+    where email = v_email;
+    return jsonb_build_object(
+      'success', false,
+      'message', 'Invalid 6-digit OTP. ' || greatest(0, 4 - v_rec.attempts) || ' attempts left.'
+    );
+  end if;
+
+  v_pw_hash := case
+    when length(coalesce(p_password, '')) >= 6 then crypt(p_password, gen_salt('bf'))
+    else v_rec.password_hash
+  end;
+  v_name := coalesce(nullif(trim(coalesce(p_name, '')), ''), nullif(v_rec.display_name, ''), split_part(v_email, '@', 1));
+
+  v_res := public._p2w_create_verified_email_user(v_email, v_pw_hash, v_name);
+  delete from public.email_signup_otps where email = v_email;
+
+  return v_res;
+end;
+$$;
+
+drop function if exists public.email_signup(text, text, text);
+
+create or replace function public.email_signup(
+  p_email text,
+  p_password text,
+  p_name text default '',
+  p_otp text default null
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+begin
+  if trim(coalesce(p_otp, '')) = '' then
+    return jsonb_build_object(
+      'success', false,
+      'otp_required', true,
+      'message', 'Email OTP verification is required before creating a new account.'
+    );
+  end if;
+
+  return public.verify_signup_otp_and_create(p_email, p_otp, p_password, p_name);
 end;
 $$;
 
@@ -464,7 +697,9 @@ begin
 end;
 $$;
 
-grant execute on function public.email_signup(text, text, text) to anon, authenticated;
+grant execute on function public.request_signup_otp(text, text, text) to anon, authenticated;
+grant execute on function public.verify_signup_otp_and_create(text, text, text, text) to anon, authenticated;
+grant execute on function public.email_signup(text, text, text, text) to anon, authenticated;
 grant execute on function public.email_login(text, text) to anon, authenticated;
 grant execute on function public.email_change_password(text, text, text) to anon, authenticated;
 

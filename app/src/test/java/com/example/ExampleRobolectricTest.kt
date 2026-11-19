@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.test.core.app.ApplicationProvider
 import com.example.webview.APP_START_URL
 import com.example.webview.Play2WinNativeBridge
+import com.example.webview.SmtpOtpMailer
 import com.example.webview.extractInAppRedirectUrl
 import com.example.webview.shouldKeepUrlInWebView
 import java.util.concurrent.atomic.AtomicBoolean
@@ -60,11 +61,16 @@ class ExampleRobolectricTest {
     assertTrue(html.contains("id=\"su-pw\""))
     assertTrue(html.contains("id=\"su-go\""))
     assertTrue(html.contains("id=\"su-show-pw\""))
+    assertTrue(html.contains("id=\"su-otp-box\""))
+    assertTrue(html.contains("id=\"su-otp\""))
+    assertTrue(html.contains("id=\"su-verify-go\""))
+    assertTrue(html.contains("id=\"su-resend-otp\""))
+    assertTrue(html.contains("request_signup_otp"))
+    assertTrue(html.contains("verify_signup_otp_and_create"))
+    assertTrue(html.contains("sendSignupOtpEmail"))
     assertTrue(html.contains("id=\"a-show-pw\""))
     assertTrue(html.contains("id=\"pw-show\""))
     assertTrue(html.contains("id=\"su-match\""))
-    assertTrue(html.contains("email_signup"))
-    assertTrue(html.contains("j.success===false"))
     assertTrue(html.contains("else if(id.indexOf('@')>0)"))
     assertTrue(html.contains("function normalizeAuthError"))
     assertTrue(html.contains("data-open-route=\"aviator\""))
@@ -111,6 +117,7 @@ class ExampleRobolectricTest {
     assertTrue(html.contains("id=\"admin-bulk-network-on\""))
     assertTrue(html.contains("id=\"admin-bulk-reset-pw\""))
     assertTrue(html.contains("id=\"admin-bulk-delete\""))
+    assertTrue(html.contains("admin_delete_user_full"))
     assertFalse(html.contains("admin-user-actions"))
     assertTrue(html.contains("id=\"p2w-update-modal\""))
     assertTrue(html.contains("id=\"p2w-upd-go\""))
@@ -336,5 +343,41 @@ class ExampleRobolectricTest {
     assertTrue(canPull.get())
     assertEquals(false, lastLockCallback)
     assertEquals(false, lastFullscreenCallback)
+  }
+
+  @Test
+  fun `smtp otp mailer validates 6-digit otp and builds proper rfc5322 email`() {
+    val invalidRes =
+      SmtpOtpMailer.sendOtpEmail(
+        host = "smtp.gmail.com",
+        port = 465,
+        senderEmail = "supportplay2win@gmail.com",
+        senderName = "Play2Win",
+        smtpPassword = "secret",
+        toEmail = "player@example.com",
+        recipientName = "Player One",
+        otpCode = "1234",
+      )
+    assertFalse(invalidRes.success)
+
+    val rawMsg =
+      SmtpOtpMailer.buildOtpEmailMessage(
+        senderEmail = "supportplay2win@gmail.com",
+        senderName = "Play2Win",
+        toEmail = "player@example.com",
+        recipientName = "Player One",
+        otpCode = "482913",
+      )
+    assertTrue(rawMsg.contains("From: Play2Win <supportplay2win@gmail.com>\r\n"))
+    assertTrue(rawMsg.contains("Reply-To: supportplay2win@gmail.com\r\n"))
+    assertTrue(rawMsg.contains("To: <player@example.com>\r\n"))
+    assertTrue(rawMsg.contains("Subject: Play2Win verification code: 482913\r\n"))
+    assertTrue(rawMsg.contains("Date: "))
+    assertTrue(rawMsg.contains("Message-ID: <"))
+    assertTrue(rawMsg.contains("Content-Type: multipart/alternative; boundary="))
+    assertTrue(rawMsg.contains("Content-Type: text/plain; charset=UTF-8"))
+    assertTrue(rawMsg.contains("Content-Type: text/html; charset=UTF-8"))
+    assertTrue(rawMsg.contains("482913"))
+    assertTrue(rawMsg.contains("Player One"))
   }
 }
